@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:front/pages/service_cortestilo_page.dart'; // Para la primera card
+import 'package:front/pages/service_barba_page.dart'; // Para la segunda card
+import 'package:front/pages/service_estilostratamiento_page.dart'; //Para la tercera card
 
 class ServiciosSection extends StatelessWidget {
   final GlobalKey keyServicios;
@@ -41,23 +44,51 @@ class ServiciosSection extends StatelessWidget {
             runSpacing: 30,
             alignment: WrapAlignment.center,
             children: [
+              // Corte & Estilo → ServiceCorteEstiloPage
               _ServicioCard(
-                imagePath: 'assets/imag/1.png', //Imagen de opciones
+                imagePath: 'assets/imag/1.png',
                 title: 'Corte & Estilo',
                 description:
                     'Cortes clásicos, modernos y ejecutivos adaptados a tu personalidad. Precisión, técnica y estilo en cada visita.',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ServiceCorteEstiloPage(),
+                    ),
+                  );
+                },
               ),
+
+              // Barba & Afeitado → ServiceBarbaPage
               _ServicioCard(
-                imagePath: 'assets/imag/4.png', //Imagen de opciones
+                imagePath: 'assets/imag/4.png',
                 title: 'Barba & Afeitado',
                 description:
                     'Perfilado, diseño y afeitado tradicional con toalla caliente. Cuida tu barba con detalle y estilo.',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ServiceBarbaPage()),
+                  );
+                },
               ),
+
+              // Tratamientos & Cuidado Especial → sin navegación
               _ServicioCard(
-                imagePath: 'assets/imag/5.png', //Imagen de opciones
+                imagePath: 'assets/imag/5.png',
                 title: 'Tratamientos & Cuidado Especial',
                 description:
                     'Faciales y tratamientos capilares que revitalizan tu piel y cabello. Bienestar y frescura en cada sesión.',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ServiceEstilostratamientoPage(),
+                    ),
+                  );
+                },
+                // onTap: null (queda estática)
               ),
             ],
           ),
@@ -71,15 +102,72 @@ class _ServicioCard extends StatelessWidget {
   final String imagePath;
   final String title;
   final String description;
+  final VoidCallback? onTap;
 
   const _ServicioCard({
+    Key? key,
     required this.imagePath,
     required this.title,
     required this.description,
-  });
+    this.onTap,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final card = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(10),
+            topRight: Radius.circular(10),
+          ),
+          child: Image.asset(
+            imagePath,
+            width: double.infinity,
+            height: 180,
+            fit: BoxFit.cover,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(15),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Georgia',
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                description,
+                style: const TextStyle(
+                  fontSize: 14,
+                  height: 1.5,
+                  fontFamily: 'Georgia',
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Ver más >',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Georgia',
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+
+    // Si nos pasaron onTap, hacemos todo el card clickeable:
     return Container(
       width: 300,
       decoration: BoxDecoration(
@@ -93,58 +181,7 @@ class _ServicioCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(10),
-              topRight: Radius.circular(10),
-            ),
-            child: Image.asset(
-              imagePath,
-              width: double.infinity,
-              height: 180,
-              fit: BoxFit.cover,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(15),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Georgia',
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  description,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    height: 1.5,
-                    fontFamily: 'Georgia',
-                  ),
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  'Ver más >',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Georgia',
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+      child: onTap != null ? InkWell(onTap: onTap, child: card) : card,
     );
   }
 }
