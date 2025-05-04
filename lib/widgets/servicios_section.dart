@@ -84,7 +84,7 @@ class ServiciosSection extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const ServiceEstilostratamientoPage(),
+                      builder: (_) => const ServiceEstilosTratamientoPage(),
                     ),
                   );
                 },

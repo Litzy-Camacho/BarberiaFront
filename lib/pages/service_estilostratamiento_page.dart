@@ -1,31 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:front/pages/login_page.dart';
-import 'home_page.dart';
+import 'package:front/pages/appointment_form_page.dart';
+import 'package:front/widgets/service_nav_bar.dart';
 
-class ServiceEstilostratamientoPage extends StatelessWidget {
-  const ServiceEstilostratamientoPage({Key? key}) : super(key: key);
+class ServiceEstilosTratamientoPage extends StatelessWidget {
+  const ServiceEstilosTratamientoPage({Key? key}) : super(key: key);
 
   final List<Map<String, String>> _services = const [
     {
       'image': 'assets/imag/3.png',
-      'title': 'Estilo & Diseño',
+      'title': 'Facial Revitalizante',
       'description':
-          'Este servicio ofrece un corte tradicional realizado con la combinación perfecta de tijera y máquina.',
-      'price': '200',
+          'Limpieza facial profunda con mascarillas naturales y vapor.',
+      'price': '220',
     },
     {
       'image': 'assets/imag/3.png',
-      'title': 'Corte  & Estilo',
+      'title': 'Tratamiento Capilar',
       'description':
-          'Este servicio ofrece perfilado, diseño y afeitado tradicional con toalla caliente.',
-      'price': '150',
+          'Nutrición intensa para cuero cabelludo y cabello con aceites naturales.',
+      'price': '210',
     },
     {
       'image': 'assets/imag/3.png',
-      'title': 'Corte & Estilo',
+      'title': 'Cuidado Total',
       'description':
-          'Faciales y tratamientos capilares que revitalizan tu piel y tu cabello.',
-      'price': '250',
+          'Combinación de limpieza facial, masaje y tratamiento capilar.',
+      'price': '300',
     },
   ];
 
@@ -70,12 +71,11 @@ class ServiceEstilostratamientoPage extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const LoginPage()),
-              );
-            },
+            onPressed:
+                () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginPage()),
+                ),
             child: const Text(
               'Iniciar Sesión',
               style: TextStyle(color: Colors.white),
@@ -87,26 +87,8 @@ class ServiceEstilostratamientoPage extends StatelessWidget {
       body: Column(
         children: [
           const SizedBox(height: 30),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            decoration: BoxDecoration(
-              color: Colors.black,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Wrap(
-              spacing: 20,
-              children: [
-                Text('Corte & Estilo', style: TextStyle(color: Colors.white)),
-                Text('|', style: TextStyle(color: Colors.white54)),
-                Text('Barba & Afeitado', style: TextStyle(color: Colors.white)),
-                Text('|', style: TextStyle(color: Colors.white54)),
-                Text(
-                  'Tratamientos & Cuidado especial',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ],
-            ),
-          ),
+          // Pestaña activa = 2
+          const ServiceNavBar(currentIndex: 2),
           const SizedBox(height: 40),
           Expanded(
             child: Padding(
@@ -117,14 +99,18 @@ class ServiceEstilostratamientoPage extends StatelessWidget {
                 crossAxisSpacing: 30,
                 childAspectRatio: 300 / 220,
                 children:
-                    _services.followedBy(_services).take(9).map((svc) {
-                      return _ServiceCard(
-                        imagePath: svc['image']!,
-                        title: svc['title']!,
-                        description: svc['description']!,
-                        price: svc['price']!,
-                      );
-                    }).toList(),
+                    _services
+                        .followedBy(_services)
+                        .take(9)
+                        .map(
+                          (svc) => _ServiceCard(
+                            imagePath: svc['image']!,
+                            title: svc['title']!,
+                            description: svc['description']!,
+                            price: svc['price']!,
+                          ),
+                        )
+                        .toList(),
               ),
             ),
           ),
@@ -136,7 +122,6 @@ class ServiceEstilostratamientoPage extends StatelessWidget {
 
 class _ServiceCard extends StatelessWidget {
   final String imagePath, title, description, price;
-
   const _ServiceCard({
     Key? key,
     required this.imagePath,
@@ -144,14 +129,6 @@ class _ServiceCard extends StatelessWidget {
     required this.description,
     required this.price,
   }) : super(key: key);
-
-  void _reservarCita(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Función de reservar cita no implementada.'),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -229,7 +206,15 @@ class _ServiceCard extends StatelessWidget {
                           ),
                           textStyle: const TextStyle(fontSize: 12),
                         ),
-                        onPressed: () => _reservarCita(context),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (_) => AppointmentFormPage(service: title),
+                            ),
+                          );
+                        },
                         child: const Text('Reservar cita'),
                       ),
                     ],

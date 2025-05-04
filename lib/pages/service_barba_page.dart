@@ -1,27 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:front/pages/login_page.dart';
-import 'home_page.dart';
+import 'package:front/pages/appointment_form_page.dart';
+import 'package:front/widgets/service_nav_bar.dart';
 
 class ServiceBarbaPage extends StatelessWidget {
   const ServiceBarbaPage({Key? key}) : super(key: key);
 
   final List<Map<String, String>> _services = const [
     {
-      'image': 'assets/imag/1.png',
+      'image': 'assets/imag/4.png',
       'title': 'Perfilado de Barba',
       'description':
           'Diseño de barba con navaja, toalla caliente y aceites esenciales.',
       'price': '180',
     },
     {
-      'image': 'assets/imag/1.png',
+      'image': 'assets/imag/4.png',
       'title': 'Afeitado Clásico',
       'description':
           'Afeitado con espuma caliente, técnica tradicional y productos relajantes.',
       'price': '160',
     },
     {
-      'image': 'assets/imag/1.png',
+      'image': 'assets/imag/4.png',
       'title': 'Barba & Facial',
       'description':
           'Servicio combinado de arreglo de barba y limpieza facial profunda.',
@@ -87,26 +88,7 @@ class ServiceBarbaPage extends StatelessWidget {
       body: Column(
         children: [
           const SizedBox(height: 30),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            decoration: BoxDecoration(
-              color: Colors.black,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Wrap(
-              spacing: 20,
-              children: [
-                Text('Corte & Estilo', style: TextStyle(color: Colors.white)),
-                Text('|', style: TextStyle(color: Colors.white54)),
-                Text('Barba & Afeitado', style: TextStyle(color: Colors.white)),
-                Text('|', style: TextStyle(color: Colors.white54)),
-                Text(
-                  'Tratamientos & Cuidado especial',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ],
-            ),
-          ),
+          const ServiceNavBar(currentIndex: 1),
           const SizedBox(height: 40),
           Expanded(
             child: Padding(
@@ -144,14 +126,6 @@ class _ServiceCard extends StatelessWidget {
     required this.description,
     required this.price,
   }) : super(key: key);
-
-  void _reservarCita(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Función de reservar cita no implementada.'),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -229,7 +203,15 @@ class _ServiceCard extends StatelessWidget {
                           ),
                           textStyle: const TextStyle(fontSize: 12),
                         ),
-                        onPressed: () => _reservarCita(context),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (_) => AppointmentFormPage(service: title),
+                            ),
+                          );
+                        },
                         child: const Text('Reservar cita'),
                       ),
                     ],
