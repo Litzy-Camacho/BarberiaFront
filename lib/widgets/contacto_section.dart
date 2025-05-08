@@ -5,8 +5,7 @@ import 'package:visibility_detector/visibility_detector.dart';
 class ContactoSection extends StatefulWidget {
   final GlobalKey keyContacto;
 
-  const ContactoSection({Key? key, required this.keyContacto})
-    : super(key: key);
+  const ContactoSection({super.key, required this.keyContacto});
 
   @override
   State<ContactoSection> createState() => _ContactoSectionState();
@@ -164,8 +163,7 @@ class ContactoItem extends StatelessWidget {
   final IconData icon;
   final String title;
 
-  const ContactoItem({Key? key, required this.icon, required this.title})
-    : super(key: key);
+  const ContactoItem({super.key, required this.icon, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -192,8 +190,7 @@ class ContactInfoRow extends StatelessWidget {
   final IconData icon;
   final String text;
 
-  const ContactInfoRow({Key? key, required this.icon, required this.text})
-    : super(key: key);
+  const ContactInfoRow({super.key, required this.icon, required this.text});
 
   @override
   Widget build(BuildContext context) {

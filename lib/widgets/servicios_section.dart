@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 class ServiciosSection extends StatelessWidget {
   final GlobalKey keyServicios;
 
-  const ServiciosSection({Key? key, required this.keyServicios})
-    : super(key: key);
+  const ServiciosSection({super.key, required this.keyServicios});
 
   @override
   Widget build(BuildContext context) {

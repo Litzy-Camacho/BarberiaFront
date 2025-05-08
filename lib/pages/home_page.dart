@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:front/widgets/servicios_section.dart'; //Importación servicios para el App Bar (Barra Navegación HomePage)
 import 'package:front/widgets/contacto_section.dart'; //Importa contacto para el App Bar (Barra Navegación HomePage)
 import 'login_page.dart'; // Importa la página de Login
+import 'user_page.dart';
+import 'barber_page.dart';
+import 'admin_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -90,7 +93,7 @@ class _HomePageState extends State<HomePage> {
               //Aquí navega hacia la página de login
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const LoginPage()),
+                MaterialPageRoute(builder: (context) => const PantallaAdministrador()),
               );
             },
             child: const Text(
