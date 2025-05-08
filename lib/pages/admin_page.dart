@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'home_page.dart';
+
 
 class PantallaAdministrador extends StatefulWidget {
   const PantallaAdministrador({super.key});
@@ -11,8 +13,34 @@ class _PantallaAdministradorState extends State<PantallaAdministrador> {
   TextEditingController nombreController = TextEditingController();
   TextEditingController correoController = TextEditingController(text: 'admin@ejemplo.com');
 
-  List<DataRow> usuarios = [];
-  List<DataRow> barberos = [];
+  List<Map<String, dynamic>> usuarios = [];
+  List<Map<String, dynamic>> barberos = [];
+
+  List<DataRow> _buildUsuarioRows() {
+  return usuarios.asMap().entries.map((entry) {
+    final index = entry.key;
+    final usuario = entry.value;
+    return DataRow(cells: [
+      DataCell(Text(usuario['nombre'])),
+      DataCell(Text(usuario['correo'])),
+      DataCell(_buildActionButtons(index, true)),
+    ]);
+  }).toList();
+}
+
+List<DataRow> _buildBarberoRows() {
+  return barberos.asMap().entries.map((entry) {
+    final index = entry.key;
+    final barbero = entry.value;
+    return DataRow(cells: [
+      DataCell(Text(barbero['nombre'])),
+      DataCell(Text(barbero['correo'])),
+      DataCell(Text('\$${barbero['salario']}')),
+      DataCell(Text(barbero['status'])),
+      DataCell(_buildActionButtons(index, false)), // Enlazado correctamente con el índice y el tipo de entidad
+    ]);
+  }).toList();
+}
 
   int usuarioCount = 4;
   int barberoCount = 4;
@@ -21,26 +49,24 @@ class _PantallaAdministradorState extends State<PantallaAdministrador> {
   Color _textColor = Colors.black;
 
   @override
-  void initState() {
-    super.initState();
-    usuarios = List.generate(usuarioCount, (index) {
-      return DataRow(cells: [
-        DataCell(Text('Usuario ${index + 1}')),
-        DataCell(Text('usuario${index + 1}@mail.com')),
-        DataCell(_buildActionButtons()),
-      ]);
-    });
+void initState() {
+  super.initState();
+  usuarios = List.generate(usuarioCount, (index) {
+    return {
+      'nombre': 'Usuario ${index + 1}',
+      'correo': 'usuario${index + 1}@mail.com',
+    };
+  });
 
-    barberos = List.generate(barberoCount, (index) {
-      return DataRow(cells: [
-        DataCell(Text('Barbero ${index + 1}')),
-        DataCell(Text('barbero${index + 1}@mail.com')),
-        DataCell(Text('\$${1000 + index * 100}')),
-        DataCell(Text(index % 2 == 0 ? 'Activo' : 'Inactivo')),
-        DataCell(_buildActionButtons()),
-      ]);
-    });
-  }
+  barberos = List.generate(barberoCount, (index) {
+    return {
+      'nombre': 'Barbero ${index + 1}',
+      'correo': 'barbero${index + 1}@mail.com',
+      'salario': 1000 + index * 100,
+      'status': index % 2 == 0 ? 'Activo' : 'Inactivo',
+    };
+  });
+}
 
   @override
   void dispose() {
@@ -50,165 +76,313 @@ class _PantallaAdministradorState extends State<PantallaAdministrador> {
   }
 
   void _mostrarDialogoAgregarUsuario() {
-    final TextEditingController nuevoNombreController = TextEditingController();
-    final TextEditingController nuevoCorreoController = TextEditingController();
-    String? errorNombre;
-    String? errorCorreo;
+  final TextEditingController nuevoNombreController = TextEditingController();
+  final TextEditingController nuevoCorreoController = TextEditingController();
+  String? errorNombre;
+  String? errorCorreo;
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, setStateDialog) {
-            return _buildDialogoFormulario(
-              titulo: "Ingresa los siguientes datos",
-              nombreController: nuevoNombreController,
-              correoController: nuevoCorreoController,
-              errorNombre: errorNombre,
-              errorCorreo: errorCorreo,
-              onChangedNombre: (value) {
-                setStateDialog(() {
-                  errorNombre = _validarNombre(value);
-                });
-              },
-              onChangedCorreo: (value) {
-                setStateDialog(() {
-                  errorCorreo = _validarCorreo(value);
-                });
-              },
-              onPressedAceptar: () {
-                final nombre = nuevoNombreController.text;
-                final correo = nuevoCorreoController.text;
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (BuildContext context, setStateDialog) {
+          return _buildDialogoFormulario(
+            titulo: "Ingresa los siguientes datos",
+            nombreController: nuevoNombreController,
+            correoController: nuevoCorreoController,
+            errorNombre: errorNombre,
+            errorCorreo: errorCorreo,
+            onChangedNombre: (value) {
+              setStateDialog(() {
+                errorNombre = _validarNombre(value);
+              });
+            },
+            onChangedCorreo: (value) {
+              setStateDialog(() {
+                errorCorreo = _validarCorreo(value);
+              });
+            },
+            onPressedAceptar: () {
+              final nombre = nuevoNombreController.text;
+              final correo = nuevoCorreoController.text;
 
-                setStateDialog(() {
-                  errorNombre = _validarNombre(nombre);
-                  errorCorreo = _validarCorreo(correo);
-                });
+              setStateDialog(() {
+                errorNombre = _validarNombre(nombre);
+                errorCorreo = _validarCorreo(correo);
+              });
 
-                if (errorNombre == null && errorCorreo == null) {
-                  setState(() {
-                    usuarioCount++;
-                    usuarios.add(
-                      DataRow(cells: [
-                        DataCell(Text(nombre)),
-                        DataCell(Text(correo)),
-                        DataCell(_buildActionButtons()),
-                      ]),
-                    );
+              if (errorNombre == null && errorCorreo == null) {
+                setState(() {
+                  usuarioCount++;
+                  usuarios.add({
+                    'nombre': nombre,
+                    'correo': correo,
                   });
+                });
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Usuario añadido correctamente'), backgroundColor: Colors.green),
-                  );
-                  Navigator.of(context).pop();
-                }
-              },
-            );
-          },
-        );
-      },
-    );
-  }
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Usuario añadido correctamente'), backgroundColor: Colors.green),
+                );
+                Navigator.of(context).pop();
+              }
+            },
+          );
+        },
+      );
+    },
+  );
+}
 
-  void _mostrarDialogoAgregarBarbero() {
-    final TextEditingController nombreController = TextEditingController();
-    final TextEditingController correoController = TextEditingController();
-    final TextEditingController salarioController = TextEditingController();
+void _mostrarDialogoEditarUsuario(int index) {
+  final TextEditingController nombreController = TextEditingController(text: usuarios[index]['nombre']);
+  final TextEditingController correoController = TextEditingController(text: usuarios[index]['correo']);
+  String? errorNombre;
+  String? errorCorreo;
 
-    String? errorNombre;
-    String? errorCorreo;
-    String? errorSalario;
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (BuildContext context, setStateDialog) {
+          return _buildDialogoFormulario(
+            titulo: "Editar Usuario",
+            nombreController: nombreController,
+            correoController: correoController,
+            errorNombre: errorNombre,
+            errorCorreo: errorCorreo,
+            onChangedNombre: (value) {
+              setStateDialog(() {
+                errorNombre = _validarNombre(value);
+              });
+            },
+            onChangedCorreo: (value) {
+              setStateDialog(() {
+                errorCorreo = _validarCorreo(value);
+              });
+            },
+            onPressedAceptar: () {
+              final nombre = nombreController.text;
+              final correo = correoController.text;
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, setStateDialog) {
-            return Align(
-              alignment: Alignment.center,
-              child: AlertDialog(
-                backgroundColor: Colors.white,
-                title: const Center(child: Text("Agregar Barbero")),
-                content: SizedBox(
-                  width: 400,
-                  height: 300,
-                  child: Column(
-                    children: [
-                      _buildTextField(
-                        label: 'Nombre',
-                        controller: nombreController,
-                        errorText: errorNombre,
-                        onChanged: (value) {
-                          setStateDialog(() {
-                            errorNombre = _validarNombre(value);
-                          });
-                        },
-                      ),
-                      const SizedBox(height: 15),
-                      _buildTextField(
-                        label: 'Correo',
-                        controller: correoController,
-                        errorText: errorCorreo,
-                        onChanged: (value) {
-                          setStateDialog(() {
-                            errorCorreo = _validarCorreo(value);
-                          });
-                        },
-                      ),
-                      const SizedBox(height: 15),
-                      _buildTextField(
-                        label: 'Salario',
-                        controller: salarioController,
-                        keyboardType: TextInputType.number,
-                        errorText: errorSalario,
-                        onChanged: (value) {
-                          setStateDialog(() {
-                            errorSalario = _validarSalario(value);
-                          });
-                        },
-                      ),
-                      const SizedBox(height: 20),
-                      _buildBotonDialogo(() {
-                        final nombre = nombreController.text;
-                        final correo = correoController.text;
-                        final salario = salarioController.text;
+              setStateDialog(() {
+                errorNombre = _validarNombre(nombre);
+                errorCorreo = _validarCorreo(correo);
+              });
 
+              if (errorNombre == null && errorCorreo == null) {
+                setState(() {
+                  usuarios[index] = {
+                    'nombre': nombre,
+                    'correo': correo,
+                  };
+                });
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Usuario editado correctamente'), backgroundColor: Colors.green),
+                );
+                Navigator.of(context).pop();
+              }
+            },
+          );
+        },
+      );
+    },
+  );
+}
+
+void _mostrarDialogoEditarBarbero(int index) {
+  final TextEditingController nombreController = TextEditingController(text: barberos[index]['nombre']);
+  final TextEditingController correoController = TextEditingController(text: barberos[index]['correo']);
+  final TextEditingController salarioController = TextEditingController(text: barberos[index]['salario'].toString());
+  String? errorNombre;
+  String? errorCorreo;
+  String? errorSalario;
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (BuildContext context, setStateDialog) {
+          return Align(
+            alignment: Alignment.center,
+            child: AlertDialog(
+              backgroundColor: Colors.white,
+              title: const Center(child: Text("Editar Barbero")),
+              content: SizedBox(
+                width: 400,
+                height: 300,
+                child: Column(
+                  children: [
+                    _buildTextField(
+                      label: 'Nombre',
+                      controller: nombreController,
+                      errorText: errorNombre,
+                      onChanged: (value) {
                         setStateDialog(() {
-                          errorNombre = _validarNombre(nombre);
-                          errorCorreo = _validarCorreo(correo);
-                          errorSalario = _validarSalario(salario);
+                          errorNombre = _validarNombre(value);
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 15),
+                    _buildTextField(
+                      label: 'Correo',
+                      controller: correoController,
+                      errorText: errorCorreo,
+                      onChanged: (value) {
+                        setStateDialog(() {
+                          errorCorreo = _validarCorreo(value);
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 15),
+                    _buildTextField(
+                      label: 'Salario',
+                      controller: salarioController,
+                      keyboardType: TextInputType.number,
+                      errorText: errorSalario,
+                      onChanged: (value) {
+                        setStateDialog(() {
+                          errorSalario = _validarSalario(value);
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    _buildBotonDialogo(() {
+                      final nombre = nombreController.text;
+                      final correo = correoController.text;
+                      final salario = salarioController.text;
+
+                      setStateDialog(() {
+                        errorNombre = _validarNombre(nombre);
+                        errorCorreo = _validarCorreo(correo);
+                        errorSalario = _validarSalario(salario);
+                      });
+
+                      if (errorNombre == null && errorCorreo == null && errorSalario == null) {
+                        setState(() {
+                          barberos[index] = {
+                            'nombre': nombre,
+                            'correo': correo,
+                            'salario': double.parse(salario),
+                            'status': barberos[index]['status'], // No cambiar el estado
+                          };
                         });
 
-                        if (errorNombre == null && errorCorreo == null && errorSalario == null) {
-                          setState(() {
-                            barberoCount++;
-                            barberos.add(
-                              DataRow(cells: [
-                                DataCell(Text(nombre)),
-                                DataCell(Text(correo)),
-                                DataCell(Text('\$$salario')),
-                                DataCell(const Text('Activo')),
-                                DataCell(_buildActionButtons()),
-                              ]),
-                            );
-                          });
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Barbero añadido correctamente'), backgroundColor: Colors.green),
-                          );
-                          Navigator.of(context).pop();
-                        }
-                      }),
-                    ],
-                  ),
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Barbero editado correctamente'), backgroundColor: Colors.green),
+                        );
+                        Navigator.of(context).pop();
+                      }
+                    }),
+                  ],
                 ),
               ),
-            );
-          },
-        );
-      },
-    );
-  }
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+
+
+ void _mostrarDialogoAgregarBarbero() {
+  final TextEditingController nombreController = TextEditingController();
+  final TextEditingController correoController = TextEditingController();
+  final TextEditingController salarioController = TextEditingController();
+
+  String? errorNombre;
+  String? errorCorreo;
+  String? errorSalario;
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (BuildContext context, setStateDialog) {
+          return Align(
+            alignment: Alignment.center,
+            child: AlertDialog(
+              backgroundColor: Colors.white,
+              title: const Center(child: Text("Agregar Barbero")),
+              content: SizedBox(
+                width: 400,
+                height: 300,
+                child: Column(
+                  children: [
+                    _buildTextField(
+                      label: 'Nombre',
+                      controller: nombreController,
+                      errorText: errorNombre,
+                      onChanged: (value) {
+                        setStateDialog(() {
+                          errorNombre = _validarNombre(value);
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 15),
+                    _buildTextField(
+                      label: 'Correo',
+                      controller: correoController,
+                      errorText: errorCorreo,
+                      onChanged: (value) {
+                        setStateDialog(() {
+                          errorCorreo = _validarCorreo(value);
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 15),
+                    _buildTextField(
+                      label: 'Salario',
+                      controller: salarioController,
+                      keyboardType: TextInputType.number,
+                      errorText: errorSalario,
+                      onChanged: (value) {
+                        setStateDialog(() {
+                          errorSalario = _validarSalario(value);
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    _buildBotonDialogo(() {
+                      final nombre = nombreController.text;
+                      final correo = correoController.text;
+                      final salario = salarioController.text;
+
+                      setStateDialog(() {
+                        errorNombre = _validarNombre(nombre);
+                        errorCorreo = _validarCorreo(correo);
+                        errorSalario = _validarSalario(salario);
+                      });
+
+                      if (errorNombre == null && errorCorreo == null && errorSalario == null) {
+                        setState(() {
+                          barberoCount++;
+                          barberos.add({
+                            'nombre': nombre,
+                            'correo': correo,
+                            'salario': double.parse(salario),
+                            'status': 'Activo',
+                          });
+                        });
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Barbero añadido correctamente'), backgroundColor: Colors.green),
+                        );
+                        Navigator.of(context).pop();
+                      }
+                    }),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+
 
   String? _validarNombre(String nombre) {
     if (nombre.isEmpty) return 'El nombre no puede estar vacío';
@@ -234,20 +408,21 @@ class _PantallaAdministradorState extends State<PantallaAdministrador> {
       backgroundColor: const Color(0xFFFDF3FF),
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildNavButton('Nosotros'),
-            const SizedBox(width: 20),
-            _buildNavButton('Servicios'),
-            const SizedBox(width: 20),
-            _buildNavButton('Contacto'),
-          ],
-        ),
-        actions: [
-          _buildNavButton('Cerrar Sesión'),
-          const SizedBox(width: 10),
-        ],
+  elevation: 0,
+  title: Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      _buildNavButton('Nosotros', 'nosotros'),
+      const SizedBox(width: 20),
+      _buildNavButton('Servicios', 'servicios'),
+      const SizedBox(width: 20),
+      _buildNavButton('Contacto', 'contacto'),
+    ],
+  ),
+  actions: [
+    _buildNavButton('Iniciar Sesión', 'inicio'), // Aquí puedes decidir qué hacer
+    const SizedBox(width: 10),
+  ],
       ),
       body: Column(
         children: [
@@ -260,7 +435,7 @@ class _PantallaAdministradorState extends State<PantallaAdministrador> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("Datos del Administrador", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    const Text("Datos Personales", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 10),
                     const Text("Nombre"),
                     const SizedBox(height: 5),
@@ -295,26 +470,26 @@ class _PantallaAdministradorState extends State<PantallaAdministrador> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildResponsiveTableSection(
-                        title: "Usuarios",
+                        title: "Control de los Usuarios",
                         columns: const [
                           DataColumn(label: Text('Nombre')),
                           DataColumn(label: Text('Correo')),
-                          DataColumn(label: Text('Acciones')),
+                          DataColumn(label: Text('Editar/Borrar')),
                         ],
-                        rows: usuarios,
+                        rows: _buildUsuarioRows(),
                         onAddRow: _mostrarDialogoAgregarUsuario,
                       ),
                       const SizedBox(height: 20),
                       _buildResponsiveTableSection(
-                        title: "Barberos",
+                        title: "Control de los Barberos",
                         columns: const [
                           DataColumn(label: Text('Nombre')),
                           DataColumn(label: Text('Correo')),
                           DataColumn(label: Text('Salario')),
                           DataColumn(label: Text('Status')),
-                          DataColumn(label: Text('Acciones')),
+                          DataColumn(label: Text('Editar/Borrar')),
                         ],
-                        rows: barberos,
+                        rows: _buildBarberoRows(),
                         onAddRow: _mostrarDialogoAgregarBarbero,
                       ),
                     ],
@@ -349,7 +524,7 @@ class _PantallaAdministradorState extends State<PantallaAdministrador> {
               ElevatedButton.icon(
                 onPressed: onAddRow,
                 icon: const Icon(Icons.add),
-                label: const Text('Añadir fila'),
+                label: const Text('Añadir'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
                   foregroundColor: Colors.white,
@@ -390,31 +565,49 @@ class _PantallaAdministradorState extends State<PantallaAdministrador> {
     );
   }
 
-  Widget _buildActionButtons() {
-    return Row(
-      children: [
-        ElevatedButton(
-          onPressed: () => print('Editar'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue,
-            shape: const CircleBorder(),
-            padding: const EdgeInsets.all(10),
-          ),
-          child: const Icon(Icons.edit, color: Colors.white),
+  Widget _buildActionButtons(int index, bool esUsuario) {
+  return Row(
+    children: [
+      ElevatedButton(
+        onPressed: () {
+          // Editar
+          print('Editar ${esUsuario ? 'usuario' : 'barbero'} en índice $index');
+          if (esUsuario) {
+            _mostrarDialogoEditarUsuario(index);
+          } else {
+            _mostrarDialogoEditarBarbero(index);
+          }
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.blue,
+          shape: const CircleBorder(),
+          padding: const EdgeInsets.all(10),
         ),
-        const SizedBox(width: 10),
-        ElevatedButton(
-          onPressed: () => print('Borrar'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red,
-            shape: const CircleBorder(),
-            padding: const EdgeInsets.all(10),
-          ),
-          child: const Icon(Icons.delete, color: Colors.white),
+        child: const Icon(Icons.edit, color: Colors.white),
+      ),
+      const SizedBox(width: 10),
+      ElevatedButton(
+        onPressed: () {
+          setState(() {
+            if (esUsuario) {
+              usuarios.removeAt(index);
+            } else {
+              barberos.removeAt(index);
+            }
+          });
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.red,
+          shape: const CircleBorder(),
+          padding: const EdgeInsets.all(10),
         ),
-      ],
-    );
-  }
+        child: const Icon(Icons.delete, color: Colors.white),
+      ),
+    ],
+  );
+}
+
+
 
   InputDecoration _inputDecoration(IconData? icon) {
     return InputDecoration(
@@ -483,12 +676,20 @@ class _PantallaAdministradorState extends State<PantallaAdministrador> {
 }
 
 
-  TextButton _buildNavButton(String text) {
-    return TextButton(
-      onPressed: () {},
-      child: Text(text, style: const TextStyle(color: Colors.white)),
-    );
-  }
+  TextButton _buildNavButton(String text, String scrollTo) {
+  return TextButton(
+    onPressed: () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomePage(scrollTo: scrollTo), // Pasamos el parámetro 'scrollTo'
+        ),
+      );
+    },
+    child: Text(text, style: const TextStyle(color: Colors.white)),
+  );
+}
+
 
   Widget _buildDialogoFormulario({
     required String titulo,

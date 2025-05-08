@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'home_page.dart';
 
 class PantallaUsuario extends StatefulWidget {
   const PantallaUsuario({super.key});
@@ -23,21 +24,21 @@ class _PantallaUsuarioState extends State<PantallaUsuario> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
-        elevation: 0,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildNavButton('Nosotros'),
-            const SizedBox(width: 20),
-            _buildNavButton('Servicios'),
-            const SizedBox(width: 20),
-            _buildNavButton('Contacto'),
-          ],
-        ),
-        actions: [
-          _buildNavButton('Iniciar Sesión'),
-          const SizedBox(width: 10),
-        ],
+  elevation: 0,
+  title: Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      _buildNavButton('Nosotros', 'nosotros'),
+      const SizedBox(width: 20),
+      _buildNavButton('Servicios', 'servicios'),
+      const SizedBox(width: 20),
+      _buildNavButton('Contacto', 'contacto'),
+    ],
+  ),
+  actions: [
+    _buildNavButton('Iniciar Sesión', 'inicio'), // Aquí puedes decidir qué hacer
+    const SizedBox(width: 10),
+  ],
       ),
       body: Column(
         children: [
@@ -160,12 +161,18 @@ class _PantallaUsuarioState extends State<PantallaUsuario> {
     );
   }
 
-  TextButton _buildNavButton(String text) {
-    return TextButton(
-      onPressed: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const PantallaUsuario()));
-      },
-      child: Text(text, style: const TextStyle(color: Colors.white)),
-    );
-  }
+  TextButton _buildNavButton(String text, String scrollTo) {
+  return TextButton(
+    onPressed: () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomePage(scrollTo: scrollTo), // Pasamos el parámetro 'scrollTo'
+        ),
+      );
+    },
+    child: Text(text, style: const TextStyle(color: Colors.white)),
+  );
+}
+
 }

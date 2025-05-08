@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:front/widgets/servicios_section.dart'; //Importación servicios para el App Bar (Barra Navegación HomePage)
-import 'package:front/widgets/contacto_section.dart'; //Importa contacto para el App Bar (Barra Navegación HomePage)
+import 'package:front/widgets/servicios_section.dart'; // Importación servicios para el App Bar (Barra Navegación HomePage)
+import 'package:front/widgets/contacto_section.dart'; // Importa contacto para el App Bar (Barra Navegación HomePage)
 import 'login_page.dart'; // Importa la página de Login
 import 'user_page.dart';
 import 'barber_page.dart';
 import 'admin_page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final String? scrollTo; // 'nosotros', 'servicios', 'contacto'
+
+  const HomePage({Key? key, this.scrollTo}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -53,6 +55,21 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+void initState() {
+  super.initState();
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (widget.scrollTo == 'nosotros') {
+      _scrollToNosotros();
+    } else if (widget.scrollTo == 'servicios') {
+      _scrollToServicios();
+    } else if (widget.scrollTo == 'contacto') {
+      _scrollToContacto();
+    }
+  });
+}
+
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
@@ -90,10 +107,9 @@ class _HomePageState extends State<HomePage> {
         actions: [
           TextButton(
             onPressed: () {
-              //Aquí navega hacia la página de login
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const PantallaAdministrador()),
+                MaterialPageRoute(builder: (context) => const LoginPage()),
               );
             },
             child: const Text(
