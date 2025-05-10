@@ -9,54 +9,70 @@ class ServiciosSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       key: keyServicios,
-      color: Colors.black,
       width: double.infinity,
+      color: Colors.black,
       padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 20),
-      child: Column(
+      child: Stack(
         children: [
-          const Text(
-            'Nuestros servicios',
-            style: TextStyle(
-              fontSize: 30,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-              fontFamily: 'Georgia',
+          // Fondo con líneas diagonales cruzadas solo en el contenedor
+          Positioned.fill(
+            child: ClipRect(
+              child: CustomPaint(
+                painter: LineasDiagonalesCruzadasPainter(),
+              ),
             ),
           ),
-          const SizedBox(height: 10),
-          const Text(
-            'Todos nuestros servicios se realizan en cabinas privadas y son exclusivos para hombre.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.white70,
-              height: 1.5,
-              fontFamily: 'Georgia',
-            ),
-          ),
-          const SizedBox(height: 50),
-          Wrap(
-            spacing: 30,
-            runSpacing: 30,
-            alignment: WrapAlignment.center,
+          // Contenido principal
+          Column(
             children: [
-              _ServicioCard(
-                imagePath: 'assets/imag/1.png', //Imagen de opciones
-                title: 'Corte & Estilo',
-                description:
-                    'Cortes clásicos, modernos y ejecutivos adaptados a tu personalidad. Precisión, técnica y estilo en cada visita.',
+              const Text(
+                'Nuestros servicios',
+                style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontFamily: 'Georgia',
+                ),
               ),
-              _ServicioCard(
-                imagePath: 'assets/imag/4.png', //Imagen de opciones
-                title: 'Barba & Afeitado',
-                description:
-                    'Perfilado, diseño y afeitado tradicional con toalla caliente. Cuida tu barba con detalle y estilo.',
+              const SizedBox(height: 10),
+              const Text(
+                'Todos nuestros servicios se realizan en cabinas privadas y son exclusivos para hombre.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.white70,
+                  height: 1.5,
+                  fontFamily: 'Georgia',
+                ),
               ),
-              _ServicioCard(
-                imagePath: 'assets/imag/5.png', //Imagen de opciones
-                title: 'Tratamientos & Cuidado Especial',
-                description:
-                    'Faciales y tratamientos capilares que revitalizan tu piel y cabello. Bienestar y frescura en cada sesión.',
+              const SizedBox(height: 50),
+              // Asegurar que las tarjetas estén centradas correctamente
+              Center(
+                child: Wrap(
+                  spacing: 40,
+                  runSpacing: 40,
+                  alignment: WrapAlignment.center, // Esto asegura que las tarjetas estén centradas
+                  children: [
+                    _ServicioCard(
+                      imagePath: 'assets/imag/estilos.jpg',
+                      title: 'Corte & Estilo',
+                      description:
+                          'Cortes clásicos, modernos y ejecutivos adaptados a tu personalidad. Precisión, técnica y estilo en cada visita.',
+                    ),
+                    _ServicioCard(
+                      imagePath: 'assets/imag/barba.jpg',
+                      title: 'Barba & Afeitado',
+                      description:
+                          'Perfilado, diseño y afeitado tradicional con toalla caliente. Cuida tu barba con detalle y estilo.',
+                    ),
+                    _ServicioCard(
+                      imagePath: 'assets/imag/tratamiento.jpg',
+                      title: 'Tratamientos & Cuidado Especial',
+                      description:
+                          'Faciales y tratamientos capilares que revitalizan tu piel y cabello. Bienestar y frescura en cada sesión.',
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -65,6 +81,33 @@ class ServiciosSection extends StatelessWidget {
     );
   }
 }
+
+class LineasDiagonalesCruzadasPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withOpacity(0.4)
+      ..strokeWidth = 1;
+
+    // ==== LÍNEAS SUPERIORES ====
+    canvas.drawLine(Offset(0, size.height * 0.9), Offset(size.width * 0.3, 0), paint);
+    canvas.drawLine(Offset(0, size.height * 0.6), Offset(size.width * 0.5, 0), paint);
+    canvas.drawLine(Offset(size.width * 0.2, size.height), Offset(size.width * 0.65, 0), paint);
+    canvas.drawLine(Offset(size.width * 0.5, size.height), Offset(size.width * 0.9, 0), paint);
+    canvas.drawLine(Offset(size.width, size.height * 0.5), Offset(size.width * 0.7, 0), paint);
+    canvas.drawLine(Offset(size.width, size.height * 0.9), Offset(size.width * 0.9, 0), paint);
+
+    // ==== LÍNEAS INFERIORES ====
+    canvas.drawLine(Offset(0, size.height * 0.8), Offset(size.width * 0.5, size.height), paint);
+    canvas.drawLine(Offset(0, size.height), Offset(size.width * 0.6, size.height * 0.95), paint);
+    canvas.drawLine(Offset(size.width, size.height * 0.8), Offset(size.width * 0.5, size.height), paint);
+    canvas.drawLine(Offset(size.width, size.height), Offset(size.width * 0.4, size.height * 0.95), paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
 
 class _ServicioCard extends StatelessWidget {
   final String imagePath;
@@ -80,10 +123,9 @@ class _ServicioCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 300,
+      width: 400,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
@@ -93,27 +135,27 @@ class _ServicioCard extends StatelessWidget {
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(10),
-              topRight: Radius.circular(10),
-            ),
-            child: Image.asset(
-              imagePath,
-              width: double.infinity,
-              height: 180,
-              fit: BoxFit.cover,
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: ClipRRect(
+              child: Image.asset(
+                imagePath,
+                width: double.infinity,
+                height: 280,
+                fit: BoxFit.cover,
+              ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(15),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
                   title,
+                  textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -123,11 +165,17 @@ class _ServicioCard extends StatelessWidget {
                 const SizedBox(height: 10),
                 Text(
                   description,
+                  textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 14,
                     height: 1.5,
                     fontFamily: 'Georgia',
                   ),
+                ),
+                const SizedBox(height: 20),
+                Divider(
+                  color: Colors.black.withOpacity(0.2),
+                  thickness: 1,
                 ),
                 const SizedBox(height: 20),
                 const Text(

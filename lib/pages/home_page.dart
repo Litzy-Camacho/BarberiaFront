@@ -5,6 +5,8 @@ import 'login_page.dart'; // Importa la página de Login
 import 'user_page.dart';
 import 'barber_page.dart';
 import 'admin_page.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
+
 
 class HomePage extends StatefulWidget {
   final String? scrollTo; // 'nosotros', 'servicios', 'contacto'
@@ -125,113 +127,137 @@ void initState() {
         child: Column(
           children: [
             // SECCIÓN HOME
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 80),
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 1,
-                    child: Text(
-                      'Ven, siéntete único\n'
-                      'y reserva tu cita\n'
-                      'para vivir una\n'
-                      'experiencia\n'
-                      'auténtica.',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 32,
-                        height: 1.3,
-                        fontFamily: 'Georgia',
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Image.asset(
-                      'assets/imag/2.png', // Imagen Pantalla Principal
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                ],
+            // SECCIÓN HOME
+Container(
+  height: 600,
+  width: double.infinity,
+  decoration: const BoxDecoration(
+    image: DecorationImage(
+      image: AssetImage('assets/imag/10.jpg'),
+      fit: BoxFit.cover,
+    ),
+  ),
+  child: Container(
+    color: Colors.black.withOpacity(0.8),
+    padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 80),
+    alignment: Alignment.centerLeft,
+    child: DefaultTextStyle(
+      style: const TextStyle(
+        color: Colors.white,
+        fontSize: 40, // Tamaño aumentado
+        height: 1.3,
+        fontFamily: 'Georgia',
+      ),
+      child: AnimatedTextKit(
+        isRepeatingAnimation: false,
+        animatedTexts: [
+          TypewriterAnimatedText(
+            'Ven, siéntete único\ny reserva tu cita\npara vivir una\nexperiencia\nauténtica.',
+            speed: const Duration(milliseconds: 80),
+          ),
+        ],
+      ),
+    ),
+  ),
+),
+
+      // SECCIÓN NOSOTROS
+Container(
+  key: _nosotrosKey,
+  color: Colors.white,
+  child: Column(
+    children: [
+      const SizedBox(height: 40),
+      const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 60),
+        child: Text(
+          'En una era donde el bienestar y la autenticidad toman protagonismo, '
+          'nace Essense, un espacio pensado para quienes buscan reconectar con '
+          'su esencia a través del cuidado personal. Más que un lugar, Essense es '
+          'una experiencia diseñada para elevar el ritual del autocuidado masculino.',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 20,
+            color: Colors.black,
+            height: 1.5,
+            fontFamily: 'Georgia',
+          ),
+        ),
+      ),
+      const SizedBox(height: 40),
+
+      // Estructura con imagen y cuadro negro desplazado más abajo en el eje Y
+      SizedBox(
+        height: 600, // Altura mayor para contener los elementos más grandes
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            // Imagen más grande
+            Positioned(
+              left: 150,
+              child: Container(
+                width: 700, // Aumento del ancho
+                height: 450, // Aumento de la altura
+                child: Image.asset(
+                  'assets/imag/10.jpg',
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-            const SizedBox(height: 200),
-
-            // SECCIÓN NOSOTROS
-            Container(
-              key: _nosotrosKey,
-              color: Colors.white,
-              child: Column(
-                children: [
-                  const SizedBox(height: 40),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 60),
-                    child: Text(
-                      'En una era donde el bienestar y la autenticidad toman protagonismo, '
-                      'nace Essense, un espacio pensado para quienes buscan reconectar con '
-                      'su esencia a través del cuidado personal. Más que un lugar, Essense es '
-                      'una experiencia diseñada para elevar el ritual del autocuidado masculino.',
-                      textAlign: TextAlign.center,
+            // Cuadro negro más grande
+            Positioned(
+              left: 700, // Se mantiene el mismo desplazamiento a la izquierda
+              top: 200,  // Mantiene la misma distancia en el eje Y
+              child: Container(
+                width: 700, // Aumento del ancho
+                height: 450,
+                color: Colors.black,
+                padding: const EdgeInsets.all(30), // Aumento del padding
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Essense',
                       style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.black,
-                        height: 1.5,
+                        fontSize: 36, // Aumento del tamaño del título
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                         fontFamily: 'Georgia',
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 40),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Image.asset(
-                          'assets/imag/3.png', // Imagen sección NOSOTROS
-                          fit: BoxFit.cover,
-                        ),
+                    SizedBox(height: 20),
+                    Text(
+                      'El primer centro integral de cuidado masculino en México. '
+                      'En Essense, entendemos que el hombre actual busca verse bien, '
+                      'sentirse bien y proyectar seguridad en cada aspecto de su vida. '
+                      'Ofrecemos una experiencia completa de cuidado personal, '
+                      'en un espacio cómodo, privado y diseñado especialmente para ti.',
+                      style: TextStyle(
+                        fontSize: 18, // Aumento del tamaño del texto
+                        color: Colors.white,
+                        height: 1.6,
+                        fontFamily: 'Georgia',
                       ),
-                      Expanded(
-                        child: Container(
-                          color: Colors.black,
-                          padding: const EdgeInsets.all(40),
-                          child: const Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Essense',
-                                style: TextStyle(
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  fontFamily: 'Georgia',
-                                ),
-                              ),
-                              SizedBox(height: 20),
-                              Text(
-                                'El primer centro integral de cuidado masculino en México...',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.white,
-                                  height: 1.6,
-                                  fontFamily: 'Georgia',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(height: 200),
+          ],
+        ),
+      ),
+      const SizedBox(height: 150),
+    ],
+  ),
+),
 
-            // SECCIÓN SERVICIOS
-            ServiciosSection(keyServicios: _serviciosKey),
-            const SizedBox(height: 200),
+// SECCIÓN SERVICIOS
+ServiciosSection(keyServicios: _serviciosKey),
 
-            // SECCIÓN CONTACTO
-            ContactoSection(keyContacto: _contactoKey),
+
+// SECCIÓN CONTACTO
+ContactoSection(keyContacto: _contactoKey),
+
           ],
         ),
       ),
