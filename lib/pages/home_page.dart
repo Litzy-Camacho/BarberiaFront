@@ -206,7 +206,7 @@ class _HomePageState extends State<HomePage> {
                             width: 700,
                             height: 450,
                             child: Image.asset(
-                              'assets/imag/10.jpg',
+                              'assets/imag/nosotros.jpg',
                               fit: BoxFit.cover,
                             ),
                           ),

@@ -11,8 +11,8 @@ class ResetPasswordPage2 extends StatefulWidget {
 
 class _ResetPasswordPage2State extends State<ResetPasswordPage2> {
   final List<TextEditingController> _controllers =
-      List.generate(6, (_) => TextEditingController());
-  final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
+      List.generate(5, (_) => TextEditingController());
+  final List<FocusNode> _focusNodes = List.generate(5, (_) => FocusNode());
   bool _isCodeComplete = false;
 
   @override
@@ -140,7 +140,7 @@ class _SecurityCodeInput extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(6, (index) {
+      children: List.generate(5, (index) {
         return Container(
           width: 45,
           margin: const EdgeInsets.symmetric(horizontal: 5),

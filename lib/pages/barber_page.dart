@@ -9,8 +9,8 @@ class PantallaBarbero extends StatefulWidget {
 }
 
 class _PantallaBarberoState extends State<PantallaBarbero> {
-  TextEditingController controller1 = TextEditingController();
-  TextEditingController controller2 = TextEditingController(text: 'barbero@ejemplo.com');
+  TextEditingController controller1 = TextEditingController(text: 'Jorge');
+  TextEditingController controller2 = TextEditingController(text: 'barber@gmail.com');
   TextEditingController controller3 = TextEditingController(text: 'Activo');
 
   List<Map<String, String>> citasPendientes = List.generate(5, (index) {
@@ -57,18 +57,45 @@ class _PantallaBarberoState extends State<PantallaBarbero> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         elevation: 0,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Image.asset('assets/imag/logo.png'),
+        ),
+        title: Stack(
+          alignment: Alignment.center,
           children: [
-            _buildNavButton('Nosotros', 'nosotros'),
-            const SizedBox(width: 20),
-            _buildNavButton('Servicios', 'servicios'),
-            const SizedBox(width: 20),
-            _buildNavButton('Contacto', 'contacto'),
+            Row(
+               mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildNavButton('Nosotros', 'nosotros'),
+                const SizedBox(width: 20),
+                _buildNavButton('Servicios', 'servicios'),
+                const SizedBox(width: 20),
+                _buildNavButton('Contacto', 'contacto'),
+              ],
+            ),
           ],
         ),
         actions: [
-          _buildNavButton('Cerrar Sesión', 'inicio'),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.account_circle, color: Colors.white),
+            onSelected: (value) {
+              if (value == 'logout') {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HomePage(scrollTo: 'inicio'),
+                  ),
+                );
+              }
+            },
+            itemBuilder: (BuildContext context) => [
+              const PopupMenuItem<String>(
+                value: 'logout',
+                child: Text('Cerrar Sesión'),
+              ),
+            ],
+          ),
           const SizedBox(width: 10),
         ],
       ),
@@ -187,7 +214,7 @@ class _PantallaBarberoState extends State<PantallaBarbero> {
                   DataColumn(label: Text('Hora')),
                   DataColumn(label: Text('Servicio')),
                   DataColumn(label: Text('Cliente')),
-                  DataColumn(label: Text('Aceptar/Rechazar')),
+                  DataColumn(label: Text('Completado/Cancelar')),
                 ],
                 rows: List.generate(citas.length, (index) {
                   final cita = citas[index];

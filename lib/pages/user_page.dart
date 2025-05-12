@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; 
 import 'home_page.dart';
+import 'user.dart';
 
 class PantallaUsuario extends StatefulWidget {
   const PantallaUsuario({super.key});
@@ -9,8 +10,8 @@ class PantallaUsuario extends StatefulWidget {
 }
 
 class _PantallaUsuarioState extends State<PantallaUsuario> {
-  TextEditingController controller1 = TextEditingController();
-  TextEditingController controller2 = TextEditingController(text: 'correo@ejemplo.com');
+  TextEditingController controller1 = TextEditingController(text: 'Abigail');
+  TextEditingController controller2 = TextEditingController(text: 'user@gmail.com');
 
   @override
   void dispose() {
@@ -24,21 +25,48 @@ class _PantallaUsuarioState extends State<PantallaUsuario> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
-  elevation: 0,
-  title: Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-      _buildNavButton('Nosotros', 'nosotros'),
-      const SizedBox(width: 20),
-      _buildNavButton('Servicios', 'servicios'),
-      const SizedBox(width: 20),
-      _buildNavButton('Contacto', 'contacto'),
-    ],
-  ),
-  actions: [
-    _buildNavButton('Cerrar Sesión', 'inicio'), // Aquí puedes decidir qué hacer
-    const SizedBox(width: 10),
-  ],
+        elevation: 0,
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Image.asset('assets/imag/logo.png'),
+        ),
+        title: Stack(
+          alignment: Alignment.center,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildNavButton('Nosotros', 'nosotros'),
+                const SizedBox(width: 20),
+                _buildNavButton('Servicios', 'servicios'),
+                const SizedBox(width: 20),
+                _buildNavButton('Contacto', 'contacto'),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.account_circle, color: Colors.white),
+            onSelected: (value) {
+              if (value == 'logout') {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HomePageUser(scrollTo: 'inicio'),
+                  ),
+                );
+              }
+            },
+            itemBuilder: (BuildContext context) => [
+              const PopupMenuItem<String>(
+                value: 'logout',
+                child: Text('Cerrar Sesión'),
+              ),
+            ],
+          ),
+          const SizedBox(width: 10),
+        ],
       ),
       body: Column(
         children: [
@@ -126,7 +154,7 @@ class _PantallaUsuarioState extends State<PantallaUsuario> {
                           child: SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: DataTable(
-                              columnSpacing: 200, // Aumenta el ancho entre columnas
+                              columnSpacing: 100,
                               headingTextStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                               dataTextStyle: const TextStyle(color: Colors.white),
                               border: TableBorder(
@@ -137,6 +165,7 @@ class _PantallaUsuarioState extends State<PantallaUsuario> {
                                 DataColumn(label: Text('Hora')),
                                 DataColumn(label: Text('Servicio')),
                                 DataColumn(label: Text('Barbero')),
+                                DataColumn(label: Text('Status')), // Nueva columna
                               ],
                               rows: List.generate(5, (index) {
                                 return DataRow(cells: [
@@ -144,6 +173,7 @@ class _PantallaUsuarioState extends State<PantallaUsuario> {
                                   DataCell(Text('10:00 AM')),
                                   DataCell(Text('Corte de cabello')),
                                   DataCell(Text('Barbero ${index + 1}')),
+                                  DataCell(Text(index % 2 == 0 ? 'Completado' : 'Pendiente')), // Valores de Status
                                 ]);
                               }),
                             ),
@@ -162,17 +192,16 @@ class _PantallaUsuarioState extends State<PantallaUsuario> {
   }
 
   TextButton _buildNavButton(String text, String scrollTo) {
-  return TextButton(
-    onPressed: () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => HomePage(scrollTo: scrollTo), // Pasamos el parámetro 'scrollTo'
-        ),
-      );
-    },
-    child: Text(text, style: const TextStyle(color: Colors.white)),
-  );
-}
-
+    return TextButton(
+      onPressed: () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomePage(scrollTo: scrollTo),
+          ),
+        );
+      },
+      child: Text(text, style: const TextStyle(color: Colors.white)),
+    );
+  }
 }

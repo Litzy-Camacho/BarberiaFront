@@ -10,7 +10,7 @@ class PantallaAdministrador extends StatefulWidget {
 }
 
 class _PantallaAdministradorState extends State<PantallaAdministrador> {
-  TextEditingController nombreController = TextEditingController();
+  TextEditingController nombreController = TextEditingController(text: 'Ricardo');
   TextEditingController correoController = TextEditingController(text: 'admin@ejemplo.com');
 
   List<Map<String, dynamic>> usuarios = [];
@@ -194,9 +194,11 @@ void _mostrarDialogoEditarBarbero(int index) {
   final TextEditingController nombreController = TextEditingController(text: barberos[index]['nombre']);
   final TextEditingController correoController = TextEditingController(text: barberos[index]['correo']);
   final TextEditingController salarioController = TextEditingController(text: barberos[index]['salario'].toString());
+
   String? errorNombre;
   String? errorCorreo;
   String? errorSalario;
+  String? selectedStatus = barberos[index]['status']; // Estado actual del barbero
 
   showDialog(
     context: context,
@@ -210,7 +212,7 @@ void _mostrarDialogoEditarBarbero(int index) {
               title: const Center(child: Text("Editar Barbero")),
               content: SizedBox(
                 width: 400,
-                height: 300,
+                height: 350, // Ajustar altura para incluir el nuevo campo
                 child: Column(
                   children: [
                     _buildTextField(
@@ -246,6 +248,27 @@ void _mostrarDialogoEditarBarbero(int index) {
                         });
                       },
                     ),
+                    const SizedBox(height: 15),
+                    // Dropdown para seleccionar el estado
+                    DropdownButtonFormField<String>(
+                      value: selectedStatus,
+                      decoration: const InputDecoration(
+                        labelText: 'Estado',
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                      items: ['Activo', 'Inactivo']
+                          .map((status) => DropdownMenuItem<String>(
+                                value: status,
+                                child: Text(status),
+                              ))
+                          .toList(),
+                      onChanged: (newValue) {
+                        setStateDialog(() {
+                          selectedStatus = newValue;
+                        });
+                      },
+                    ),
                     const SizedBox(height: 20),
                     _buildBotonDialogo(() {
                       final nombre = nombreController.text;
@@ -264,12 +287,12 @@ void _mostrarDialogoEditarBarbero(int index) {
                             'nombre': nombre,
                             'correo': correo,
                             'salario': double.parse(salario),
-                            'status': barberos[index]['status'], // No cambiar el estado
+                            'status': selectedStatus ?? 'Activo', // Asigna el estado seleccionado
                           };
                         });
 
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Barbero editado correctamente'), backgroundColor: Colors.green),
+                          const SnackBar(content: Text('Barbero actualizado correctamente'), backgroundColor: Colors.green),
                         );
                         Navigator.of(context).pop();
                       }
@@ -408,21 +431,48 @@ void _mostrarDialogoEditarBarbero(int index) {
       backgroundColor: const Color(0xFFFDF3FF),
       appBar: AppBar(
         backgroundColor: Colors.black,
-  elevation: 0,
-  title: Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-      _buildNavButton('Nosotros', 'nosotros'),
-      const SizedBox(width: 20),
-      _buildNavButton('Servicios', 'servicios'),
-      const SizedBox(width: 20),
-      _buildNavButton('Contacto', 'contacto'),
-    ],
-  ),
-  actions: [
-    _buildNavButton('Cerrar Sesión', 'inicio'), // Aquí puedes decidir qué hacer
-    const SizedBox(width: 10),
-  ],
+        elevation: 0,
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Image.asset('assets/imag/logo.png'),
+        ),
+        title: Stack(
+          alignment: Alignment.center,
+          children: [
+            Row(
+               mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildNavButton('Nosotros', 'nosotros'),
+                const SizedBox(width: 20),
+                _buildNavButton('Servicios', 'servicios'),
+                const SizedBox(width: 20),
+                _buildNavButton('Contacto', 'contacto'),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.account_circle, color: Colors.white),
+            onSelected: (value) {
+              if (value == 'logout') {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HomePage(scrollTo: 'inicio'),
+                  ),
+                );
+              }
+            },
+            itemBuilder: (BuildContext context) => [
+              const PopupMenuItem<String>(
+                value: 'logout',
+                child: Text('Cerrar Sesión'),
+              ),
+            ],
+          ),
+          const SizedBox(width: 10),
+        ],
       ),
       body: Column(
         children: [
