@@ -1,7 +1,36 @@
 import 'package:flutter/material.dart';
+import 'reset_password_2_page.dart';
 
-class ResetPasswordPage extends StatelessWidget {
+class ResetPasswordPage extends StatefulWidget {
   const ResetPasswordPage({super.key});
+
+  @override
+  State<ResetPasswordPage> createState() => _ResetPasswordPageState();
+}
+
+class _ResetPasswordPageState extends State<ResetPasswordPage> {
+  final TextEditingController _emailController = TextEditingController();
+  bool _isEmailValid = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController.addListener(_validateEmail);
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  void _validateEmail() {
+    final email = _emailController.text.trim();
+    final isValid = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+    setState(() {
+      _isEmailValid = isValid;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -11,9 +40,17 @@ class ResetPasswordPage extends StatelessWidget {
           // IZQUIERDA: Imagen
           Expanded(
             flex: 1,
-            child: Image.asset(
-              'assets/imag/1.png', // Imagen de lado izquierdo Recuperar Contraseña
-              fit: BoxFit.cover,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.asset(
+                  'assets/imag/login.jpg',
+                  fit: BoxFit.cover,
+                ),
+                Container(
+                  color: Colors.black.withOpacity(0.5),
+                ),
+              ],
             ),
           ),
 
@@ -29,28 +66,19 @@ class ResetPasswordPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       _ResetPasswordTextField(
-                        label: 'Contraseña',
-                        hintText: 'Ingresa una contraseña',
-                        obscureText: true,
-                      ),
-                      const SizedBox(height: 20),
-                      _ResetPasswordTextField(
-                        label: 'Confirma tu contraseña',
-                        hintText: 'Confirma una contraseña',
-                        obscureText: true,
-                      ),
-                      const SizedBox(height: 20),
-                      _ResetPasswordTextField(
-                        label: 'Código',
-                        hintText: 'Ingresa el código',
+                        label: 'Te Enviaremos un Código de Seguridad',
+                        hintText: 'Ingresa tu correo',
+                        controller: _emailController,
+                        showError: _emailController.text.isNotEmpty && !_isEmailValid,
                       ),
                       const SizedBox(height: 40),
 
-                      // Botón Confirmar
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: Colors.black,
+                          disabledBackgroundColor: Colors.grey.shade700,
+                          disabledForegroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(
                             horizontal: 40,
                             vertical: 15,
@@ -59,13 +87,17 @@ class ResetPasswordPage extends StatelessWidget {
                             borderRadius: BorderRadius.circular(20),
                           ),
                         ),
-                        onPressed: () {
-                          // Acción al confirmar (agregar validaciones)
-                          Navigator.pop(
-                            context,
-                          ); // Regresar a LoginPage después
-                        },
-                        child: const Text('Confirmar'),
+                        onPressed: _isEmailValid
+                            ? () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const ResetPasswordPage2(),
+                                  ),
+                                );
+                              }
+                            : null,
+                        child: const Text('Enviar'),
                       ),
                     ],
                   ),
@@ -79,16 +111,20 @@ class ResetPasswordPage extends StatelessWidget {
   }
 }
 
-// Widget campos de texto para Reset Password
+// Campo de texto con validación
 class _ResetPasswordTextField extends StatelessWidget {
   final String label;
   final String hintText;
   final bool obscureText;
+  final TextEditingController controller;
+  final bool showError;
 
   const _ResetPasswordTextField({
     required this.label,
     required this.hintText,
+    required this.controller,
     this.obscureText = false,
+    this.showError = false,
   });
 
   @override
@@ -99,6 +135,8 @@ class _ResetPasswordTextField extends StatelessWidget {
         Text(label, style: const TextStyle(color: Colors.white, fontSize: 16)),
         const SizedBox(height: 5),
         TextField(
+          controller: controller,
+          keyboardType: TextInputType.emailAddress,
           obscureText: obscureText,
           decoration: InputDecoration(
             hintText: hintText,
@@ -113,6 +151,7 @@ class _ResetPasswordTextField extends StatelessWidget {
               horizontal: 20,
               vertical: 15,
             ),
+            errorText: showError ? 'Correo inválido' : null,
           ),
         ),
       ],

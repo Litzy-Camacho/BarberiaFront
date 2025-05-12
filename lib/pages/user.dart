@@ -7,16 +7,16 @@ import 'barber_page.dart';
 import 'admin_page.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 
-class HomePage extends StatefulWidget {
+class HomePageUser extends StatefulWidget {
   final String? scrollTo; // 'nosotros', 'servicios', 'contacto'
 
-  const HomePage({Key? key, this.scrollTo}) : super(key: key);
+  const HomePageUser({Key? key, this.scrollTo}) : super(key: key);
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<HomePageUser> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePageUser> {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _nosotrosKey = GlobalKey();
   final GlobalKey _serviciosKey = GlobalKey();
@@ -121,14 +121,29 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
-                },
-                child: const Text('Iniciar Sesión', style: TextStyle(color: Colors.white)),
-              ),
-              const SizedBox(width: 10),
-            ],
+  PopupMenuButton<String>(
+    icon: const Icon(Icons.account_circle, color: Colors.white, size: 30),
+    onSelected: (value) {
+      if (value == 'perfil') {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const PantallaUsuario()));
+      } else if (value == 'cerrar') {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
+      }
+    },
+    itemBuilder: (BuildContext context) => [
+      const PopupMenuItem<String>(
+        value: 'perfil',
+        child: Text('Ver perfil'),
+      ),
+      const PopupMenuItem<String>(
+        value: 'cerrar',
+        child: Text('Cerrar sesión'),
+      ),
+    ],
+  ),
+  const SizedBox(width: 10),
+],
+
           ),
         ),
       ),

@@ -36,7 +36,7 @@ class _PantallaUsuarioState extends State<PantallaUsuario> {
     ],
   ),
   actions: [
-    _buildNavButton('Iniciar Sesión', 'inicio'), // Aquí puedes decidir qué hacer
+    _buildNavButton('Cerrar Sesión', 'inicio'), // Aquí puedes decidir qué hacer
     const SizedBox(width: 10),
   ],
       ),

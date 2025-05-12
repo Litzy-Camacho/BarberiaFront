@@ -35,90 +35,7 @@ class _ContactoSectionState extends State<ContactoSection> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 50),
-              const Text(
-                '¿Por qué elegirnos?',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Georgia',
-                  color: Colors.black,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 50),
-
-              // Contenido principal
-              Padding(
-  padding: const EdgeInsets.symmetric(horizontal: 20),
-  child: Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: [
-      // IZQUIERDA: Características
-      SizedBox(
-        width: MediaQuery.of(context).size.width * 0.3, // Ajusta según sea necesario
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: const [
-            ContactoItem(
-              icon: Icons.lightbulb_outline,
-              title: 'Experiencia\nPersonalizada',
-            ),
-            SizedBox(height: 20),
-            ContactoItem(
-              icon: Icons.verified,
-              title: 'Calidad &\nProfesionalismo',
-            ),
-            SizedBox(height: 20),
-            ContactoItem(
-              icon: Icons.spa,
-              title: 'Un Espacio\nCómodo Para Ti',
-            ),
-          ],
-        ),
-      ),
-      const SizedBox(width: 30),
-
-      // DERECHA: Imagen + Cuadro con texto debajo
-      SizedBox(
-        width: MediaQuery.of(context).size.width * 0.4,
-        child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center, // Centrado horizontal
-                        children: [
-                          // Imagen sin bordes redondeados
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.4, // 80% del ancho de la pantalla
-                            child: Image.asset(
-                              'assets/imag/4.png', // Imagen sección Contacto
-                              fit: BoxFit.cover,
-                              height: 280,
-                            ),
-                          ),
-                          
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.4, // 80% del ancho de la pantalla
-                            padding: const EdgeInsets.all(16),
-                            color: Colors.black,
-                            child: const Text(
-                              'En Essense, cada cliente recibe atención personalizada en un ambiente privado y cómodo.',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontFamily: 'Georgia',
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 80),
+              
 
               // SECCIÓN FINAL: Dirección con líneas diagonales
 Container(
@@ -142,15 +59,15 @@ Container(
         children: [
           ContactInfoRow(
             icon: Icons.email,
-            text: 'correo@essense.com',
+            text: 'essence_barber@gmail.com',
           ),
           const SizedBox(height: 15),
           ContactInfoRow(
             icon: Icons.location_on,
-            text: 'Dirección #34, Colonia, Ciudad',
+            text: '20 de Noviembre #34, Centro Histórico, Morelia',
           ),
           const SizedBox(height: 15),
-          ContactInfoRow(icon: Icons.phone, text: '+52 123 456 7890'),
+          ContactInfoRow(icon: Icons.phone, text: '443 4632 2732'),
           const SizedBox(height: 15),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -159,7 +76,7 @@ Container(
               SizedBox(width: 15),
               Icon(
                 FontAwesomeIcons.instagram,
-                color: Colors.pinkAccent,
+                color: Colors.white,
               ),
             ],
           ),
