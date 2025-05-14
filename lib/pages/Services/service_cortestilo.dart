@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:front/pages/Login/login.dart';
-import 'package:front/pages/Clients/reservation_data.dart';
+import 'package:front/pages/Reservation/reservation_data.dart';
 import 'package:front/widgets/service_nav_bar.dart';
 
 class ServiceCorteEstiloPage extends StatelessWidget {
@@ -70,11 +70,10 @@ class ServiceCorteEstiloPage extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed:
-                () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginPage()),
-                ),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const LoginPage()),
+            ),
             child: const Text(
               'Iniciar Sesión',
               style: TextStyle(color: Colors.white),
@@ -89,17 +88,29 @@ class ServiceCorteEstiloPage extends StatelessWidget {
           // Navegación interna de servicios
           const ServiceNavBar(currentIndex: 0),
           const SizedBox(height: 40),
-          // Grid de tarjetas
+          // Grid de tarjetas con responsividad
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: GridView.count(
-                crossAxisCount: 4,
-                mainAxisSpacing: 50,
-                crossAxisSpacing: 50,
-                childAspectRatio: 250 / 180,
-                children:
-                    _services
+              padding: const EdgeInsets.symmetric(horizontal: 10), // Reducir margen
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  // Determina el número de columnas basado en el ancho de la pantalla
+                  int crossAxisCount = 4;
+                  double aspectRatio = 250 / 180; // Aspect ratio por defecto
+
+                  if (constraints.maxWidth < 600) {
+                    crossAxisCount = 2; // Dos columnas en pantallas pequeñas
+                    aspectRatio = 1.5; // Ajuste del ratio para pantallas pequeñas
+                  } else if (constraints.maxWidth < 1000) {
+                    crossAxisCount = 3; // Tres columnas en pantallas medianas
+                  }
+
+                  return GridView.count(
+                    crossAxisCount: crossAxisCount,
+                    mainAxisSpacing: 20,
+                    crossAxisSpacing: 20,
+                    childAspectRatio: aspectRatio,
+                    children: _services
                         .followedBy(_services)
                         .take(9)
                         .map(
@@ -111,6 +122,8 @@ class ServiceCorteEstiloPage extends StatelessWidget {
                           ),
                         )
                         .toList(),
+                  );
+                },
               ),
             ),
           ),
@@ -163,7 +176,7 @@ class _ServiceCard extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(34), // Aumentar el padding
+              padding: const EdgeInsets.all(16), // Reduce el padding para pantallas pequeñas
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -171,7 +184,7 @@ class _ServiceCard extends StatelessWidget {
                     title,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 20,
+                      fontSize: 18, // Reduce el tamaño de la fuente
                       fontFamily: 'Georgia',
                     ),
                   ),
@@ -181,7 +194,7 @@ class _ServiceCard extends StatelessWidget {
                       description,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 14,
+                        fontSize: 12, // Reducir el tamaño de la fuente en pantallas pequeñas
                         height: 1.4,
                       ),
                       maxLines: 3,
@@ -196,7 +209,7 @@ class _ServiceCard extends StatelessWidget {
                         '\$$price',
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: 16, // Ajuste de tamaño de texto
                           fontFamily: 'Georgia',
                         ),
                       ),
@@ -232,5 +245,3 @@ class _ServiceCard extends StatelessWidget {
     );
   }
 }
-
-

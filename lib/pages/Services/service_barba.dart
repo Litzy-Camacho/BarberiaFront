@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:front/pages/Login/login.dart';
-import 'package:front/pages/Clients/reservation_data.dart';
+import 'package:front/pages/Reservation/reservation_data.dart';
 import 'package:front/widgets/service_nav_bar.dart';
 
 class ServiceBarbaPage extends StatelessWidget {
