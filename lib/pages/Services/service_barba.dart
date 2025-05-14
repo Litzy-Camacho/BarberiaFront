@@ -1,32 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:front/pages/login_page.dart';
-import 'package:front/pages/appointment_form_page.dart';
+import 'package:front/pages/Login/login.dart';
+import 'package:front/pages/Clients/reservation_data.dart';
 import 'package:front/widgets/service_nav_bar.dart';
 
-class ServiceEstilosTratamientoPage extends StatelessWidget {
-  const ServiceEstilosTratamientoPage({Key? key}) : super(key: key);
+class ServiceBarbaPage extends StatelessWidget {
+  const ServiceBarbaPage({Key? key}) : super(key: key);
 
   final List<Map<String, String>> _services = const [
     {
-      'image': 'assets/imag/tratamientocuidado.jpg',
-      'title': 'Facial Revitalizante',
+      'image': 'assets/imag/barbaafeitado.jpg',
+      'title': 'Perfilado de Barba',
       'description':
-          'Limpieza facial profunda con mascarillas naturales y vapor.',
+          'Diseño de barba con navaja, toalla caliente y aceites esenciales.',
+      'price': '180',
+    },
+    {
+      'image': 'assets/imag/barbaafeitado.jpg',
+      'title': 'Afeitado Clásico',
+      'description':
+          'Afeitado con espuma caliente, técnica tradicional y productos relajantes.',
+      'price': '160',
+    },
+    {
+      'image': 'assets/imag/barbaafeitado.jpg',
+      'title': 'Barba & Facial',
+      'description':
+          'Servicio combinado de arreglo de barba y limpieza facial profunda.',
       'price': '220',
-    },
-    {
-      'image': 'assets/imag/tratamientocuidado.jpg',
-      'title': 'Tratamiento Capilar',
-      'description':
-          'Nutrición intensa para cuero cabelludo y cabello con aceites naturales.',
-      'price': '210',
-    },
-    {
-      'image': 'assets/imag/tratamientocuidado.jpg',
-      'title': 'Cuidado Total',
-      'description':
-          'Combinación de limpieza facial, masaje y tratamiento capilar.',
-      'price': '300',
     },
   ];
 
@@ -71,11 +71,12 @@ class ServiceEstilosTratamientoPage extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed:
-                () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginPage()),
-                ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const LoginPage()),
+              );
+            },
             child: const Text(
               'Iniciar Sesión',
               style: TextStyle(color: Colors.white),
@@ -87,8 +88,7 @@ class ServiceEstilosTratamientoPage extends StatelessWidget {
       body: Column(
         children: [
           const SizedBox(height: 30),
-          // Pestaña activa = 2
-          const ServiceNavBar(currentIndex: 2),
+          const ServiceNavBar(currentIndex: 1),
           const SizedBox(height: 40),
           Expanded(
             child: Padding(
@@ -98,19 +98,14 @@ class ServiceEstilosTratamientoPage extends StatelessWidget {
                 mainAxisSpacing: 50,
                 crossAxisSpacing: 50,
                 childAspectRatio: 250 / 180,
-                children:
-                    _services
-                        .followedBy(_services)
-                        .take(9)
-                        .map(
-                          (svc) => _ServiceCard(
-                            imagePath: svc['image']!,
-                            title: svc['title']!,
-                            description: svc['description']!,
-                            price: svc['price']!,
-                          ),
-                        )
-                        .toList(),
+                children: _services.followedBy(_services).take(9).map((svc) {
+                  return _ServiceCard(
+                    imagePath: svc['image']!,
+                    title: svc['title']!,
+                    description: svc['description']!,
+                    price: svc['price']!,
+                  );
+                }).toList(),
               ),
             ),
           ),

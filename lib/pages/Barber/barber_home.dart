@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:front/widgets/servicios_section.dart'; // Importación servicios para el App Bar (Barra Navegación HomePage)
 import 'package:front/widgets/contacto_section.dart'; // Importa contacto para el App Bar (Barra Navegación HomePage)
-import 'login_page.dart'; // Importa la página de Login
-import 'user_page.dart';
-import 'barber_page.dart';
-import 'admin_page.dart';
+import '../Login/login.dart'; // Importa la página de Login
+import '../Clients/user_profile.dart';
+import 'barber_profile.dart';
+import '../Administrator/admin_profile.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 
-class HomePageAdmin extends StatefulWidget {
+class HomePageBarber extends StatefulWidget {
   final String? scrollTo; // 'nosotros', 'servicios', 'contacto'
 
-  const HomePageAdmin({Key? key, this.scrollTo}) : super(key: key);
+  const HomePageBarber({Key? key, this.scrollTo}) : super(key: key);
 
   @override
-  State<HomePageAdmin> createState() => _HomePageState();
+  State<HomePageBarber> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePageAdmin> {
+class _HomePageState extends State<HomePageBarber> {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _nosotrosKey = GlobalKey();
   final GlobalKey _serviciosKey = GlobalKey();
@@ -125,7 +125,7 @@ class _HomePageState extends State<HomePageAdmin> {
     icon: const Icon(Icons.account_circle, color: Colors.white, size: 30),
     onSelected: (value) {
       if (value == 'perfil') {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const PantallaAdministrador()));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const PantallaBarbero()));
       } else if (value == 'cerrar') {
         Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
       }
@@ -221,7 +221,7 @@ class _HomePageState extends State<HomePageAdmin> {
                             width: 700,
                             height: 450,
                             child: Image.asset(
-                              'assets/imag/10.jpg',
+                              'assets/imag/nosotros.jpg',
                               fit: BoxFit.cover,
                             ),
                           ),

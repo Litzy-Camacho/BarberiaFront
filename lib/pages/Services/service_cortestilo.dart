@@ -1,32 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:front/pages/login_page.dart';
-import 'package:front/pages/appointment_form_page.dart';
+import 'package:front/pages/Login/login.dart';
+import 'package:front/pages/Clients/reservation_data.dart';
 import 'package:front/widgets/service_nav_bar.dart';
 
-class ServiceBarbaPage extends StatelessWidget {
-  const ServiceBarbaPage({Key? key}) : super(key: key);
+class ServiceCorteEstiloPage extends StatelessWidget {
+  const ServiceCorteEstiloPage({Key? key}) : super(key: key);
 
   final List<Map<String, String>> _services = const [
     {
-      'image': 'assets/imag/barbaafeitado.jpg',
-      'title': 'Perfilado de Barba',
+      'image': 'assets/imag/corteestilo.jpg',
+      'title': 'Corte & Estilo',
       'description':
-          'Diseño de barba con navaja, toalla caliente y aceites esenciales.',
+          'Corte tradicional realizado con la combinación perfecta de tijera y máquina.',
+      'price': '200',
+    },
+    {
+      'image': 'assets/imag/corteestilo.jpg',
+      'title': 'Corte Clásico',
+      'description':
+          'Corte con técnicas modernas y personalización según tu estilo.',
       'price': '180',
     },
     {
-      'image': 'assets/imag/barbaafeitado.jpg',
-      'title': 'Afeitado Clásico',
-      'description':
-          'Afeitado con espuma caliente, técnica tradicional y productos relajantes.',
-      'price': '160',
-    },
-    {
-      'image': 'assets/imag/barbaafeitado.jpg',
-      'title': 'Barba & Facial',
-      'description':
-          'Servicio combinado de arreglo de barba y limpieza facial profunda.',
-      'price': '220',
+      'image': 'assets/imag/corteestilo.jpg',
+      'title': 'Corte Premium',
+      'description': 'Incluye lavado, masaje capilar y estilizado profesional.',
+      'price': '250',
     },
   ];
 
@@ -71,12 +70,11 @@ class ServiceBarbaPage extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const LoginPage()),
-              );
-            },
+            onPressed:
+                () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginPage()),
+                ),
             child: const Text(
               'Iniciar Sesión',
               style: TextStyle(color: Colors.white),
@@ -88,8 +86,10 @@ class ServiceBarbaPage extends StatelessWidget {
       body: Column(
         children: [
           const SizedBox(height: 30),
-          const ServiceNavBar(currentIndex: 1),
+          // Navegación interna de servicios
+          const ServiceNavBar(currentIndex: 0),
           const SizedBox(height: 40),
+          // Grid de tarjetas
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -98,14 +98,19 @@ class ServiceBarbaPage extends StatelessWidget {
                 mainAxisSpacing: 50,
                 crossAxisSpacing: 50,
                 childAspectRatio: 250 / 180,
-                children: _services.followedBy(_services).take(9).map((svc) {
-                  return _ServiceCard(
-                    imagePath: svc['image']!,
-                    title: svc['title']!,
-                    description: svc['description']!,
-                    price: svc['price']!,
-                  );
-                }).toList(),
+                children:
+                    _services
+                        .followedBy(_services)
+                        .take(9)
+                        .map(
+                          (svc) => _ServiceCard(
+                            imagePath: svc['image']!,
+                            title: svc['title']!,
+                            description: svc['description']!,
+                            price: svc['price']!,
+                          ),
+                        )
+                        .toList(),
               ),
             ),
           ),
@@ -227,4 +232,5 @@ class _ServiceCard extends StatelessWidget {
     );
   }
 }
+
 

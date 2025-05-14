@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'home_page.dart';
-import 'user_page.dart';
+import '../Home/home_page.dart';
+import 'user_profile.dart';
 
 class PaymentPage extends StatefulWidget {
   final String name;

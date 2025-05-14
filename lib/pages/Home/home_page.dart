@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:front/widgets/servicios_section.dart'; // Importación servicios para el App Bar (Barra Navegación HomePage)
 import 'package:front/widgets/contacto_section.dart'; // Importa contacto para el App Bar (Barra Navegación HomePage)
-import 'login_page.dart'; // Importa la página de Login
-import 'user_page.dart';
-import 'barber_page.dart';
-import 'admin_page.dart';
+import '../Login/login.dart'; // Importa la página de Login
+import '../Clients/user_profile.dart';
+import '../Barber/barber_profile.dart';
+import '../Administrator/admin_profile.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 
-class HomePageBarber extends StatefulWidget {
+class HomePage extends StatefulWidget {
   final String? scrollTo; // 'nosotros', 'servicios', 'contacto'
 
-  const HomePageBarber({Key? key, this.scrollTo}) : super(key: key);
+  const HomePage({Key? key, this.scrollTo}) : super(key: key);
 
   @override
-  State<HomePageBarber> createState() => _HomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePageBarber> {
+class _HomePageState extends State<HomePage> {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _nosotrosKey = GlobalKey();
   final GlobalKey _serviciosKey = GlobalKey();
@@ -121,29 +121,14 @@ class _HomePageState extends State<HomePageBarber> {
               ],
             ),
             actions: [
-  PopupMenuButton<String>(
-    icon: const Icon(Icons.account_circle, color: Colors.white, size: 30),
-    onSelected: (value) {
-      if (value == 'perfil') {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const PantallaBarbero()));
-      } else if (value == 'cerrar') {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
-      }
-    },
-    itemBuilder: (BuildContext context) => [
-      const PopupMenuItem<String>(
-        value: 'perfil',
-        child: Text('Ver perfil'),
-      ),
-      const PopupMenuItem<String>(
-        value: 'cerrar',
-        child: Text('Cerrar sesión'),
-      ),
-    ],
-  ),
-  const SizedBox(width: 10),
-],
-
+              TextButton(
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
+                },
+                child: const Text('Iniciar Sesión', style: TextStyle(color: Colors.white)),
+              ),
+              const SizedBox(width: 10),
+            ],
           ),
         ),
       ),
@@ -221,7 +206,7 @@ class _HomePageState extends State<HomePageBarber> {
                             width: 700,
                             height: 450,
                             child: Image.asset(
-                              'assets/imag/10.jpg',
+                              'assets/imag/nosotros.jpg',
                               fit: BoxFit.cover,
                             ),
                           ),

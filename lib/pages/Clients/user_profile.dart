@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart'; 
-import 'home_page.dart';
-import 'user.dart';
+import '../Home/home_page.dart';
+import 'user_home.dart';
 
 class PantallaUsuario extends StatefulWidget {
   const PantallaUsuario({super.key});

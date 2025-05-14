@@ -1,31 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:front/pages/login_page.dart';
-import 'package:front/pages/appointment_form_page.dart';
+import 'package:front/pages/Login/login.dart';
+import 'package:front/pages/Clients/reservation_data.dart';
 import 'package:front/widgets/service_nav_bar.dart';
 
-class ServiceCorteEstiloPage extends StatelessWidget {
-  const ServiceCorteEstiloPage({Key? key}) : super(key: key);
+class ServiceEstilosTratamientoPage extends StatelessWidget {
+  const ServiceEstilosTratamientoPage({Key? key}) : super(key: key);
 
   final List<Map<String, String>> _services = const [
     {
-      'image': 'assets/imag/corteestilo.jpg',
-      'title': 'Corte & Estilo',
+      'image': 'assets/imag/tratamientocuidado.jpg',
+      'title': 'Facial Revitalizante',
       'description':
-          'Corte tradicional realizado con la combinación perfecta de tijera y máquina.',
-      'price': '200',
+          'Limpieza facial profunda con mascarillas naturales y vapor.',
+      'price': '220',
     },
     {
-      'image': 'assets/imag/corteestilo.jpg',
-      'title': 'Corte Clásico',
+      'image': 'assets/imag/tratamientocuidado.jpg',
+      'title': 'Tratamiento Capilar',
       'description':
-          'Corte con técnicas modernas y personalización según tu estilo.',
-      'price': '180',
+          'Nutrición intensa para cuero cabelludo y cabello con aceites naturales.',
+      'price': '210',
     },
     {
-      'image': 'assets/imag/corteestilo.jpg',
-      'title': 'Corte Premium',
-      'description': 'Incluye lavado, masaje capilar y estilizado profesional.',
-      'price': '250',
+      'image': 'assets/imag/tratamientocuidado.jpg',
+      'title': 'Cuidado Total',
+      'description':
+          'Combinación de limpieza facial, masaje y tratamiento capilar.',
+      'price': '300',
     },
   ];
 
@@ -86,10 +87,9 @@ class ServiceCorteEstiloPage extends StatelessWidget {
       body: Column(
         children: [
           const SizedBox(height: 30),
-          // Navegación interna de servicios
-          const ServiceNavBar(currentIndex: 0),
+          // Pestaña activa = 2
+          const ServiceNavBar(currentIndex: 2),
           const SizedBox(height: 40),
-          // Grid de tarjetas
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -232,5 +232,4 @@ class _ServiceCard extends StatelessWidget {
     );
   }
 }
-
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:front/pages/service_cortestilo_page.dart';
-import 'package:front/pages/service_barba_page.dart';
-import 'package:front/pages/service_estilostratamiento_page.dart';
+import 'package:front/pages/Services/service_cortestilo.dart';
+import 'package:front/pages/Services/service_barba.dart';
+import 'package:front/pages/Services/service_tratamiento_.dart';
 
 class ServiciosSection extends StatelessWidget {
   final GlobalKey keyServicios;

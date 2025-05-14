@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
 
-import 'user.dart';
-import 'payment.dart';
-import 'resume_page.dart';
+import 'user_home.dart';
+import 'payment_data.dart';
+import 'resume_reservation.dart';
 
 class AppointmentFormPage extends StatefulWidget {
   final String service;
