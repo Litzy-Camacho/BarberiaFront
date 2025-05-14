@@ -26,7 +26,6 @@ class _AppointmentFormPageState extends State<AppointmentFormPage> {
 
   final List<String> _barbers = ['Ricardo', 'Andrea', 'Litzy'];
 
-  // Para cambiar servicio
   bool _showServiceDropdown = false;
   late String _selectedService;
   final List<String> _availableServices = ['Corte de cabello', 'Barba', 'Color', 'Afeitado'];
@@ -43,7 +42,7 @@ class _AppointmentFormPageState extends State<AppointmentFormPage> {
   @override
   void initState() {
     super.initState();
-    _selectedService = widget.service;
+    _selectedService = widget.service; // Servicio inicial
     _nameCtrl.addListener(() {
       setState(() {});
     });
@@ -180,27 +179,32 @@ class _AppointmentFormPageState extends State<AppointmentFormPage> {
 
                       const Text('Servicio'),
                       const SizedBox(height: 8),
-                      TextFormField(
-                        initialValue: _selectedService,
-                        enabled: false,
-                        style: const TextStyle(color: Colors.black),
-                        decoration: _customInputDecoration(''),
-                      ),
+                      Row(
+  children: [
+    Expanded(
+      child: TextFormField(
+        controller: TextEditingController(text: _selectedService), // Dynamically update the service
+        enabled: false,
+        style: const TextStyle(color: Colors.black),
+        decoration: _customInputDecoration(''),
+      ),
+    ),
+  Container(
+  
+  child: IconButton(
+    icon: const Icon(Icons.edit, color: Colors.white), // ícono de editar
+    onPressed: () {
+      setState(() {
+        _showServiceDropdown = !_showServiceDropdown;
+      });
+    },
+  ),
+),
+
+  ],
+),
+
                       const SizedBox(height: 8),
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _showServiceDropdown = !_showServiceDropdown;
-                          });
-                        },
-                        child: const Text(
-                          'Cambiar servicio',
-                          style: TextStyle(
-                            color: Colors.blueAccent,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      ),
                       if (_showServiceDropdown) ...[
                         const SizedBox(height: 8),
                         DropdownButtonFormField<String>(
@@ -213,8 +217,8 @@ class _AppointmentFormPageState extends State<AppointmentFormPage> {
                               .toList(),
                           onChanged: (value) {
                             setState(() {
-                              _selectedService = value!;
-                              _showServiceDropdown = false;
+                              _selectedService = value!;  // Update selected service
+                              _showServiceDropdown = false;  // Hide the dropdown
                             });
                           },
                         ),
