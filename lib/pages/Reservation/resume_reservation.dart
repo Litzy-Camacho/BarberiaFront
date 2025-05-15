@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:confetti/confetti.dart'; // Importar el paquete de confeti
+import 'package:confetti/confetti.dart';
 import '../Clients/user_profile.dart';
 
 class ResumeReservationPage extends StatefulWidget {
@@ -32,17 +32,17 @@ class ResumeReservationPage extends StatefulWidget {
 }
 
 class _ResumeReservationPageState extends State<ResumeReservationPage> {
-  late ConfettiController _confettiController; // Controlador de confeti
+  late ConfettiController _confettiController;
 
   @override
   void initState() {
     super.initState();
-    _confettiController = ConfettiController(duration: const Duration(seconds: 5)); // Duración de la animación
+    _confettiController = ConfettiController(duration: const Duration(seconds: 5));
   }
 
   @override
   void dispose() {
-    _confettiController.dispose(); // Liberar el controlador cuando se destruya el widget
+    _confettiController.dispose();
     super.dispose();
   }
 
@@ -51,14 +51,12 @@ class _ResumeReservationPageState extends State<ResumeReservationPage> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
-        child: Stack( // Usamos un Stack para superponer el confeti sobre la interfaz
+        child: Stack(
           children: [
-            // Confeti que se lanza desde el fondo
             ConfettiWidget(
               confettiController: _confettiController,
-              blastDirectionality: BlastDirectionality.explosive, // Explosión en todas direcciones
-              colors: const [Colors.green, Colors.blue, Colors.red, Colors.yellow], // Colores del confeti
-              
+              blastDirectionality: BlastDirectionality.explosive,
+              colors: const [Colors.green, Colors.blue, Colors.red, Colors.yellow],
             ),
             Center(
               child: SingleChildScrollView(
@@ -78,28 +76,23 @@ class _ResumeReservationPageState extends State<ResumeReservationPage> {
                     _buildInfo('Barbero: ', widget.barber),
                     _buildInfo('Servicio: ', widget.service),
                     const SizedBox(height: 20),
-
                     const Text(
                       'Detalles del pago',
                       style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10),
-                    _buildInfo('Titular: ${widget.cardholderName}', ''),
-                    _buildInfo('Número: ${_formatCardNumber(widget.cardNumber)}', ''),
-                    _buildInfo('Expira: ${widget.expiryMonth}/${widget.expiryYear}', ''),
+                    _buildInfo('Titular: ', widget.cardholderName),
+                    _buildInfo('Número: ', _formatCardNumber(widget.cardNumber)),
+                    _buildInfo('Expira: ', '${widget.expiryMonth}/${widget.expiryYear}'),
                     const Divider(color: Colors.white24, height: 30),
-
                     ElevatedButton(
                       onPressed: () {
-                        // Iniciar la animación de confeti
                         _confettiController.play();
-
-                        // Mostrar el cuadro de diálogo de confirmación
                         showDialog(
                           context: context,
                           builder: (context) {
                             return AlertDialog(
-                              backgroundColor: Colors.green, // Fondo verde para la notificación
+                              backgroundColor: Colors.green,
                               title: const Text(
                                 'Cita Reservada',
                                 style: TextStyle(color: Colors.white, fontSize: 18),
@@ -111,10 +104,10 @@ class _ResumeReservationPageState extends State<ResumeReservationPage> {
                               actions: [
                                 TextButton(
                                   onPressed: () {
-                                    Navigator.pop(context); // Cierra el diálogo
+                                    Navigator.pop(context);
                                     Navigator.pushReplacement(
                                       context,
-                                      MaterialPageRoute(builder: (context) => const PantallaUsuario()),  // Redirige a PantallaUsuario
+                                      MaterialPageRoute(builder: (context) => const PantallaUsuario()),
                                     );
                                   },
                                   child: const Text('Aceptar', style: TextStyle(color: Colors.white)),
@@ -153,9 +146,11 @@ class _ResumeReservationPageState extends State<ResumeReservationPage> {
   }
 
   String _formatCardNumber(String cardNumber) {
-    return cardNumber.replaceAllMapped(
-      RegExp(r'(\d{4})(?=\d)'),
-      (match) => '${match.group(1)} ',
-    ).trim();
+    // Elimina espacios si vienen incluidos
+    String cleanNumber = cardNumber.replaceAll(' ', '');
+    if (cleanNumber.length < 4) return cardNumber;
+
+    String lastFour = cleanNumber.substring(cleanNumber.length - 4);
+    return '**** **** **** $lastFour';
   }
 }
