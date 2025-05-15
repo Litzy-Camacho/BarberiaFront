@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../Home/home_page.dart';
+import '../Components/navbar_home.dart';  // Aquí está tu CustomAppBar
 
 class PantallaUsuario extends StatefulWidget {
   const PantallaUsuario({super.key});
@@ -114,58 +115,18 @@ class _PantallaUsuarioState extends State<PantallaUsuario> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Image.asset('assets/imag/logo.png'),
-        ),
-        title: LayoutBuilder(
-          builder: (context, constraints) {
-            if (constraints.maxWidth > 600) {
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildNavButton('Nosotros', 'nosotros'),
-                  const SizedBox(width: 20),
-                  _buildNavButton('Servicios', 'servicios'),
-                  const SizedBox(width: 20),
-                  _buildNavButton('Contacto', 'contacto'),
-                ],
-              );
-            } else {
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildNavButton('Nosotros', 'nosotros'),
-                  _buildNavButton('Servicios', 'servicios'),
-                  _buildNavButton('Contacto', 'contacto'),
-                ],
-              );
-            }
-          },
-        ),
-        actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.account_circle, color: Colors.white),
-            onSelected: (value) {
-              if (value == 'logout') {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => HomePage(scrollTo: 'inicio')),
-                );
-              }
-            },
-            itemBuilder: (BuildContext context) => [
-              const PopupMenuItem<String>(
-                value: 'logout',
-                child: Text('Cerrar Sesión'),
-              ),
-            ],
-          ),
-          const SizedBox(width: 10),
-        ],
+      appBar: CustomAppBar(
+        onNavigateToSection: (seccion) {
+          // Al hacer click en la navbar, navegamos a HomePage con la sección para hacer scroll
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => HomePage(scrollTo: seccion.toLowerCase()),
+            ),
+          );
+        },
+        // Si quieres que haya una función para scroll to top en la pantalla actual, la defines aquí
+        scrollToTop: () {}, // Puedes dejar vacía o agregar algo
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -189,9 +150,7 @@ class _PantallaUsuarioState extends State<PantallaUsuario> {
                   const SizedBox(height: 5),
                   _buildTextField(controllerStatus),
                   const SizedBox(height: 20),
-
                   const Divider(color: Colors.grey),
-
                   const Center(
                     child: Text(
                       "Servicios solicitados",
@@ -199,8 +158,6 @@ class _PantallaUsuarioState extends State<PantallaUsuario> {
                     ),
                   ),
                   const SizedBox(height: 10),
-
-                  // Filtro tipo pestañas con estilo que pediste
                   Center(
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
@@ -217,9 +174,7 @@ class _PantallaUsuarioState extends State<PantallaUsuario> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 20),
-
                   _buildTablaServicios(serviciosFiltrados),
                 ],
               ),
@@ -286,18 +241,6 @@ class _PantallaUsuarioState extends State<PantallaUsuario> {
           ),
         ),
       ),
-    );
-  }
-
-  TextButton _buildNavButton(String text, String scrollTo) {
-    return TextButton(
-      onPressed: () {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomePage(scrollTo: scrollTo)),
-        );
-      },
-      child: Text(text, style: const TextStyle(color: Colors.white)),
     );
   }
 }

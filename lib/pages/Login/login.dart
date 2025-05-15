@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'reset_password_email.dart';
-import '../Clients/user_home.dart';
-import '../Barber/barber_home.dart';
-import '../Administrator/admin_home.dart';
 import 'create_account.dart';
 import '../Clients/user_profile.dart';
+import '../Login/session.dart'; // Asegúrate de crear este archivo con la clase Session
+import '../Home/home_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -50,7 +49,7 @@ class _LoginPageState extends State<LoginPage> {
                   controller: emailController,
                   label: 'Correo',
                   hintText: 'Ingresa tu correo',
-                  errorText: emailError,
+                  errorText: emailError.isEmpty ? null : emailError,
                 ),
                 const SizedBox(height: 20),
                 _LoginTextField(
@@ -145,13 +144,17 @@ class _LoginPageState extends State<LoginPage> {
                           }
 
                           Widget destination;
+                          String userRole;
 
                           if (email == 'admin@gmail.com') {
-                            destination = const HomePageAdmin();
+                            destination = const HomePage(); // Igual que user
+                            userRole = 'admin';
                           } else if (email == 'barber@gmail.com') {
-                            destination = const HomePageBarber();
+                            destination = const HomePage();
+                            userRole = 'barber';
                           } else if (email == 'user@gmail.com') {
-                            destination = const HomePageUser();
+                            destination = const HomePage();
+                            userRole = 'user';
                           } else {
                             setState(() {
                               emailError = 'Correo no reconocido';
@@ -159,7 +162,11 @@ class _LoginPageState extends State<LoginPage> {
                             return;
                           }
 
-                          Navigator.push(
+                          // Guardar email y rol en sesión
+                          Session.email.value = email;
+                          Session.role.value = userRole;
+
+                          Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(builder: (context) => destination),
                           );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'pages/Home/home_page.dart'; // Importa el HomePage
+import 'pages/Home/home_page.dart';
+import 'pages/Home/contacto_section.dart'; // Importa el HomePage
 import 'pages/Administrator/admin_profile.dart'; // Importa el HomePage
 
 void main() {
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false, // Quita la banderita de debug
       title: 'Barbería',
-      home: PantallaAdministrador(), // HomePage como pantalla principal
+      home: HomePage(), // HomePage como pantalla principal
     );
   }
 }

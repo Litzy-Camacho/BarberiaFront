@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:front/pages/Login/login.dart';
 import 'package:front/pages/Reservation/reservation_data.dart';
-import 'package:front/widgets/service_nav_bar.dart';
+import 'package:front/pages/Services/service_nav_bar.dart';
 
 class ServiceCorteEstiloPage extends StatelessWidget {
   const ServiceCorteEstiloPage({Key? key}) : super(key: key);
