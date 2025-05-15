@@ -125,7 +125,7 @@ class _HomePageState extends State<HomePageAdmin> {
     icon: const Icon(Icons.account_circle, color: Colors.white, size: 30),
     onSelected: (value) {
       if (value == 'perfil') {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const PantallaAdministrador()));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => PantallaAdministrador()));
       } else if (value == 'cerrar') {
         Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
       }
