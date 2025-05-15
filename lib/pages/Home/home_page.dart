@@ -267,8 +267,7 @@ class _HomePageState extends State<HomePage> {
 
                   // SECCIÓN SERVICIOS
                   ServiciosSection(keyServicios: _serviciosKey),
-
-                  // SECCIÓN ¿Por qué elegirnos?
+// SECCIÓN ¿Por qué elegirnos?
                   Container(
                     color: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
@@ -304,25 +303,96 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       const SizedBox(height: 20),
                                       const ContactoItem(
-                                        icon: Icons.mood,
-                                        title: 'Atención al\nCliente',
+                                        icon: Icons.spa,
+                                        title: 'Un Espacio\nCómodo Para Ti',
+                                      ),
+                                      const SizedBox(height: 30),
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: Image.asset(
+                                          'assets/imag/extra.jpg',
+                                          fit: BoxFit.cover,
+                                          width: double.infinity,
+                                          height: 200,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Container(
+                                        padding: const EdgeInsets.all(16),
+                                        decoration: BoxDecoration(
+                                          color: Colors.black,
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: const Text(
+                                          'En Essense, cada cliente recibe atención personalizada en un ambiente privado y cómodo.',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                            fontFamily: 'Georgia',
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
                                       ),
                                     ],
                                   )
                                 : Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: const [
-                                      ContactoItem(
-                                        icon: Icons.lightbulb_outline,
-                                        title: 'Experiencia\nPersonalizada',
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        flex: 1,
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: const [
+                                            ContactoItem(
+                                              icon: Icons.lightbulb_outline,
+                                              title: 'Experiencia\nPersonalizada',
+                                            ),
+                                            SizedBox(height: 20),
+                                            ContactoItem(
+                                              icon: Icons.verified,
+                                              title: 'Calidad &\nProfesionalismo',
+                                            ),
+                                            SizedBox(height: 20),
+                                            ContactoItem(
+                                              icon: Icons.spa,
+                                              title: 'Un Espacio\nCómodo Para Ti',
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                      ContactoItem(
-                                        icon: Icons.verified,
-                                        title: 'Calidad &\nProfesionalismo',
-                                      ),
-                                      ContactoItem(
-                                        icon: Icons.mood,
-                                        title: 'Atención al\nCliente',
+                                      const SizedBox(width: 40),
+                                      Expanded(
+                                        flex: 1,
+                                        child: Column(
+                                          children: [
+                                            ClipRRect(
+                                              borderRadius: BorderRadius.circular(12),
+                                              child: Image.asset(
+                                                'assets/imag/extra.jpg',
+                                                fit: BoxFit.cover,
+                                                height: 280,
+                                                width: double.infinity,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 10),
+                                            Container(
+                                              padding: const EdgeInsets.all(16),
+                                              decoration: BoxDecoration(
+                                                color: Colors.black,
+                                                borderRadius: BorderRadius.circular(8),
+                                              ),
+                                              child: const Text(
+                                                'En Essense, cada cliente recibe atención personalizada en un ambiente privado y cómodo.',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 16,
+                                                  fontFamily: 'Georgia',
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ],
                                   );
@@ -331,7 +401,7 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                   ),
-
+                  
                   // SECCIÓN CONTACTO
                   ContactoSection(keyContacto: _contactoKey),
                 ],
