@@ -200,7 +200,7 @@ class _PantallaUsuarioState extends State<PantallaUsuario> {
                   ),
                   const SizedBox(height: 10),
 
-                  // Aquí el filtro con el estilo tipo pestañas de PantallaBarbero
+                  // Filtro tipo pestañas con estilo que pediste
                   Center(
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
