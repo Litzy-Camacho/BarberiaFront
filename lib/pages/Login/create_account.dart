@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // Import necesario para filtrar entrada
 import 'login.dart';  // Asegúrate de importar la página de login
 
 class RegisterPage extends StatefulWidget {
@@ -10,6 +11,7 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController(); // Nuevo controlador para teléfono
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
@@ -18,6 +20,7 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _obscureConfirmPassword = true;
 
   bool get isNameValid => RegExp(r'^[a-zA-Z\s]+$').hasMatch(_nameController.text);
+  bool get isPhoneValid => RegExp(r'^\d*$').hasMatch(_phoneController.text); // Validación para solo números
   bool get isEmailValid => RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(_emailController.text);
   bool get isPasswordValid =>
       _passwordController.text == _confirmPasswordController.text &&
@@ -32,14 +35,14 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        width: double.infinity, // Asegura que el contenedor ocupe todo el ancho
-        height: MediaQuery.of(context).size.height, // Asegura que el contenedor ocupe todo el alto
-        color: const Color(0xFF1C1C1C), // Color de fondo
+        width: double.infinity,
+        height: MediaQuery.of(context).size.height,
+        color: const Color(0xFF1C1C1C),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
         child: Center(
-          child: SingleChildScrollView( // Usamos SingleChildScrollView para permitir desplazamiento en dispositivos pequeños
+          child: SingleChildScrollView(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center, // Centra el contenido
+              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _RegisterTextField(
@@ -53,6 +56,25 @@ class _RegisterPageState extends State<RegisterPage> {
                     padding: EdgeInsets.only(top: 4),
                     child: Text(
                       'El nombre solo debe contener letras.',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
+                const SizedBox(height: 20),
+
+                // NUEVO CAMPO TELÉFONO
+                _RegisterTextField(
+                  label: 'Teléfono',
+                  hintText: 'Ingresa tu número de teléfono',
+                  controller: _phoneController,
+                  onChanged: (_) => setState(() {}),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                ),
+                if (!isPhoneValid && _phoneController.text.isNotEmpty)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 4),
+                    child: Text(
+                      'El teléfono solo debe contener números.',
                       style: TextStyle(color: Colors.red),
                     ),
                   ),
@@ -132,10 +154,10 @@ class _RegisterPageState extends State<RegisterPage> {
                 Center(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: isNameValid && isEmailValid && isPasswordValid
+                      backgroundColor: isNameValid && isEmailValid && isPasswordValid && isPhoneValid
                           ? Colors.white
                           : Colors.grey.shade700,
-                      foregroundColor: isNameValid && isEmailValid && isPasswordValid
+                      foregroundColor: isNameValid && isEmailValid && isPasswordValid && isPhoneValid
                           ? Colors.black
                           : Colors.white,
                       disabledBackgroundColor: Colors.grey.shade700,
@@ -143,7 +165,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                     ),
-                    onPressed: isNameValid && isEmailValid && isPasswordValid
+                    onPressed: isNameValid && isEmailValid && isPasswordValid && isPhoneValid
                         ? () {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
@@ -178,6 +200,8 @@ class _RegisterTextField extends StatelessWidget {
   final bool obscureText;
   final ValueChanged<String>? onChanged;
   final Widget? suffixIcon;
+  final TextInputType? keyboardType;  // Agregado para permitir tipos de teclado
+  final List<TextInputFormatter>? inputFormatters; // Para filtrar entrada
 
   const _RegisterTextField({
     required this.label,
@@ -186,6 +210,8 @@ class _RegisterTextField extends StatelessWidget {
     this.obscureText = false,
     this.onChanged,
     this.suffixIcon,
+    this.keyboardType,
+    this.inputFormatters,
   });
 
   @override
@@ -199,6 +225,8 @@ class _RegisterTextField extends StatelessWidget {
           controller: controller,
           obscureText: obscureText,
           onChanged: onChanged,
+          keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: const TextStyle(color: Colors.grey),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../Home/home_page.dart';
-import '../Components/navbar_home.dart';  // Aquí está tu CustomAppBar
+import '../Components/navbar_home.dart';
+import 'package:flutter/services.dart';
 
 class PantallaUsuario extends StatefulWidget {
   const PantallaUsuario({super.key});
@@ -11,8 +12,14 @@ class PantallaUsuario extends StatefulWidget {
 
 class _PantallaUsuarioState extends State<PantallaUsuario> {
   TextEditingController controllerNombre = TextEditingController(text: 'Andrés');
+  TextEditingController controllerTelefono = TextEditingController(text: '5551234567');
   TextEditingController controllerCorreo = TextEditingController(text: 'usuario@gmail.com');
-  TextEditingController controllerStatus = TextEditingController(text: 'Activo');
+
+  bool nombreValido = true;
+
+  // Variables para controlar si el campo está en modo edición o no
+  bool _editandoNombre = false;
+  bool _editandoTelefono = false;
 
   List<Map<String, String>> serviciosSolicitados = [];
   List<Map<String, String>> serviciosFiltrados = [];
@@ -59,6 +66,26 @@ class _PantallaUsuarioState extends State<PantallaUsuario> {
     super.initState();
     serviciosSolicitados = List<Map<String, String>>.from(datosServiciosJson['serviciosSolicitados']);
     _aplicarFiltro();
+    controllerNombre.addListener(_validarNombre);
+  }
+
+  void _validarNombre() {
+    final texto = controllerNombre.text;
+    final contieneNumero = texto.contains(RegExp(r'[0-9]'));
+
+    if (contieneNumero) {
+      String nuevoTexto = texto.replaceAll(RegExp(r'[0-9]'), '');
+      controllerNombre.value = controllerNombre.value.copyWith(
+        text: nuevoTexto,
+        selection: TextSelection.collapsed(offset: nuevoTexto.length),
+      );
+
+      setState(() => nombreValido = false);
+    } else {
+      if (!nombreValido) {
+        setState(() => nombreValido = true);
+      }
+    }
   }
 
   void _aplicarFiltro() {
@@ -76,8 +103,8 @@ class _PantallaUsuarioState extends State<PantallaUsuario> {
   @override
   void dispose() {
     controllerNombre.dispose();
+    controllerTelefono.dispose();
     controllerCorreo.dispose();
-    controllerStatus.dispose();
     super.dispose();
   }
 
@@ -112,12 +139,108 @@ class _PantallaUsuarioState extends State<PantallaUsuario> {
     );
   }
 
+  Widget _buildEditableTextField({
+  required TextEditingController controller,
+  required String label,
+  required List<TextInputFormatter> inputFormatters,
+  TextInputType keyboardType = TextInputType.text,
+}) {
+  final focusNode = FocusNode();
+  bool isEditing = false;
+  bool showWarning = false;
+  String lastValidValue = controller.text;  // Guardamos el último valor válido
+
+  return StatefulBuilder(
+    builder: (context, setInnerState) {
+      return GestureDetector(
+        onTap: () {
+          focusNode.requestFocus();
+          setInnerState(() => isEditing = true);
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label),
+            const SizedBox(height: 5),
+            TextField(
+              controller: controller,
+              focusNode: focusNode,
+              inputFormatters: inputFormatters,
+              keyboardType: keyboardType,
+              maxLength: label == "Teléfono" ? 10 : null,
+              style: const TextStyle(color: Colors.white),
+              cursorColor: Colors.green,
+              onChanged: (value) {
+                if (label == "Nombre") {
+                  // Revisamos si el texto contiene números
+                  if (RegExp(r'\d').hasMatch(value)) {
+                    setInnerState(() {
+                      showWarning = true;
+                      // Revertimos al último valor válido
+                      controller.text = lastValidValue;
+                      controller.selection = TextSelection.fromPosition(
+                        TextPosition(offset: lastValidValue.length),
+                      );
+                    });
+                  } else {
+                    setInnerState(() {
+                      showWarning = false;
+                      lastValidValue = value; // Actualizamos el último valor válido
+                    });
+                  }
+                } else if (label == "Teléfono") {
+                  setInnerState(() {
+                    showWarning = value.length != 10;
+                  });
+                } else {
+                  setInnerState(() {
+                    showWarning = false;
+                  });
+                }
+              },
+              onEditingComplete: () {
+                setInnerState(() => isEditing = false);
+                focusNode.unfocus();
+              },
+              decoration: InputDecoration(
+                counterText: "",
+                suffixIcon: const Icon(Icons.edit, color: Colors.white),
+                filled: true,
+                fillColor: Colors.black,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: showWarning ? Colors.red : Colors.grey),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: showWarning ? Colors.red : Colors.green, width: 2),
+                ),
+              ),
+            ),
+            if (showWarning)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  label == "Nombre"
+                      ? "No se permiten números en el nombre"
+                      : "El teléfono debe tener exactamente 10 dígitos",
+                  style: const TextStyle(color: Colors.red, fontSize: 12),
+                ),
+              ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
         onNavigateToSection: (seccion) {
-          // Al hacer click en la navbar, navegamos a HomePage con la sección para hacer scroll
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -125,8 +248,7 @@ class _PantallaUsuarioState extends State<PantallaUsuario> {
             ),
           );
         },
-        // Si quieres que haya una función para scroll to top en la pantalla actual, la defines aquí
-        scrollToTop: () {}, // Puedes dejar vacía o agregar algo
+        scrollToTop: () {},
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -137,18 +259,42 @@ class _PantallaUsuarioState extends State<PantallaUsuario> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text("Datos personales", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 10),
-                  const Text("Nombre"),
+                const SizedBox(height: 10),
+                _buildEditableTextField(
+                  controller: controllerNombre,
+                  label: "Nombre",
+                  inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]'))],
+                ),
+                const SizedBox(height: 10),
+                _buildEditableTextField(
+                  controller: controllerTelefono,
+                  label: "Teléfono",
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(height: 10),
+                const Text("Correo"),
                   const SizedBox(height: 5),
-                  _buildTextField(controllerNombre, editable: true),
-                  const SizedBox(height: 10),
-                  const Text("Correo"),
-                  const SizedBox(height: 5),
-                  _buildTextField(controllerCorreo),
-                  const SizedBox(height: 10),
-                  const Text("Status"),
-                  const SizedBox(height: 5),
-                  _buildTextField(controllerStatus),
+                  TextField(
+                    controller: controllerCorreo,
+                    readOnly: true,
+                    cursorColor: Colors.green,
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      filled: true,
+                      fillColor: Colors.black,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Colors.grey),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Colors.green, width: 2),
+                      ),
+                    ),
+                    style: const TextStyle(color: Colors.white),
+                  ),
                   const SizedBox(height: 20),
                   const Divider(color: Colors.grey),
                   const Center(
@@ -181,28 +327,6 @@ class _PantallaUsuarioState extends State<PantallaUsuario> {
             ),
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildTextField(TextEditingController controller, {bool editable = false}) {
-    return SizedBox(
-      width: double.infinity,
-      child: TextField(
-        controller: controller,
-        readOnly: !editable,
-        style: const TextStyle(color: Colors.white),
-        decoration: InputDecoration(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          filled: true,
-          fillColor: Colors.black,
-          suffixIcon: editable ? const Icon(Icons.edit, color: Colors.white) : null,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Colors.grey),
-          ),
-        ),
       ),
     );
   }

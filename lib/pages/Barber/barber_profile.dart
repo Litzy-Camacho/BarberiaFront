@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../Home/home_page.dart';
 import '../Components/navbar_home.dart';
 
@@ -10,37 +11,42 @@ class PantallaBarbero extends StatefulWidget {
 }
 
 class _PantallaBarberoState extends State<PantallaBarbero> {
-  TextEditingController controller1 = TextEditingController(text: 'Jorge');
-  TextEditingController controller2 = TextEditingController(text: 'barber@gmail.com');
-  TextEditingController controller3 = TextEditingController(text: 'Activo');
+  final TextEditingController controllerNombre = TextEditingController(text: 'Jorge');
+  final TextEditingController controllerTelefono = TextEditingController(text: '1234567890');
+  final TextEditingController controllerCorreo = TextEditingController(text: 'barber@gmail.com');
+  final TextEditingController controllerStatus = TextEditingController(text: 'Activo');
 
   List<Map<String, String>> citasPendientes = [];
   List<Map<String, String>> citasProximas = [];
 
-  final Map<String, dynamic> datosCitasJson = {
-    "citasPendientes": [
-      {
-        "fecha": "2025-05-01",
-        "hora": "10:00 AM",
-        "servicio": "Corte de cabello",
-        "cliente": "Cliente 1"
-      },
-      {
-        "fecha": "2025-05-02",
-        "hora": "11:00 AM",
-        "servicio": "Barba",
-        "cliente": "Cliente 2"
-      }
-    ],
-    "citasProximas": [
-      {
-        "fecha": "2025-05-05",
-        "hora": "2:00 PM",
-        "servicio": "Tinte",
-        "cliente": "Cliente 3"
-      }
-    ]
-  };
+  // En datosCitasJson, agrega el campo 'telefono' a cada cita:
+final Map<String, dynamic> datosCitasJson = {
+  "citasPendientes": [
+    {
+      "fecha": "2025-05-01",
+      "hora": "10:00 AM",
+      "servicio": "Corte de cabello",
+      "cliente": "Cliente 1",
+      "telefono": "1234567890"
+    },
+    {
+      "fecha": "2025-05-02",
+      "hora": "11:00 AM",
+      "servicio": "Barba",
+      "cliente": "Cliente 2",
+      "telefono": "0987654321"
+    }
+  ],
+  "citasProximas": [
+    {
+      "fecha": "2025-05-05",
+      "hora": "2:00 PM",
+      "servicio": "Tinte",
+      "cliente": "Cliente 3",
+      "telefono": "1122334455"
+    }
+  ]
+};
 
   bool showCitasPendientes = true;
   bool showCitasProximas = false;
@@ -48,52 +54,24 @@ class _PantallaBarberoState extends State<PantallaBarbero> {
   @override
   void initState() {
     super.initState();
-    // Cargar los datos desde el JSON definido
     citasPendientes = List<Map<String, String>>.from(datosCitasJson['citasPendientes']);
     citasProximas = List<Map<String, String>>.from(datosCitasJson['citasProximas']);
   }
 
   @override
   void dispose() {
-    controller1.dispose();
-    controller2.dispose();
-    controller3.dispose();
+    controllerNombre.dispose();
+    controllerTelefono.dispose();
+    controllerCorreo.dispose();
+    controllerStatus.dispose();
     super.dispose();
-  }
-
-  void aceptarCita(int index) {
-    setState(() {
-      citasProximas.add(citasPendientes[index]);
-      citasPendientes.removeAt(index);
-    });
-  }
-
-  void rechazarCitaPendiente(int index) {
-    setState(() {
-      citasPendientes.removeAt(index);
-    });
-  }
-
-  void eliminarCitaProxima(int index) {
-    setState(() {
-      citasProximas.removeAt(index);
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Cita completada'),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       appBar: CustomAppBar(
+      appBar: CustomAppBar(
         onNavigateToSection: (seccion) {
-          // Al hacer click en la navbar, navegamos a HomePage con la sección para hacer scroll
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -101,73 +79,71 @@ class _PantallaBarberoState extends State<PantallaBarbero> {
             ),
           );
         },
-        // Si quieres que haya una función para scroll to top en la pantalla actual, la defines aquí
-        scrollToTop: () {}, // Puedes dejar vacía o agregar algo
+        scrollToTop: () {},
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
           return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text("Datos personales", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 10),
-                  const Text("Nombre"),
-                  const SizedBox(height: 5),
-                  _buildTextField(controller1, editable: true),
-                  const SizedBox(height: 10),
-                  const Text("Correo"),
-                  const SizedBox(height: 5),
-                  _buildTextField(controller2),
-                  const SizedBox(height: 10),
-                  const Text("Status"),
-                  const SizedBox(height: 5),
-                  _buildTextField(controller3),
-                  const SizedBox(height: 20),
-
-                  // Línea divisoria
-                  const Divider(color: Colors.grey),
-
-                  // Selector tipo pestañas centrado
-                  Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _buildTabOption('Citas Pendientes', showCitasPendientes, () {
-                          setState(() {
-                            showCitasPendientes = true;
-                            showCitasProximas = false;
-                          });
-                        }),
-                        const SizedBox(width: 30),
-                        _buildTabOption('Citas Próximas', showCitasProximas, () {
-                          setState(() {
-                            showCitasPendientes = false;
-                            showCitasProximas = true;
-                          });
-                        }),
-                      ],
-                    ),
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text("Datos personales", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 10),
+                _buildEditableTextField(
+                  controller: controllerNombre,
+                  label: "Nombre",
+                  inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]'))],
+                ),
+                const SizedBox(height: 10),
+                _buildEditableTextField(
+                  controller: controllerTelefono,
+                  label: "Teléfono",
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(height: 10),
+                const Text("Correo"),
+                _buildReadOnlyField(controllerCorreo),
+                const SizedBox(height: 10),
+                const Text("Status"),
+                _buildReadOnlyField(controllerStatus),
+                const SizedBox(height: 20),
+                const Divider(color: Colors.grey),
+                Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildTabOption('Citas Pendientes', showCitasPendientes, () {
+                        setState(() {
+                          showCitasPendientes = true;
+                          showCitasProximas = false;
+                        });
+                      }),
+                      const SizedBox(width: 30),
+                      _buildTabOption('Citas Próximas', showCitasProximas, () {
+                        setState(() {
+                          showCitasPendientes = false;
+                          showCitasProximas = true;
+                        });
+                      }),
+                    ],
                   ),
-
-                  const SizedBox(height: 20),
-
-                  if (showCitasPendientes)
-                    _buildTablaCitas(
-                      citas: citasPendientes,
-                      onAceptar: aceptarCita,
-                      onRechazar: rechazarCitaPendiente,
-                    ),
-                  if (showCitasProximas)
-                    _buildTablaCitas(
-                      citas: citasProximas,
-                      onAceptar: null,
-                      onRechazar: eliminarCitaProxima,
-                    ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 20),
+                if (showCitasPendientes)
+                  _buildTablaCitas(
+                    citas: citasPendientes,
+                    onAceptar: aceptarCita,
+                    onRechazar: rechazarCitaPendiente,
+                  ),
+                if (showCitasProximas)
+                  _buildTablaCitas(
+                    citas: citasProximas,
+                    onAceptar: completarCitaProxima,
+                    onRechazar: eliminarCitaProxima,
+                  ),
+              ],
             ),
           );
         },
@@ -175,18 +151,113 @@ class _PantallaBarberoState extends State<PantallaBarbero> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, {bool editable = false}) {
+  Widget _buildEditableTextField({
+  required TextEditingController controller,
+  required String label,
+  required List<TextInputFormatter> inputFormatters,
+  TextInputType keyboardType = TextInputType.text,
+}) {
+  final focusNode = FocusNode();
+  bool isEditing = false;
+  bool showWarning = false;
+  String lastValidValue = controller.text;  // Guardamos el último valor válido
+
+  return StatefulBuilder(
+    builder: (context, setInnerState) {
+      return GestureDetector(
+        onTap: () {
+          focusNode.requestFocus();
+          setInnerState(() => isEditing = true);
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label),
+            const SizedBox(height: 5),
+            TextField(
+              controller: controller,
+              focusNode: focusNode,
+              inputFormatters: inputFormatters,
+              keyboardType: keyboardType,
+              maxLength: label == "Teléfono" ? 10 : null,
+              style: const TextStyle(color: Colors.white),
+              cursorColor: Colors.green,
+              onChanged: (value) {
+                if (label == "Nombre") {
+                  // Revisamos si el texto contiene números
+                  if (RegExp(r'\d').hasMatch(value)) {
+                    setInnerState(() {
+                      showWarning = true;
+                      // Revertimos al último valor válido
+                      controller.text = lastValidValue;
+                      controller.selection = TextSelection.fromPosition(
+                        TextPosition(offset: lastValidValue.length),
+                      );
+                    });
+                  } else {
+                    setInnerState(() {
+                      showWarning = false;
+                      lastValidValue = value; // Actualizamos el último valor válido
+                    });
+                  }
+                } else if (label == "Teléfono") {
+                  setInnerState(() {
+                    showWarning = value.length != 10;
+                  });
+                } else {
+                  setInnerState(() {
+                    showWarning = false;
+                  });
+                }
+              },
+              onEditingComplete: () {
+                setInnerState(() => isEditing = false);
+                focusNode.unfocus();
+              },
+              decoration: InputDecoration(
+                counterText: "",
+                suffixIcon: const Icon(Icons.edit, color: Colors.white),
+                filled: true,
+                fillColor: Colors.black,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: showWarning ? Colors.red : Colors.grey),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: showWarning ? Colors.red : Colors.green, width: 2),
+                ),
+              ),
+            ),
+            if (showWarning)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  label == "Nombre"
+                      ? "No se permiten números en el nombre"
+                      : "El teléfono debe tener exactamente 10 dígitos",
+                  style: const TextStyle(color: Colors.red, fontSize: 12),
+                ),
+              ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+  Widget _buildReadOnlyField(TextEditingController controller) {
     return SizedBox(
       width: double.infinity,
       child: TextField(
         controller: controller,
-        readOnly: !editable,
+        readOnly: true,
         style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           filled: true,
           fillColor: Colors.black,
-          suffixIcon: editable ? const Icon(Icons.edit, color: Colors.white) : null,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
@@ -198,92 +269,176 @@ class _PantallaBarberoState extends State<PantallaBarbero> {
   }
 
   Widget _buildTablaCitas({
-    required List<Map<String, String>> citas,
-    required Function(int)? onAceptar,
-    required Function(int) onRechazar,
-  }) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        color: Colors.black,
-        padding: const EdgeInsets.all(10),
-        child: Center( // <-- Este Center centra horizontalmente
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: DataTable(
-              columnSpacing: 30,
-              headingTextStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-              dataTextStyle: const TextStyle(color: Colors.white),
-              border: TableBorder(horizontalInside: const BorderSide(color: Colors.white)),
-              columns: const [
-                DataColumn(label: Text('Fecha')),
-                DataColumn(label: Text('Hora')),
-                DataColumn(label: Text('Servicio')),
-                DataColumn(label: Text('Cliente')),
-                DataColumn(label: Text('Completado/Cancelar')),
-              ],
-              rows: List.generate(citas.length, (index) {
-                final cita = citas[index];
-                return DataRow(cells: [
-                  DataCell(Text(cita['fecha']!)),
-                  DataCell(Text(cita['hora']!)),
-                  DataCell(Text(cita['servicio']!)),
-                  DataCell(Text(cita['cliente']!)),
-                  DataCell(Row(
-                    children: [
-                      onAceptar != null
-                          ? ElevatedButton(
-                              onPressed: () => onAceptar(index),
+  required List<Map<String, String>> citas,
+  required Function(int)? onAceptar,
+  required Function(int) onRechazar,
+}) {
+  return ClipRRect(
+    borderRadius: BorderRadius.circular(12),
+    child: Container(
+      color: Colors.black,
+      padding: const EdgeInsets.all(10),
+      child: Center(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: DataTable(
+            columnSpacing: 30,
+            headingTextStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            dataTextStyle: const TextStyle(color: Colors.white),
+            border: TableBorder(horizontalInside: const BorderSide(color: Colors.white)),
+            columns: const [
+              DataColumn(label: Text('Fecha')),
+              DataColumn(label: Text('Hora')),
+              DataColumn(label: Text('Servicio')),
+              DataColumn(label: Text('Cliente')),
+              DataColumn(label: Text('Teléfono')),
+              DataColumn(label: Text('Completado/Cancelar')),
+            ],
+            rows: List.generate(citas.length, (index) {
+              final cita = citas[index];
+              return DataRow(cells: [
+                DataCell(Text(cita['fecha']!)),
+                DataCell(Text(cita['hora']!)),
+                DataCell(Text(cita['servicio']!)),
+                DataCell(Text(cita['cliente']!)),
+                DataCell(Text(cita['telefono'] ?? '')),
+                DataCell(Row(
+                  children: [
+                    onAceptar != null
+                        ? ElevatedButton(
+                            onPressed: () => onAceptar(index),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              shape: const CircleBorder(),
+                              padding: const EdgeInsets.all(10),
+                            ),
+                            child: const Icon(Icons.check, color: Colors.white),
+                          )
+                        : IgnorePointer(
+                            child: ElevatedButton(
+                              onPressed: () {},
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.green,
                                 shape: const CircleBorder(),
                                 padding: const EdgeInsets.all(10),
                               ),
                               child: const Icon(Icons.check, color: Colors.white),
-                            )
-                          : IgnorePointer(
-                              child: ElevatedButton(
-                                onPressed: () {},
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.green,
-                                  shape: const CircleBorder(),
-                                  padding: const EdgeInsets.all(10),
-                                ),
-                                child: const Icon(Icons.check, color: Colors.white),
-                              ),
                             ),
-                      const SizedBox(width: 10),
-                      ElevatedButton(
-                        onPressed: () => onRechazar(index),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          shape: const CircleBorder(),
-                          padding: const EdgeInsets.all(10),
-                        ),
-                        child: const Icon(Icons.close, color: Colors.white),
+                          ),
+                    const SizedBox(width: 10),
+                    ElevatedButton(
+                      onPressed: () => confirmarCancelacion(context, index, onRechazar),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        shape: const CircleBorder(),
+                        padding: const EdgeInsets.all(10),
                       ),
-                    ],
-                  )),
-                ]);
-              }),
-            ),
+                      child: const Icon(Icons.close, color: Colors.white),
+                    ),
+                  ],
+                )),
+              ]);
+            }),
           ),
         ),
       ),
-    );
+    ),
+  );
+}
+
+// Función para mostrar el diálogo de confirmación
+void confirmarCancelacion(BuildContext context, int index, Function(int) onRechazar) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      backgroundColor: Colors.white, 
+      title: const Text('Confirmar cancelación'),
+      content: const Text('¿Estás seguro que deseas cancelar esta cita?'),
+      actions: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black, // Fondo gris para "No"
+              ),
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text(
+                'No',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+            const SizedBox(width: 20),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+              ),
+              onPressed: () {
+                onRechazar(index);
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'Sí',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
+}
+
+  void aceptarCita(int index) {
+    setState(() {
+      citasProximas.add(citasPendientes[index]);
+      citasPendientes.removeAt(index);
+    });
   }
 
-  TextButton _buildNavButton(String text, String scrollTo) {
-    return TextButton(
-      onPressed: () {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomePage(scrollTo: scrollTo)),
-        );
-      },
-      child: Text(text, style: const TextStyle(color: Colors.white)),
-    );
-  }
+void rechazarCitaPendiente(int index) {
+  setState(() {
+    citasPendientes.removeAt(index);
+  });
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text('Cita cancelada'),
+      backgroundColor: Colors.red,
+      duration: Duration(seconds: 2),
+    ),
+  );
+}
+
+void eliminarCitaProxima(int index) {
+  setState(() {
+    citasProximas.removeAt(index);
+  });
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text('Cita cancelada'),
+      backgroundColor: Colors.red,
+      duration: Duration(seconds: 2),
+    ),
+  );
+}
+
+void completarCitaProxima(int index) {
+  setState(() {
+    citasProximas.removeAt(index);
+  });
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text('Cita completada'),
+      backgroundColor: Colors.green,
+      duration: Duration(seconds: 2),
+    ),
+  );
+}
+
+
 
   Widget _buildTabOption(String title, bool isSelected, VoidCallback onTap) {
     return GestureDetector(
@@ -307,19 +462,6 @@ class _PantallaBarberoState extends State<PantallaBarbero> {
           )
         ],
       ),
-    );
-  }
-
-  Widget _buildOptionButton(String text, VoidCallback onPressed, {required bool seleccionado}) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: seleccionado ? Colors.grey : Colors.black,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        foregroundColor: Colors.white,
-      ),
-      child: Text(text),
     );
   }
 }
