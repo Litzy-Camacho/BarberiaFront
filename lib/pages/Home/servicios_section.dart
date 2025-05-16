@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:front/pages/Services/service_cortestilo.dart';
 import 'package:front/pages/Services/service_barba.dart';
 import 'package:front/pages/Services/service_tratamiento_.dart';
+import '../Services/services_screen.dart';
 
 class ServiciosSection extends StatelessWidget {
   final GlobalKey keyServicios;
@@ -71,7 +72,7 @@ class ServiciosSection extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const ServiceCorteEstiloPage(),
+                            builder: (_) => const ServicesScreen(),
                           ),
                         );
                       },
