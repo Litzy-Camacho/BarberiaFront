@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:front/pages/Home/servicios_section.dart';
-import 'package:front/pages/Home/contacto_section.dart';
+import 'package:front/pages/Components/contacto_section.dart';
 import '../Login/login.dart';
 import '../Clients/user_profile.dart';
 import '../Barber/barber_profile.dart';

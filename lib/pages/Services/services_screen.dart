@@ -3,6 +3,7 @@ import '../Login/login.dart';
 import '../Components/navbar_home.dart';
 import '../Home/home_page.dart';
 import '../Reservation/reservation_data.dart';
+import '../Components/contacto_section.dart';  // <-- tu componente contacto
 
 // Simulación de JSON local con campo de duración
 final List<Map<String, dynamic>> servicesJson = [
@@ -48,6 +49,7 @@ class ServicesScreen extends StatefulWidget {
 }
 
 class _ServicesScreenState extends State<ServicesScreen> {
+  final GlobalKey contactoKey = GlobalKey();
   int selectedCategory = 1;
 
   @override
@@ -55,67 +57,92 @@ class _ServicesScreenState extends State<ServicesScreen> {
     final filteredServices = servicesJson
         .where((service) => service['categoryId'] == selectedCategory)
         .toList();
-          return Scaffold(
-            backgroundColor: Colors.white,
-            appBar: CustomAppBar(
-              onNavigateToSection: (seccion) {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => HomePage(scrollTo: seccion.toLowerCase()),
-                  ),
-                );
-              },
-              scrollToTop: () {},
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: CustomAppBar(
+        onNavigateToSection: (seccion) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => HomePage(scrollTo: seccion.toLowerCase()),
             ),
-            body: Column(
-              children: [
-                _buildCategoryBar(),
-                Expanded(
-        child: OrientationBuilder(
-          builder: (context, orientation) {
-            final isPortrait = orientation == Orientation.portrait;
-            final crossAxisCount = isPortrait ? 2 : 3;
-            final spacing = 12.0;
-
-            return LayoutBuilder(
-              builder: (context, constraints) {
-                double idealItemWidth = (constraints.maxWidth - spacing * (crossAxisCount + 1)) / crossAxisCount;
-                // En vertical, cards más altas; en horizontal, cards menos altas:
-                double itemHeight = isPortrait ? idealItemWidth * 1.2 : idealItemWidth * 0.9;
-
-                return GridView.builder(
-                  padding: const EdgeInsets.all(12),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: crossAxisCount,
-                    mainAxisSpacing: spacing,
-                    crossAxisSpacing: spacing,
-                    childAspectRatio: idealItemWidth / itemHeight,
-                  ),
-                  itemCount: filteredServices.length,
-                  itemBuilder: (context, index) {
-                    final service = filteredServices[index];
-                    return _ServiceCard(
-                      title: service['name'],
-                      description: service['description'],
-                      price: service['price'],
-                      duration: service['duration'],
-                      imagePath: _getImageForCategory(service['categoryId']),
-                    );
-                  },
-                );
-              },
-            );
-          },
-        ),
+          );
+        },
+        scrollToTop: () {},
       ),
-        ],
+      body: OrientationBuilder(
+        builder: (context, orientation) {
+          final isPortrait = orientation == Orientation.portrait;
+          final crossAxisCount = isPortrait ? 2 : 3;
+          final spacing = 12.0;
+
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              double idealItemWidth =
+                  (constraints.maxWidth - spacing * (crossAxisCount + 1)) /
+                      crossAxisCount;
+              double itemHeight =
+                  isPortrait ? idealItemWidth * 1.2 : idealItemWidth * 0.9;
+
+              return Column(
+                children: [
+                  // Categorías y grilla con scroll
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          _buildCategoryBar(),
+                          const SizedBox(height: 16), 
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: GridView.builder(
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: crossAxisCount,
+                                mainAxisSpacing: spacing,
+                                crossAxisSpacing: spacing,
+                                childAspectRatio: idealItemWidth / itemHeight,
+                              ),
+                              itemCount: filteredServices.length,
+                              itemBuilder: (context, index) {
+                                final service = filteredServices[index];
+                                return _ServiceCard(
+                                  title: service['name'],
+                                  description: service['description'],
+                                  price: service['price'],
+                                  duration: service['duration'],
+                                  imagePath:
+                                      _getImageForCategory(service['categoryId']),
+                                );
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // Sección contacto pegada abajo siempre
+                  ContactoSection(keyContacto: contactoKey),
+                ],
+              );
+            },
+          );
+        },
       ),
     );
   }
 
   Widget _buildCategoryBar() {
-    final categories = ['Corte & Estilo', 'Barba & Afeitado', 'Tratamiento & Cuidado'];
+    final categories = [
+      'Corte & Estilo',
+      'Barba & Afeitado',
+      'Tratamiento & Cuidado'
+    ];
 
     return Column(
       children: [
@@ -277,7 +304,8 @@ class _ServiceCard extends StatelessWidget {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: Colors.black,
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 6),
                           textStyle: const TextStyle(fontSize: 12),
                         ),
                         onPressed: () {

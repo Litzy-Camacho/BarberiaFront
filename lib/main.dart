@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'pages/Home/home_page.dart';
-import 'pages/Home/contacto_section.dart'; // Importa el HomePage
+import 'pages/Components/contacto_section.dart'; // Importa el HomePage
 import 'pages/Administrator/admin_profile.dart'; // Importa el HomePage
 
 void main() {
