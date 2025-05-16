@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:front/pages/Services/service_cortestilo.dart';
-import 'package:front/pages/Services/service_barba.dart';
-import 'package:front/pages/Services/service_tratamiento_.dart';
+import 'package:front/pages/Services/services_screen.dart'; // Importa solo esta pantalla
 
 class ServiciosSection extends StatelessWidget {
   final GlobalKey keyServicios;
@@ -25,36 +23,34 @@ class ServiciosSection extends StatelessWidget {
             ),
           ),
           Column(
-  children: [
-    Container(
-      color: Colors.black, // Fondo negro
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-      child: const Text(
-        'Nuestros servicios',
-        style: TextStyle(
-          fontSize: 30,
-          fontWeight: FontWeight.bold,
-          color: Colors.white, // Texto blanco
-          fontFamily: 'Georgia',
-        ),
-      ),
-    ),
-    
-    Container(
-      color: Colors.black, // Fondo negro
-      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-      child: const Text(
-        'Todos nuestros servicios se realizan en cabinas privadas y son exclusivos para hombre.',
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          fontSize: 16,
-          color: Colors.white70, // Texto blanco
-          height: 1,
-          fontFamily: 'Georgia',
-        ),
-      ),
-    ),
-
+            children: [
+              Container(
+                color: Colors.black, // Fondo negro
+                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                child: const Text(
+                  'Nuestros servicios',
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white, // Texto blanco
+                    fontFamily: 'Georgia',
+                  ),
+                ),
+              ),
+              Container(
+                color: Colors.black, // Fondo negro
+                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                child: const Text(
+                  'Todos nuestros servicios se realizan en cabinas privadas y son exclusivos para hombre.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white70, // Texto blanco
+                    height: 1,
+                    fontFamily: 'Georgia',
+                  ),
+                ),
+              ),
               const SizedBox(height: 50),
               Center(
                 child: Wrap(
@@ -71,7 +67,7 @@ class ServiciosSection extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const ServiceCorteEstiloPage(),
+                            builder: (_) => const ServicesScreen(categoryId: 1),
                           ),
                         );
                       },
@@ -85,7 +81,7 @@ class ServiciosSection extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const ServiceBarbaPage(),
+                            builder: (_) => const ServicesScreen(categoryId: 2),
                           ),
                         );
                       },
@@ -99,7 +95,7 @@ class ServiciosSection extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const ServiceEstilosTratamientoPage(),
+                            builder: (_) => const ServicesScreen(categoryId: 3),
                           ),
                         );
                       },
