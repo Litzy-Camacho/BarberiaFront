@@ -7,6 +7,7 @@ import '../Barber/barber_profile.dart';
 import '../Administrator/admin_profile.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import '../Components/navbar_home.dart'; // Barra de navegación personalizada
+import 'dart:math';
 
 class HomePage extends StatefulWidget {
   final String? scrollTo;
@@ -22,6 +23,7 @@ class _HomePageState extends State<HomePage> {
   final GlobalKey _nosotrosKey = GlobalKey();
   final GlobalKey _serviciosKey = GlobalKey();
   final GlobalKey _contactoKey = GlobalKey();
+  String currentSection = 'Inicio';
 
   void _scrollTo(GlobalKey key) {
     final context = key.currentContext;
@@ -35,18 +37,27 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.scrollTo == 'nosotros') {
-        _scrollTo(_nosotrosKey);
-      } else if (widget.scrollTo == 'servicios') {
-        _scrollTo(_serviciosKey);
-      } else if (widget.scrollTo == 'contacto') {
-        _scrollTo(_contactoKey);
-      }
-    });
-  }
+  @override
+void initState() {
+  super.initState();
+  _scrollController.addListener(_updateCurrentSection);
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (widget.scrollTo == 'nosotros') {
+      _scrollTo(_nosotrosKey);
+    } else if (widget.scrollTo == 'servicios') {
+      _scrollTo(_serviciosKey);
+    } else if (widget.scrollTo == 'contacto') {
+      _scrollTo(_contactoKey);
+    }
+  });
+}
+
+@override
+void dispose() {
+  _scrollController.removeListener(_updateCurrentSection);
+  _scrollController.dispose();
+  super.dispose();
+}
 
   void _scrollToTop() {
     _scrollController.animateTo(
@@ -74,6 +85,30 @@ class _HomePageState extends State<HomePage> {
         break;
     }
   }
+
+  void _updateCurrentSection() {
+  final RenderBox? nosotrosBox = _nosotrosKey.currentContext?.findRenderObject() as RenderBox?;
+  final RenderBox? serviciosBox = _serviciosKey.currentContext?.findRenderObject() as RenderBox?;
+  final RenderBox? contactoBox = _contactoKey.currentContext?.findRenderObject() as RenderBox?;
+
+  final offset = _scrollController.offset;
+
+  String newSection = 'Inicio';
+
+  if (contactoBox != null && offset >= contactoBox.localToGlobal(Offset.zero).dy - 200) {
+    newSection = 'Contacto';
+  } else if (serviciosBox != null && offset >= serviciosBox.localToGlobal(Offset.zero).dy - 200) {
+    newSection = 'Servicios';
+  } else if (nosotrosBox != null && offset >= nosotrosBox.localToGlobal(Offset.zero).dy - 200) {
+    newSection = 'Nosotros';
+  }
+
+  if (newSection != currentSection) {
+    setState(() {
+      currentSection = newSection;
+    });
+  }
+}
 
   @override
   Widget build(BuildContext context) {

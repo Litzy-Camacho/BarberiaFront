@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false, // Quita la banderita de debug
       title: 'Barbería',
-      home: LoginPage(), // HomePage como pantalla principal
+      home: HomePage(), // HomePage como pantalla principal
     );
   }
 }

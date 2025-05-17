@@ -31,12 +31,11 @@ class _CustomAppBarState extends State<CustomAppBar> {
     });
 
     if (option == 'Inicio') {
-      if (widget.scrollToTop != null) {
-        widget.scrollToTop!();
-      }
-    } else {
-      widget.onNavigateToSection(option);
-    }
+  widget.onNavigateToSection('inicio');
+} else {
+  widget.onNavigateToSection(option);
+}
+
   }
 
   @override
@@ -48,14 +47,12 @@ class _CustomAppBarState extends State<CustomAppBar> {
         padding: const EdgeInsets.only(left: 12.0),
         child: GestureDetector(
           onTap: () {
-            if (widget.scrollToTop != null) {
-              widget.scrollToTop!();
-            }
-          },
+  widget.onNavigateToSection('inicio');
+},
+
           child: Image.asset(
             'assets/imag/logo.png',
             height: 50,
-            
           ),
         ),
       ),
