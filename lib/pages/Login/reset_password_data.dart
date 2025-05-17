@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'login.dart';
+import 'reset_password_code.dart'; // Asegúrate de tener esta importación
 
 class ResetPasswordPage3 extends StatefulWidget {
   const ResetPasswordPage3({super.key});
@@ -23,102 +24,128 @@ class _ResetPasswordPage3State extends State<ResetPasswordPage3> {
     bool showMismatchError = confirmPassword.isNotEmpty && newPassword != confirmPassword;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF1C1C1C),  // Color de fondo
-      body: Center( // Centrado del contenido
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 40),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center, // Centrado vertical
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 50), // Espacio superior
+      backgroundColor: const Color(0xFF1C1C1C),
+      body: Stack(
+        children: [
+          // Contenido principal
+          Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 50),
 
-              // Campo Nueva Contraseña
-              _ResetPasswordTextField(
-                controller: _newPasswordController,
-                label: 'Ingresa tu Nueva Contraseña',
-                hintText: 'Nueva Contraseña',
-                obscureText: _obscureNewPassword,
-                onTap: () {
-                  setState(() {
-                    _obscureNewPassword = !_obscureNewPassword;
-                  });
-                },
-                onChanged: (text) {
-                  setState(() {});
-                },
-              ),
-              const SizedBox(height: 10),
-              PasswordCriteriaWidget(password: newPassword),
-              const SizedBox(height: 40),
+                  // Campo Nueva Contraseña
+                  _ResetPasswordTextField(
+                    controller: _newPasswordController,
+                    label: 'Ingresa tu Nueva Contraseña',
+                    hintText: 'Nueva Contraseña',
+                    obscureText: _obscureNewPassword,
+                    onTap: () {
+                      setState(() {
+                        _obscureNewPassword = !_obscureNewPassword;
+                      });
+                    },
+                    onChanged: (text) {
+                      setState(() {});
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                  PasswordCriteriaWidget(password: newPassword),
+                  const SizedBox(height: 40),
 
-              // Campo Confirmar Contraseña
-              _ResetPasswordTextField(
-                controller: _confirmPasswordController,
-                label: 'Confirma tu Contraseña',
-                hintText: 'Confirmar Contraseña',
-                obscureText: _obscureConfirmPassword,
-                onTap: () {
-                  setState(() {
-                    _obscureConfirmPassword = !_obscureConfirmPassword;
-                  });
-                },
-                onChanged: (text) {
-                  setState(() {});
-                },
-              ),
+                  // Campo Confirmar Contraseña
+                  _ResetPasswordTextField(
+                    controller: _confirmPasswordController,
+                    label: 'Confirma tu Contraseña',
+                    hintText: 'Confirmar Contraseña',
+                    obscureText: _obscureConfirmPassword,
+                    onTap: () {
+                      setState(() {
+                        _obscureConfirmPassword = !_obscureConfirmPassword;
+                      });
+                    },
+                    onChanged: (text) {
+                      setState(() {});
+                    },
+                  ),
 
-              // Mensaje de error alineado a la izquierda
-              if (showMismatchError)
-                const Padding(
-                  padding: EdgeInsets.only(top: 10),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Las contraseñas no coinciden',
-                      style: TextStyle(color: Colors.red, fontSize: 14),
+                  if (showMismatchError)
+                    const Padding(
+                      padding: EdgeInsets.only(top: 10),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Las contraseñas no coinciden',
+                          style: TextStyle(color: Colors.red, fontSize: 14),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
 
-              const SizedBox(height: 40),
+                  const SizedBox(height: 40),
 
-              // Botón Confirmar
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: isPasswordValid ? Colors.white : Colors.grey.shade700,
-                  foregroundColor: isPasswordValid ? Colors.black : Colors.white,
-                  disabledBackgroundColor: Colors.grey.shade700,
-                  disabledForegroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 40,
-                    vertical: 15,
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isPasswordValid ? Colors.white : Colors.grey.shade700,
+                      foregroundColor: isPasswordValid ? Colors.black : Colors.white,
+                      disabledBackgroundColor: Colors.grey.shade700,
+                      disabledForegroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    onPressed: isPasswordValid
+                        ? () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Contraseña cambiada exitosamente'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                            Future.delayed(const Duration(seconds: 2), () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (_) => const LoginPage()),
+                              );
+                            });
+                          }
+                        : null,
+                    child: const Text('Enviar'),
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-                onPressed: isPasswordValid
-                    ? () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Contraseña cambiada exitosamente'),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-                        Future.delayed(const Duration(seconds: 2), () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (_) => const LoginPage()),
-                          );
-                        });
-                      }
-                    : null,
-                child: const Text('Enviar'),
+                ],
               ),
-            ],
+            ),
           ),
+
+          // Flecha de regreso
+          // Flecha de regreso con texto "Regresar"
+Positioned(
+  top: 40,
+  left: 10,
+  child: GestureDetector(
+    onTap: () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const ResetPasswordPage2()),
+      );
+    },
+    child: Row(
+      children: const [
+        Icon(Icons.arrow_back, color: Colors.white),
+        SizedBox(width: 5),
+        Text(
+          'Regresar',
+          style: TextStyle(color: Colors.white, fontSize: 16),
         ),
+      ],
+    ),
+  ),
+),
+
+        ],
       ),
     );
   }

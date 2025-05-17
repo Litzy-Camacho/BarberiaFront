@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'reset_password_data.dart';
+import 'reset_password_email.dart'; // ResetPasswordPage
+ // Asegúrate de tener esta importación
 
 class ResetPasswordPage2 extends StatefulWidget {
   const ResetPasswordPage2({super.key});
@@ -18,8 +20,8 @@ class _ResetPasswordPage2State extends State<ResetPasswordPage2> {
   @override
   void initState() {
     super.initState();
-    for (var controller in _controllers) {
-      controller.addListener(_validateCode);
+    for (int i = 0; i < _controllers.length; i++) {
+      _controllers[i].addListener(_validateCode);
     }
   }
 
@@ -41,27 +43,63 @@ class _ResetPasswordPage2State extends State<ResetPasswordPage2> {
     });
   }
 
+  void _showSuccessSnackbar() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Código correcto'),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1C1C1C),  // Color de fondo del Scaffold
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          // Si el ancho es mayor a 600, se muestra el formulario de lado a lado
-          if (constraints.maxWidth > 600) {
-            return Row(
-              children: [
-                // DERECHA: Formulario
-                Expanded(
-                  child: _buildForm(),
+      backgroundColor: const Color(0xFF1C1C1C),
+      body: Stack(
+        children: [
+          LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth > 600) {
+                return Row(
+                  children: [
+                    Expanded(
+                      child: _buildForm(),
+                    ),
+                  ],
+                );
+              } else {
+                return _buildForm();
+              }
+            },
+          ),
+
+          // Botón de regreso con texto
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8.0, top: 16.0),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ResetPasswordPage()),
+                  );
+                },
+                child: Row(
+                  children: const [
+                    Icon(Icons.arrow_back, color: Colors.white),
+                    SizedBox(width: 5),
+                    Text(
+                      'Regresar',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                  ],
                 ),
-              ],
-            );
-          } else {
-            // Si el ancho es menor o igual a 600, se muestra solo el formulario
-            return _buildForm();
-          }
-        },
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -103,12 +141,15 @@ class _ResetPasswordPage2State extends State<ResetPasswordPage2> {
                 ),
                 onPressed: _isCodeComplete
                     ? () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ResetPasswordPage3(),
-                          ),
-                        );
+                        _showSuccessSnackbar(); // Mostrar SnackBar
+                        Future.delayed(const Duration(seconds: 2), () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ResetPasswordPage3(),
+                            ),
+                          );
+                        });
                       }
                     : null,
                 child: const Text('Siguiente'),
@@ -121,7 +162,6 @@ class _ResetPasswordPage2State extends State<ResetPasswordPage2> {
   }
 }
 
-// Widget con 5 cuadros de entrada numérica
 class _SecurityCodeInput extends StatelessWidget {
   final List<TextEditingController> controllers;
   final List<FocusNode> focusNodes;
@@ -162,6 +202,8 @@ class _SecurityCodeInput extends StatelessWidget {
             onChanged: (value) {
               if (value.isNotEmpty && index < 4) {
                 FocusScope.of(context).requestFocus(focusNodes[index + 1]);
+              } else if (value.isEmpty && index > 0) {
+                FocusScope.of(context).requestFocus(focusNodes[index - 1]);
               }
             },
           ),

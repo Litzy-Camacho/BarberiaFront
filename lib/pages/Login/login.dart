@@ -3,7 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'reset_password_email.dart';
 import 'create_account.dart';
 import '../Clients/user_profile.dart';
-import '../Login/session.dart'; // Asegúrate de crear este archivo con la clase Session
+import '../Login/session.dart';
 import '../Home/home_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -17,7 +17,24 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   String emailError = '';
-  bool isPasswordEmpty = true;
+  bool isButtonEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    emailController.addListener(_validateInputs);
+    passwordController.addListener(_validateInputs);
+  }
+
+  void _validateInputs() {
+    final email = emailController.text.trim();
+    final password = passwordController.text;
+
+    setState(() {
+      isButtonEnabled = isValidEmail(email) && password.isNotEmpty;
+      emailError = email.isEmpty || isValidEmail(email) ? '' : 'Correo inválido';
+    });
+  }
 
   bool isValidEmail(String email) {
     final regex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$');
@@ -25,13 +42,10 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    passwordController.addListener(() {
-      setState(() {
-        isPasswordEmpty = passwordController.text.isEmpty;
-      });
-    });
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -59,81 +73,66 @@ class _LoginPageState extends State<LoginPage> {
                   obscureText: true,
                 ),
                 const SizedBox(height: 10),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    const Text(
-                      '¿Olvidaste tu contraseña?',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ResetPasswordPage(),
-                          ),
-                        );
-                      },
-                      child: const Text(
-                        'Recuperar',
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontSize: 14,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        '¿No tienes cuenta?',
-                        style: TextStyle(color: Colors.white, fontSize: 14),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const RegisterPage(),
-                            ),
-                          );
-                        },
-                        child: const Text(
-                          'Regístrate',
-                          style: TextStyle(
-                            color: Colors.blue,
-                            fontSize: 14,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+Row(
+  mainAxisAlignment: MainAxisAlignment.end,
+  children: [
+    TextButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const ResetPasswordPage(),
+          ),
+        );
+      },
+      style: TextButton.styleFrom(padding: EdgeInsets.zero),
+      child: const Text(
+        'Recuperar Contraseña',
+        style: TextStyle(
+          color: Colors.blue,
+          fontSize: 14,
+          decoration: TextDecoration.underline,
+        ),
+      ),
+    ),
+    const Text(
+      ' / ',
+      style: TextStyle(color: Colors.white, fontSize: 14),
+    ),
+    TextButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const RegisterPage(),
+          ),
+        );
+      },
+      style: TextButton.styleFrom(padding: EdgeInsets.zero),
+      child: const Text(
+        'Crear Cuenta',
+        style: TextStyle(
+          color: Colors.blue,
+          fontSize: 14,
+          decoration: TextDecoration.underline,
+        ),
+      ),
+    ),
+  ],
+),
                 const SizedBox(height: 20),
 
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isPasswordEmpty ? Colors.grey.shade700 : Colors.white,
-                    foregroundColor: isPasswordEmpty ? Colors.white : Colors.black,
+                    backgroundColor: isButtonEnabled ? Colors.white : Colors.grey.shade700,
+                    foregroundColor: isButtonEnabled ? Colors.black : Colors.white,
+                    disabledBackgroundColor: Colors.grey.shade700,
+                    disabledForegroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                   ),
-                  onPressed: isPasswordEmpty
-                      ? null
-                      : () {
+                  onPressed: isButtonEnabled
+                      ? () {
                           String email = emailController.text.trim().toLowerCase();
 
                           if (!isValidEmail(email)) {
@@ -147,7 +146,7 @@ class _LoginPageState extends State<LoginPage> {
                           String userRole;
 
                           if (email == 'admin@gmail.com') {
-                            destination = const HomePage(); // Igual que user
+                            destination = const HomePage();
                             userRole = 'admin';
                           } else if (email == 'barber@gmail.com') {
                             destination = const HomePage();
@@ -162,7 +161,6 @@ class _LoginPageState extends State<LoginPage> {
                             return;
                           }
 
-                          // Guardar email y rol en sesión
                           Session.email.value = email;
                           Session.role.value = userRole;
 
@@ -170,7 +168,8 @@ class _LoginPageState extends State<LoginPage> {
                             context,
                             MaterialPageRoute(builder: (context) => destination),
                           );
-                        },
+                        }
+                      : null,
                   child: const Text('Confirmar'),
                 ),
                 const SizedBox(height: 20),
@@ -189,13 +188,13 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 ),
                 const SizedBox(height: 20),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
                     Icon(FontAwesomeIcons.google, color: Colors.white, size: 30),
                     SizedBox(width: 30),
                     Icon(FontAwesomeIcons.github, color: Colors.white, size: 30),
+                
                   ],
                 ),
               ],
@@ -227,6 +226,20 @@ class _LoginTextField extends StatefulWidget {
 }
 
 class _LoginTextFieldState extends State<_LoginTextField> {
+  late bool _obscure;
+
+  @override
+  void initState() {
+    super.initState();
+    _obscure = widget.obscureText;
+  }
+
+  void _toggleVisibility() {
+    setState(() {
+      _obscure = !_obscure;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -240,7 +253,7 @@ class _LoginTextFieldState extends State<_LoginTextField> {
           ),
           child: TextField(
             controller: widget.controller,
-            obscureText: widget.obscureText,
+            obscureText: _obscure,
             decoration: InputDecoration(
               hintText: widget.hintText,
               hintStyle: const TextStyle(color: Colors.grey),
@@ -252,6 +265,15 @@ class _LoginTextFieldState extends State<_LoginTextField> {
               ),
               contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               errorText: widget.errorText,
+              suffixIcon: widget.obscureText
+                  ? IconButton(
+                      icon: Icon(
+                        _obscure ? Icons.visibility_off : Icons.visibility,
+                        color: Colors.grey,
+                      ),
+                      onPressed: _toggleVisibility,
+                    )
+                  : null,
             ),
           ),
         ),
@@ -259,3 +281,5 @@ class _LoginTextFieldState extends State<_LoginTextField> {
     );
   }
 }
+
+

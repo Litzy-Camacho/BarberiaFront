@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'pages/Home/home_page.dart';
-import './pages/Services/services_screen.dart';
+import './pages/Login/login.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false, // Quita la banderita de debug
       title: 'Barbería',
-      home: ServicesScreen(), // HomePage como pantalla principal
+      home: LoginPage(), // HomePage como pantalla principal
     );
   }
 }

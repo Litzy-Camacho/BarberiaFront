@@ -1,97 +1,132 @@
 import 'package:flutter/material.dart';
-import 'reset_password_code.dart';
+import '../Login/reset_password_code.dart';
+import '../Login/login.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   const ResetPasswordPage({super.key});
 
   @override
-  State<ResetPasswordPage> createState() => _ResetPasswordPageState();
+  _ResetPasswordPageState createState() => _ResetPasswordPageState();
 }
 
 class _ResetPasswordPageState extends State<ResetPasswordPage> {
-  final TextEditingController _emailController = TextEditingController();
-  bool _isEmailValid = false;
+  final TextEditingController emailController = TextEditingController();
+  String emailError = '';
+  bool isButtonEnabled = false;
 
   @override
   void initState() {
     super.initState();
-    _emailController.addListener(_validateEmail);
+    emailController.addListener(_validateInputs);
+  }
+
+  void _validateInputs() {
+    final email = emailController.text.trim();
+
+    setState(() {
+      isButtonEnabled = isValidEmail(email);
+      emailError = email.isEmpty || isValidEmail(email) ? '' : 'Correo inválido';
+    });
+  }
+
+  bool isValidEmail(String email) {
+    final regex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$');
+    return regex.hasMatch(email);
   }
 
   @override
   void dispose() {
-    _emailController.dispose();
+    emailController.dispose();
     super.dispose();
-  }
-
-  void _validateEmail() {
-    final email = _emailController.text.trim();
-    final isValid = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
-    setState(() {
-      _isEmailValid = isValid;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1C1C1C),  // Asegura que el fondo del Scaffold tenga el color deseado
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),  // Padding general para toda la pantalla
-        child: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _buildForm(),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildForm() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 40),  // Padding específico para el formulario
-      child: Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+      backgroundColor: const Color(0xFF1C1C1C),
+      body: SafeArea(
+        child: Stack(
           children: [
-            _ResetPasswordTextField(
-              label: 'Te Enviaremos un Código de Seguridad',
-              hintText: 'Ingresa tu correo',
-              controller: _emailController,
-              showError: _emailController.text.isNotEmpty && !_isEmailValid,
-            ),
-            const SizedBox(height: 40),
-
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
-                disabledBackgroundColor: Colors.grey.shade700,
-                disabledForegroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 40,
-                  vertical: 15,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+            // Botón de regresar arriba a la izquierda
+            Positioned(
+              top: 0,
+              left: 0,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const LoginPage()),
+                        );
+                      },
+                    ),
+                    const Text(
+                      'Regresar',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                  ],
                 ),
               ),
-              onPressed: _isEmailValid
-                  ? () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ResetPasswordPage2(),
-                        ),
-                      );
-                    }
-                  : null,
-              child: const Text('Enviar'),
+            ),
+
+            // Contenido centrado
+            Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _LoginTextField(
+                      controller: emailController,
+                      label: 'Te Enviaremos un Código a tu Correo',
+                      hintText: 'Ingresa tu correo',
+                      errorText: emailError.isEmpty ? null : emailError,
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isButtonEnabled ? Colors.white : Colors.grey.shade700,
+                        foregroundColor: isButtonEnabled ? Colors.black : Colors.white,
+                        disabledBackgroundColor: Colors.grey.shade700,
+                        disabledForegroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      ),
+                      onPressed: isButtonEnabled
+                          ? () {
+                              String email = emailController.text.trim().toLowerCase();
+                              if (!isValidEmail(email)) {
+                                setState(() {
+                                  emailError = 'Correo inválido';
+                                });
+                                return;
+                              }
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Correo enviado a: $email'),
+                                  backgroundColor: Colors.green,
+                                  duration: const Duration(seconds: 2),
+                                ),
+                              );
+
+                              Future.delayed(const Duration(milliseconds: 300), () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const ResetPasswordPage2()),
+                                );
+                              });
+                            }
+                          : null,
+                      child: const Text('Enviar'),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
@@ -100,37 +135,56 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   }
 }
 
-// Campo de texto con validación
-class _ResetPasswordTextField extends StatelessWidget {
+class _LoginTextField extends StatefulWidget {
   final String label;
   final String hintText;
   final bool obscureText;
   final TextEditingController controller;
-  final bool showError;
+  final String? errorText;
 
-  const _ResetPasswordTextField({
+  const _LoginTextField({
     required this.label,
     required this.hintText,
-    required this.controller,
     this.obscureText = false,
-    this.showError = false,
+    required this.controller,
+    this.errorText,
   });
+
+  @override
+  _LoginTextFieldState createState() => _LoginTextFieldState();
+}
+
+class _LoginTextFieldState extends State<_LoginTextField> {
+  late bool _obscure;
+
+  @override
+  void initState() {
+    super.initState();
+    _obscure = widget.obscureText;
+  }
+
+  void _toggleVisibility() {
+    setState(() {
+      _obscure = !_obscure;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Colors.white, fontSize: 16)),
+        Text(widget.label, style: const TextStyle(color: Colors.white, fontSize: 16)),
         const SizedBox(height: 5),
         Container(
-          width: double.infinity,  // Hacer que el campo ocupe todo el ancho disponible
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+          ),
           child: TextField(
-            controller: controller,
-            keyboardType: TextInputType.emailAddress,
-            obscureText: obscureText,
+            controller: widget.controller,
+            obscureText: _obscure,
             decoration: InputDecoration(
-              hintText: hintText,
+              hintText: widget.hintText,
               hintStyle: const TextStyle(color: Colors.grey),
               filled: true,
               fillColor: Colors.white,
@@ -138,11 +192,17 @@ class _ResetPasswordTextField extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
               ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 20,  // Aumenta el padding horizontal para hacerlo más largo
-                vertical: 15,    // Ajuste en el padding vertical
-              ),
-              errorText: showError ? 'Correo inválido' : null,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+              errorText: widget.errorText,
+              suffixIcon: widget.obscureText
+                  ? IconButton(
+                      icon: Icon(
+                        _obscure ? Icons.visibility_off : Icons.visibility,
+                        color: Colors.grey,
+                      ),
+                      onPressed: _toggleVisibility,
+                    )
+                  : null,
             ),
           ),
         ),
