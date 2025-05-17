@@ -480,6 +480,7 @@ void _mostrarDialogoEditarUsuario(int index) {
 void _mostrarDialogoAnadirBarbero() {
   final nombreController = TextEditingController();
   final correoController = TextEditingController();
+  final telefonoController = TextEditingController();
   final salarioController = TextEditingController();
 
   bool isValid = false;
@@ -492,6 +493,10 @@ void _mostrarDialogoAnadirBarbero() {
     return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(texto) && texto.isNotEmpty;
   }
 
+  bool isTelefonoValido(String texto) {
+    return RegExp(r'^\d{10}$').hasMatch(texto);
+  }
+
   bool isSalarioValido(String texto) {
     return RegExp(r'^\d+(\.\d{1,2})?$').hasMatch(texto) && texto.isNotEmpty;
   }
@@ -499,9 +504,13 @@ void _mostrarDialogoAnadirBarbero() {
   void validarFormulario() {
     final nombre = nombreController.text.trim();
     final correo = correoController.text.trim();
+    final telefono = telefonoController.text.trim();
     final salario = salarioController.text.trim();
 
-    final valido = isNombreValido(nombre) && isCorreoValido(correo) && isSalarioValido(salario);
+    final valido = isNombreValido(nombre) &&
+        isCorreoValido(correo) &&
+        isTelefonoValido(telefono) &&
+        isSalarioValido(salario);
 
     if (valido != isValid) {
       setState(() {
@@ -516,6 +525,7 @@ void _mostrarDialogoAnadirBarbero() {
       return StatefulBuilder(builder: (context, setState) {
         final nombreTexto = nombreController.text.trim();
         final correoTexto = correoController.text.trim();
+        final telefonoTexto = telefonoController.text.trim();
         final salarioTexto = salarioController.text.trim();
 
         Color colorNombre() {
@@ -526,6 +536,11 @@ void _mostrarDialogoAnadirBarbero() {
         Color colorCorreo() {
           if (correoTexto.isEmpty) return Colors.black;
           return isCorreoValido(correoTexto) ? Colors.green : Colors.red;
+        }
+
+        Color colorTelefono() {
+          if (telefonoTexto.isEmpty) return Colors.black;
+          return isTelefonoValido(telefonoTexto) ? Colors.green : Colors.red;
         }
 
         Color colorSalario() {
@@ -556,7 +571,9 @@ void _mostrarDialogoAnadirBarbero() {
                     focusedBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: colorNombre(), width: 2.0),
                     ),
-                    errorText: nombreTexto.isNotEmpty && !isNombreValido(nombreTexto) ? 'Solo letras permitidas' : null,
+                    errorText: nombreTexto.isNotEmpty && !isNombreValido(nombreTexto)
+                        ? 'Solo letras permitidas'
+                        : null,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -576,9 +593,39 @@ void _mostrarDialogoAnadirBarbero() {
                     focusedBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: colorCorreo(), width: 2.0),
                     ),
-                    errorText: correoTexto.isNotEmpty && !isCorreoValido(correoTexto) ? 'Correo inválido' : null,
+                    errorText: correoTexto.isNotEmpty && !isCorreoValido(correoTexto)
+                        ? 'Correo inválido'
+                        : null,
                   ),
                 ),
+                const SizedBox(height: 12),
+                TextField(
+  controller: telefonoController,
+  keyboardType: TextInputType.number,
+  inputFormatters: [
+    FilteringTextInputFormatter.digitsOnly,
+    LengthLimitingTextInputFormatter(10),
+  ],
+  cursorColor: colorTelefono(),
+  onChanged: (value) {
+    validarFormulario();
+    setState(() {});
+  },
+  decoration: InputDecoration(
+    labelText: 'Teléfono',
+    labelStyle: TextStyle(color: colorTelefono()),
+    enabledBorder: UnderlineInputBorder(
+      borderSide: BorderSide(color: colorTelefono()),
+    ),
+    focusedBorder: UnderlineInputBorder(
+      borderSide: BorderSide(color: colorTelefono(), width: 2.0),
+    ),
+    errorText: telefonoTexto.isNotEmpty && !isTelefonoValido(telefonoTexto)
+        ? 'Debe tener 10 dígitos numéricos'
+        : null,
+  ),
+),
+
                 const SizedBox(height: 12),
                 TextField(
                   controller: salarioController,
@@ -597,7 +644,9 @@ void _mostrarDialogoAnadirBarbero() {
                     focusedBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: colorSalario(), width: 2.0),
                     ),
-                    errorText: salarioTexto.isNotEmpty && !isSalarioValido(salarioTexto) ? 'Solo números con hasta 2 decimales' : null,
+                    errorText: salarioTexto.isNotEmpty && !isSalarioValido(salarioTexto)
+                        ? 'Solo números con hasta 2 decimales'
+                        : null,
                   ),
                 ),
               ],
@@ -619,12 +668,14 @@ void _mostrarDialogoAnadirBarbero() {
                       ? () {
                           final nombre = nombreController.text.trim();
                           final correo = correoController.text.trim();
+                          final telefono = telefonoController.text.trim();
                           final salario = salarioController.text.trim();
 
                           setState(() {
                             barberosJson.add({
                               "nombre": nombre,
                               "correo": correo,
+                              "telefono": telefono,
                               "salario": double.tryParse(salario) ?? 0,
                               "status": "Activo",
                             });
@@ -644,23 +695,30 @@ void _mostrarDialogoAnadirBarbero() {
   );
 }
 
+
 void _mostrarDialogoEditarBarbero(Map<String, dynamic> barbero) {
   final nombreController = TextEditingController(text: barbero['nombre']);
   final correoController = TextEditingController(text: barbero['correo']);
+  final telefonoController = TextEditingController(text: barbero['telefono']);
   final salarioController = TextEditingController(text: barbero['salario'].toString());
 
   bool isValid = false;
 
   bool isNombreValido(String texto) => RegExp(r'^[a-zA-Z\s]+$').hasMatch(texto) && texto.isNotEmpty;
   bool isCorreoValido(String texto) => RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(texto) && texto.isNotEmpty;
+  bool isTelefonoValido(String texto) => RegExp(r'^\d{10}$').hasMatch(texto);
   bool isSalarioValido(String texto) => RegExp(r'^\d+(\.\d{1,2})?$').hasMatch(texto) && texto.isNotEmpty;
 
   void validarFormulario() {
     final nombre = nombreController.text.trim();
     final correo = correoController.text.trim();
+    final telefono = telefonoController.text.trim();
     final salario = salarioController.text.trim();
 
-    final valido = isNombreValido(nombre) && isCorreoValido(correo) && isSalarioValido(salario);
+    final valido = isNombreValido(nombre) &&
+        isCorreoValido(correo) &&
+        isTelefonoValido(telefono) &&
+        isSalarioValido(salario);
 
     if (valido != isValid) {
       setState(() {
@@ -675,10 +733,12 @@ void _mostrarDialogoEditarBarbero(Map<String, dynamic> barbero) {
       return StatefulBuilder(builder: (context, setState) {
         final nombreTexto = nombreController.text.trim();
         final correoTexto = correoController.text.trim();
+        final telefonoTexto = telefonoController.text.trim();
         final salarioTexto = salarioController.text.trim();
 
         Color colorNombre() => nombreTexto.isEmpty ? Colors.black : (isNombreValido(nombreTexto) ? Colors.green : Colors.red);
         Color colorCorreo() => correoTexto.isEmpty ? Colors.black : (isCorreoValido(correoTexto) ? Colors.green : Colors.red);
+        Color colorTelefono() => telefonoTexto.isEmpty ? Colors.black : (isTelefonoValido(telefonoTexto) ? Colors.green : Colors.red);
         Color colorSalario() => salarioTexto.isEmpty ? Colors.black : (isSalarioValido(salarioTexto) ? Colors.green : Colors.red);
 
         return AlertDialog(
@@ -721,6 +781,34 @@ void _mostrarDialogoEditarBarbero(Map<String, dynamic> barbero) {
                 ),
                 const SizedBox(height: 12),
                 TextField(
+  controller: telefonoController,
+  keyboardType: TextInputType.number,
+  inputFormatters: [
+    FilteringTextInputFormatter.digitsOnly,
+    LengthLimitingTextInputFormatter(10),
+  ],
+  cursorColor: colorTelefono(),
+  onChanged: (value) {
+    validarFormulario();
+    setState(() {});
+  },
+  decoration: InputDecoration(
+    labelText: 'Teléfono',
+    labelStyle: TextStyle(color: colorTelefono()),
+    enabledBorder: UnderlineInputBorder(
+      borderSide: BorderSide(color: colorTelefono()),
+    ),
+    focusedBorder: UnderlineInputBorder(
+      borderSide: BorderSide(color: colorTelefono(), width: 2.0),
+    ),
+    errorText: telefonoTexto.isNotEmpty && !isTelefonoValido(telefonoTexto)
+        ? 'Debe tener 10 dígitos numéricos'
+        : null,
+  ),
+),
+
+                const SizedBox(height: 12),
+                TextField(
                   controller: salarioController,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   cursorColor: colorSalario(),
@@ -755,11 +843,13 @@ void _mostrarDialogoEditarBarbero(Map<String, dynamic> barbero) {
                       ? () {
                           final nuevoNombre = nombreController.text.trim();
                           final nuevoCorreo = correoController.text.trim();
+                          final nuevoTelefono = telefonoController.text.trim();
                           final nuevoSalario = salarioController.text.trim();
 
                           setState(() {
                             barbero['nombre'] = nuevoNombre;
                             barbero['correo'] = nuevoCorreo;
+                            barbero['telefono'] = nuevoTelefono;
                             barbero['salario'] = double.tryParse(nuevoSalario) ?? 0;
                           });
 
@@ -784,6 +874,7 @@ void _mostrarDialogoEditarBarbero(Map<String, dynamic> barbero) {
     },
   );
 }
+
 
 //WIDGETS
 
@@ -831,6 +922,13 @@ void _mostrarDialogoEditarBarbero(Map<String, dynamic> barbero) {
                   _buildTextField(controller2),
                   const SizedBox(height: 20),
                   const Divider(color: Colors.grey),
+                  const Center(
+  child: Text(
+    "Control de Datos",
+    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+  ),
+),
+const SizedBox(height: 20),
                   Center(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -1068,6 +1166,7 @@ void _mostrarDialogoEditarBarbero(Map<String, dynamic> barbero) {
         columnas: const [
           DataColumn(label: Text('Nombre')),
           DataColumn(label: Text('Correo')),
+          DataColumn(label: Text('Teléfono')), // Nueva columna
           DataColumn(label: Text('Salario')),
           DataColumn(label: Text('Status')),
           DataColumn(label: Text('Editar/Borrar')),
@@ -1076,45 +1175,47 @@ void _mostrarDialogoEditarBarbero(Map<String, dynamic> barbero) {
           return DataRow(cells: [
             DataCell(Text(barbero['nombre'] ?? '')),
             DataCell(Text(barbero['correo'] ?? '')),
+            DataCell(Text(barbero['telefono'] ?? '')), // Nuevo dato
             DataCell(Text('\$${barbero['salario']}')),
             DataCell(Text(barbero['status'] ?? '')),
             DataCell(Row(
-  children: [
-    IconButton(
-      icon: const Icon(Icons.edit, color: Colors.yellow),
-      onPressed: () {
-        _mostrarDialogoEditarBarbero(barbero);
-      },
-    ),
-    IconButton(
-      icon: const Icon(Icons.delete, color: Colors.red),
-      onPressed: () {
-        _confirmarEliminacion(
-          context,
-          nombre: barbero['nombre'] ?? '',
-          onConfirmar: () {
-            setState(() {
-              barberosJson.remove(barbero);
-            });
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Barbero eliminado'),
-                backgroundColor: Colors.green,
-                duration: Duration(seconds: 2),
-              ),
-            );
-          },
-        );
-      },
-    ),
-  ],
-)),
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.edit, color: Colors.yellow),
+                  onPressed: () {
+                    _mostrarDialogoEditarBarbero(barbero);
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: () {
+                    _confirmarEliminacion(
+                      context,
+                      nombre: barbero['nombre'] ?? '',
+                      onConfirmar: () {
+                        setState(() {
+                          barberosJson.remove(barbero);
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Barbero eliminado'),
+                            backgroundColor: Colors.green,
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ],
+            )),
           ]);
         }).toList(),
       ),
     ],
   );
 }
+
 
   Widget _buildTablaGenerica({
     required List<DataColumn> columnas,
@@ -1155,8 +1256,22 @@ void _mostrarDialogoEditarBarbero(Map<String, dynamic> barbero) {
   }
 
   Widget _buildTabOption(String title, bool isSelected, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
+  return GestureDetector(
+    onTap: onTap,
+    child: Container(
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            color: isSelected ? Colors.black : Colors.transparent,
+            width: 2,
+          ),
+          bottom: BorderSide(
+            color: isSelected ? Colors.black : Colors.transparent,
+            width: 2,
+          ),
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -1172,12 +1287,14 @@ void _mostrarDialogoEditarBarbero(Map<String, dynamic> barbero) {
           Container(
             height: 2,
             width: 80,
-            color: isSelected ? Colors.black : Colors.transparent,
-          )
+            color: Colors.transparent, // Ya no se necesita esta línea
+          ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _buildOptionButton(String text, VoidCallback onPressed, {required bool seleccionado}) {
     return ElevatedButton(

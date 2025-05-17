@@ -5,6 +5,7 @@ import '../Clients/user_profile.dart';
 
 class ResumeReservationPage extends StatefulWidget {
   final String name;
+  final String phone;
   final DateTime date;
   final String time;
   final String barber;
@@ -17,6 +18,7 @@ class ResumeReservationPage extends StatefulWidget {
   const ResumeReservationPage({
     Key? key,
     required this.name,
+    required this.phone,
     required this.date,
     required this.time,
     required this.barber,
@@ -71,6 +73,7 @@ class _ResumeReservationPageState extends State<ResumeReservationPage> {
                     ),
                     const SizedBox(height: 12),
                     _buildInfo('Nombre: ', widget.name),
+                    _buildInfo('Telefono: ', widget.phone),
                     _buildInfo('Fecha: ', DateFormat.yMMMd().format(widget.date)),
                     _buildInfo('Hora: ', widget.time),
                     _buildInfo('Barbero: ', widget.barber),

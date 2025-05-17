@@ -17,6 +17,7 @@ class AppointmentFormPage extends StatefulWidget {
 class _AppointmentFormPageState extends State<AppointmentFormPage> {
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
+  final _phoneCtrl = TextEditingController();
   DateTime? _selectedDate;
   String? _selectedTime;
   String? _selectedBarber;
@@ -29,13 +30,14 @@ class _AppointmentFormPageState extends State<AppointmentFormPage> {
   final List<String> _availableServices = ['Corte de cabello', 'Barba', 'Color', 'Afeitado'];
 
   bool get isNameValid => RegExp(r'^[a-zA-Z\s]+$').hasMatch(_nameCtrl.text);
+  bool get isPhoneValid => RegExp(r'^\d{10}$').hasMatch(_phoneCtrl.text);
   bool get isDateValid => _selectedDate != null;
   bool get isTimeValid => _selectedTime != null;
   bool get isBarberValid => _selectedBarber != null;
   bool get isPaymentValid => _paymentMethod != null;
 
   bool get isFormValid =>
-      isNameValid && isDateValid && isTimeValid && isBarberValid && isPaymentValid;
+      isNameValid && isPhoneValid && isDateValid && isTimeValid && isBarberValid && isPaymentValid ;
 
   @override
   void initState() {
@@ -44,11 +46,15 @@ class _AppointmentFormPageState extends State<AppointmentFormPage> {
     _nameCtrl.addListener(() {
       setState(() {});
     });
+    _phoneCtrl.addListener(() {
+      setState(() {});
+    });
   }
 
   @override
   void dispose() {
     _nameCtrl.dispose();
+    _phoneCtrl.dispose();
     super.dispose();
   }
 
@@ -84,6 +90,7 @@ class _AppointmentFormPageState extends State<AppointmentFormPage> {
 
       final Map<String, dynamic> appointmentData = {
         'name': _nameCtrl.text,
+        'phone': _phoneCtrl.text,
         'dateTime': combinedDateTime.toIso8601String(),
         'barber': _selectedBarber,
         'paymentMethod': _paymentMethod,
@@ -135,6 +142,28 @@ class _AppointmentFormPageState extends State<AppointmentFormPage> {
                       ),
                       const SizedBox(height: 20),
 
+                     const Text('Telefono'),
+const SizedBox(height: 8),
+TextFormField(
+  controller: _phoneCtrl,
+  style: const TextStyle(color: Colors.black),
+  decoration: _customInputDecoration('Ingresa tu número de teléfono'),
+  keyboardType: TextInputType.number,
+  inputFormatters: [
+    FilteringTextInputFormatter.digitsOnly,
+    LengthLimitingTextInputFormatter(10),
+  ],
+  validator: (value) {
+    if (value == null || value.isEmpty) {
+      return 'Requerido';
+    } else if (!RegExp(r'^\d{10}$').hasMatch(value)) {
+      return 'Debe tener exactamente 10 dígitos numéricos';
+    }
+    return null;
+  },
+),
+
+                      const SizedBox(height: 20),
                       const Text('Fecha'),
                       const SizedBox(height: 8),
                       TextFormField(
@@ -264,6 +293,7 @@ class _AppointmentFormPageState extends State<AppointmentFormPage> {
                                     MaterialPageRoute(
                                       builder: (context) => PaymentPage(
                                         name: _nameCtrl.text,
+                                        phone: _phoneCtrl.text,
                                         date: _selectedDate ?? DateTime.now(),
                                         time: _selectedTime ?? 'Hora no seleccionada',
                                         barber: _selectedBarber ?? 'Barbero no seleccionado',

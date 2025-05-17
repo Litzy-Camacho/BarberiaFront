@@ -110,18 +110,25 @@ final Map<String, dynamic> datosCitasJson = {
                 _buildReadOnlyField(controllerStatus),
                 const SizedBox(height: 20),
                 const Divider(color: Colors.grey),
+                const Center(
+  child: Text(
+    "Control de Citas",
+    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+  ),
+),
+const SizedBox(height: 20),
                 Center(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildTabOption('Citas Pendientes', showCitasPendientes, () {
+                      _buildTabOption('Pendientes', showCitasPendientes, () {
                         setState(() {
                           showCitasPendientes = true;
                           showCitasProximas = false;
                         });
                       }),
                       const SizedBox(width: 30),
-                      _buildTabOption('Citas Próximas', showCitasProximas, () {
+                      _buildTabOption('Próximas', showCitasProximas, () {
                         setState(() {
                           showCitasPendientes = false;
                           showCitasProximas = true;
@@ -389,7 +396,7 @@ void confirmarCancelacion(BuildContext context, int index, Function(int) onRecha
   );
 }
 
-  void aceptarCita(int index) {
+void aceptarCita(int index) {
     setState(() {
       citasProximas.add(citasPendientes[index]);
       citasPendientes.removeAt(index);
@@ -438,11 +445,23 @@ void completarCitaProxima(int index) {
   );
 }
 
-
-
   Widget _buildTabOption(String title, bool isSelected, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
+  return GestureDetector(
+    onTap: onTap,
+    child: Container(
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            color: isSelected ? Colors.black : Colors.transparent,
+            width: 2,
+          ),
+          bottom: BorderSide(
+            color: isSelected ? Colors.black : Colors.transparent,
+            width: 2,
+          ),
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -458,10 +477,11 @@ void completarCitaProxima(int index) {
           Container(
             height: 2,
             width: 80,
-            color: isSelected ? Colors.black : Colors.transparent,
-          )
+            color: Colors.transparent, // Ya no se necesita esta línea
+          ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }

@@ -6,6 +6,7 @@ import 'resume_reservation.dart';  // Asegúrate de importar la página de resum
 
 class PaymentPage extends StatefulWidget {
   final String name;
+  final String phone;
   final DateTime date;
   final String time;
   final String barber;
@@ -14,6 +15,7 @@ class PaymentPage extends StatefulWidget {
   const PaymentPage({
     Key? key,
     required this.name,
+    required this.phone,
     required this.date,
     required this.time,
     required this.barber,
@@ -71,6 +73,7 @@ class _PaymentPageState extends State<PaymentPage> {
         MaterialPageRoute(
           builder: (context) => ResumeReservationPage(
             name: widget.name,
+            phone:widget.phone,
             date: widget.date,
             time: widget.time,
             barber: widget.barber,
