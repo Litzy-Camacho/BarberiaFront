@@ -258,7 +258,7 @@ class _PantallaUsuarioState extends State<PantallaUsuario> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Datos personales", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                const Text("Datos personales", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 10),
                 _buildEditableTextField(
                   controller: controllerNombre,

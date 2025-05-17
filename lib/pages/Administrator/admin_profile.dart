@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../Home/home_page.dart';
 import '../Components/navbar_home.dart';
+import 'package:flutter/services.dart';
 
 
 class PantallaAdministrador extends StatefulWidget {
@@ -15,14 +16,26 @@ class _PantallaAdministradorState extends State<PantallaAdministrador> {
   TextEditingController controller1 = TextEditingController(text: 'Jorge');
   TextEditingController controller2 = TextEditingController(text: 'barber@gmail.com');
 
+  TextEditingController controllerNombre = TextEditingController(text: 'Andrés');
+  TextEditingController controllerTelefono = TextEditingController(text: '5551234567');
+  TextEditingController controllerCorreo = TextEditingController(text: 'usuario@gmail.com');
+
+  bool nombreValido = true;
+
+  // Variables para controlar si el campo está en modo edición o no
+  bool _editandoNombre = false;
+  bool _editandoTelefono = false;
+
 List<Map<String, dynamic>> usuariosJson = [
   {
     "nombre": "Juan Pérez",
     "correo": "juan@example.com",
+    "telefono": "1234567890",
   },
   {
     "nombre": "Ana Gómez",
     "correo": "ana@example.com",
+    "telefono": "0987654321",
   },
 ];
 
@@ -32,14 +45,17 @@ List<Map<String, dynamic>> barberosJson = [
     "correo": "carlos@example.com",
     "salario": 1200.50,
     "status": "Activo",
+    "telefono": "1112223333",
   },
   {
     "nombre": "Luis Martínez",
     "correo": "luis@example.com",
     "salario": 1100,
     "status": "Activo",
+    "telefono": "4445556666",
   },
 ];
+
 
 
   bool showUsuarios = true;
@@ -96,6 +112,7 @@ void _confirmarEliminacion(BuildContext context, {
 void _mostrarDialogoAnadirUsuario() {
   final nombreController = TextEditingController();
   final correoController = TextEditingController();
+  final telefonoController = TextEditingController();
 
   bool isValid = false;
 
@@ -107,11 +124,16 @@ void _mostrarDialogoAnadirUsuario() {
     return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(texto) && texto.isNotEmpty;
   }
 
+  bool isTelefonoValido(String texto) {
+    return RegExp(r'^\d{10}$').hasMatch(texto);
+  }
+
   void validarFormulario() {
     final nombre = nombreController.text.trim();
     final correo = correoController.text.trim();
+    final telefono = telefonoController.text.trim();
 
-    final valido = isNombreValido(nombre) && isCorreoValido(correo);
+    final valido = isNombreValido(nombre) && isCorreoValido(correo) && isTelefonoValido(telefono);
 
     if (valido != isValid) {
       setState(() {
@@ -126,6 +148,7 @@ void _mostrarDialogoAnadirUsuario() {
       return StatefulBuilder(builder: (context, setState) {
         final nombreTexto = nombreController.text.trim();
         final correoTexto = correoController.text.trim();
+        final telefonoTexto = telefonoController.text.trim();
 
         Color colorNombre() {
           if (nombreTexto.isEmpty) return Colors.black;
@@ -135,6 +158,11 @@ void _mostrarDialogoAnadirUsuario() {
         Color colorCorreo() {
           if (correoTexto.isEmpty) return Colors.black;
           return isCorreoValido(correoTexto) ? Colors.green : Colors.red;
+        }
+
+        Color colorTelefono() {
+          if (telefonoTexto.isEmpty) return Colors.black;
+          return isTelefonoValido(telefonoTexto) ? Colors.green : Colors.red;
         }
 
         return AlertDialog(
@@ -154,13 +182,15 @@ void _mostrarDialogoAnadirUsuario() {
                   decoration: InputDecoration(
                     labelText: 'Nombre',
                     labelStyle: TextStyle(color: colorNombre()),
+                    errorText: nombreTexto.isNotEmpty && !isNombreValido(nombreTexto)
+                        ? 'Solo letras permitidas'
+                        : null,
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: colorNombre()),
+                    ),
                     enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: colorNombre()),
                     ),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: colorNombre(), width: 2.0),
-                    ),
-                    errorText: nombreTexto.isNotEmpty && !isNombreValido(nombreTexto) ? 'Solo letras permitidas' : null,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -174,13 +204,40 @@ void _mostrarDialogoAnadirUsuario() {
                   decoration: InputDecoration(
                     labelText: 'Correo',
                     labelStyle: TextStyle(color: colorCorreo()),
+                    errorText: correoTexto.isNotEmpty && !isCorreoValido(correoTexto)
+                        ? 'Correo inválido'
+                        : null,
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: colorCorreo()),
+                    ),
                     enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: colorCorreo()),
                     ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: telefonoController,
+                  keyboardType: TextInputType.number,
+                  maxLength: 10,
+                  cursorColor: colorTelefono(),
+                  onChanged: (value) {
+                    validarFormulario();
+                    setState(() {});
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Teléfono',
+                    counterText: "",
+                    labelStyle: TextStyle(color: colorTelefono()),
+                    errorText: telefonoTexto.isNotEmpty && !isTelefonoValido(telefonoTexto)
+                        ? 'Teléfono inválido (10 dígitos)'
+                        : null,
                     focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: colorCorreo(), width: 2.0),
+                      borderSide: BorderSide(color: colorTelefono()),
                     ),
-                    errorText: correoTexto.isNotEmpty && !isCorreoValido(correoTexto) ? 'Correo inválido' : null,
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: colorTelefono()),
+                    ),
                   ),
                 ),
               ],
@@ -202,11 +259,13 @@ void _mostrarDialogoAnadirUsuario() {
                       ? () {
                           final nombre = nombreController.text.trim();
                           final correo = correoController.text.trim();
+                          final telefono = telefonoController.text.trim();
 
                           setState(() {
                             usuariosJson.add({
                               "nombre": nombre,
                               "correo": correo,
+                              "telefono": telefono,
                             });
                           });
 
@@ -236,6 +295,7 @@ void _mostrarDialogoEditarUsuario(int index) {
   final usuario = usuariosJson[index];
   final nombreController = TextEditingController(text: usuario['nombre']);
   final correoController = TextEditingController(text: usuario['correo']);
+  final telefonoController = TextEditingController(text: usuario['telefono'] ?? '');
 
   bool isValid = true;
 
@@ -247,11 +307,16 @@ void _mostrarDialogoEditarUsuario(int index) {
     return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(texto) && texto.isNotEmpty;
   }
 
+  bool isTelefonoValido(String texto) {
+    return RegExp(r'^\d{10}$').hasMatch(texto);
+  }
+
   void validarFormulario() {
     final nombre = nombreController.text.trim();
     final correo = correoController.text.trim();
+    final telefono = telefonoController.text.trim();
 
-    final valido = isNombreValido(nombre) && isCorreoValido(correo);
+    final valido = isNombreValido(nombre) && isCorreoValido(correo) && isTelefonoValido(telefono);
 
     if (valido != isValid) {
       setState(() {
@@ -266,6 +331,7 @@ void _mostrarDialogoEditarUsuario(int index) {
       return StatefulBuilder(builder: (context, setState) {
         final nombreTexto = nombreController.text.trim();
         final correoTexto = correoController.text.trim();
+        final telefonoTexto = telefonoController.text.trim();
 
         Color colorNombre() {
           if (nombreTexto.isEmpty) return Colors.black;
@@ -277,6 +343,11 @@ void _mostrarDialogoEditarUsuario(int index) {
           return isCorreoValido(correoTexto) ? Colors.green : Colors.red;
         }
 
+        Color colorTelefono() {
+          if (telefonoTexto.isEmpty) return Colors.black;
+          return isTelefonoValido(telefonoTexto) ? Colors.green : Colors.red;
+        }
+
         return AlertDialog(
           backgroundColor: Colors.white,
           title: const Text('Editar Usuario'),
@@ -284,6 +355,7 @@ void _mostrarDialogoEditarUsuario(int index) {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Nombre
                 TextField(
                   controller: nombreController,
                   cursorColor: colorNombre(),
@@ -294,16 +366,19 @@ void _mostrarDialogoEditarUsuario(int index) {
                   decoration: InputDecoration(
                     labelText: 'Nombre',
                     labelStyle: TextStyle(color: colorNombre()),
+                    errorText: nombreTexto.isNotEmpty && !isNombreValido(nombreTexto)
+                        ? 'Solo letras permitidas'
+                        : null,
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: colorNombre()),
+                    ),
                     enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: colorNombre()),
                     ),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: colorNombre(), width: 2.0),
-                    ),
-                    errorText: nombreTexto.isNotEmpty && !isNombreValido(nombreTexto) ? 'Solo letras permitidas' : null,
                   ),
                 ),
                 const SizedBox(height: 12),
+                // Correo
                 TextField(
                   controller: correoController,
                   cursorColor: colorCorreo(),
@@ -314,13 +389,41 @@ void _mostrarDialogoEditarUsuario(int index) {
                   decoration: InputDecoration(
                     labelText: 'Correo',
                     labelStyle: TextStyle(color: colorCorreo()),
+                    errorText: correoTexto.isNotEmpty && !isCorreoValido(correoTexto)
+                        ? 'Correo inválido'
+                        : null,
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: colorCorreo()),
+                    ),
                     enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: colorCorreo()),
                     ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // Teléfono
+                TextField(
+                  controller: telefonoController,
+                  keyboardType: TextInputType.number,
+                  maxLength: 10,
+                  cursorColor: colorTelefono(),
+                  onChanged: (value) {
+                    validarFormulario();
+                    setState(() {});
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Teléfono',
+                    counterText: "",
+                    labelStyle: TextStyle(color: colorTelefono()),
+                    errorText: telefonoTexto.isNotEmpty && !isTelefonoValido(telefonoTexto)
+                        ? 'Teléfono inválido (10 dígitos)'
+                        : null,
                     focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: colorCorreo(), width: 2.0),
+                      borderSide: BorderSide(color: colorTelefono()),
                     ),
-                    errorText: correoTexto.isNotEmpty && !isCorreoValido(correoTexto) ? 'Correo inválido' : null,
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: colorTelefono()),
+                    ),
                   ),
                 ),
               ],
@@ -342,11 +445,13 @@ void _mostrarDialogoEditarUsuario(int index) {
                       ? () {
                           final nombre = nombreController.text.trim();
                           final correo = correoController.text.trim();
+                          final telefono = telefonoController.text.trim();
 
                           setState(() {
                             usuariosJson[index] = {
                               "nombre": nombre,
                               "correo": correo,
+                              "telefono": telefono,
                             };
                           });
 
@@ -680,7 +785,6 @@ void _mostrarDialogoEditarBarbero(Map<String, dynamic> barbero) {
   );
 }
 
-
 //WIDGETS
 
   @override
@@ -708,12 +812,21 @@ void _mostrarDialogoEditarBarbero(Map<String, dynamic> barbero) {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text("Datos personales", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 10),
-                  const Text("Nombre"),
-                  const SizedBox(height: 5),
-                  _buildTextField(controller1, editable: true),
-                  const SizedBox(height: 10),
-                  const Text("Correo"),
+                const SizedBox(height: 10),
+                _buildEditableTextField(
+                  controller: controllerNombre,
+                  label: "Nombre",
+                  inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]'))],
+                ),
+                const SizedBox(height: 10),
+                _buildEditableTextField(
+                  controller: controllerTelefono,
+                  label: "Teléfono",
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(height: 10),
+                const Text("Correo"),
                   const SizedBox(height: 5),
                   _buildTextField(controller2),
                   const SizedBox(height: 20),
@@ -749,6 +862,102 @@ void _mostrarDialogoEditarBarbero(Map<String, dynamic> barbero) {
       ),
     );
   }
+
+  Widget _buildEditableTextField({
+  required TextEditingController controller,
+  required String label,
+  required List<TextInputFormatter> inputFormatters,
+  TextInputType keyboardType = TextInputType.text,
+}) {
+  final focusNode = FocusNode();
+  bool isEditing = false;
+  bool showWarning = false;
+  String lastValidValue = controller.text;  // Guardamos el último valor válido
+
+  return StatefulBuilder(
+    builder: (context, setInnerState) {
+      return GestureDetector(
+        onTap: () {
+          focusNode.requestFocus();
+          setInnerState(() => isEditing = true);
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label),
+            const SizedBox(height: 5),
+            TextField(
+              controller: controller,
+              focusNode: focusNode,
+              inputFormatters: inputFormatters,
+              keyboardType: keyboardType,
+              maxLength: label == "Teléfono" ? 10 : null,
+              style: const TextStyle(color: Colors.white),
+              cursorColor: Colors.green,
+              onChanged: (value) {
+                if (label == "Nombre") {
+                  // Revisamos si el texto contiene números
+                  if (RegExp(r'\d').hasMatch(value)) {
+                    setInnerState(() {
+                      showWarning = true;
+                      // Revertimos al último valor válido
+                      controller.text = lastValidValue;
+                      controller.selection = TextSelection.fromPosition(
+                        TextPosition(offset: lastValidValue.length),
+                      );
+                    });
+                  } else {
+                    setInnerState(() {
+                      showWarning = false;
+                      lastValidValue = value; // Actualizamos el último valor válido
+                    });
+                  }
+                } else if (label == "Teléfono") {
+                  setInnerState(() {
+                    showWarning = value.length != 10;
+                  });
+                } else {
+                  setInnerState(() {
+                    showWarning = false;
+                  });
+                }
+              },
+              onEditingComplete: () {
+                setInnerState(() => isEditing = false);
+                focusNode.unfocus();
+              },
+              decoration: InputDecoration(
+                counterText: "",
+                suffixIcon: const Icon(Icons.edit, color: Colors.white),
+                filled: true,
+                fillColor: Colors.black,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: showWarning ? Colors.red : Colors.grey),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: showWarning ? Colors.red : Colors.green, width: 2),
+                ),
+              ),
+            ),
+            if (showWarning)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  label == "Nombre"
+                      ? "No se permiten números en el nombre"
+                      : "El teléfono debe tener exactamente 10 dígitos",
+                  style: const TextStyle(color: Colors.red, fontSize: 12),
+                ),
+              ),
+          ],
+        ),
+      );
+    },
+  );
+}
 
   Widget _buildTextField(TextEditingController controller, {bool editable = false}) {
     return SizedBox(
@@ -792,20 +1001,22 @@ void _mostrarDialogoEditarBarbero(Map<String, dynamic> barbero) {
         columnas: const [
           DataColumn(label: Text('Nombre')),
           DataColumn(label: Text('Correo')),
+          DataColumn(label: Text('Teléfono')), // NUEVA COLUMNA
           DataColumn(label: Text('Editar/Borrar')),
         ],
         filas: usuariosJson.map((usuario) {
           return DataRow(cells: [
             DataCell(Text(usuario['nombre'] ?? '')),
             DataCell(Text(usuario['correo'] ?? '')),
+            DataCell(Text(usuario['telefono'] ?? '')), // NUEVO CAMPO
             DataCell(Row(
               children: [
                 IconButton(
                   icon: const Icon(Icons.edit, color: Colors.yellow),
-                 onPressed: () {
-                  final index = usuariosJson.indexOf(usuario);
-                  _mostrarDialogoEditarUsuario(index);
-                },
+                  onPressed: () {
+                    final index = usuariosJson.indexOf(usuario);
+                    _mostrarDialogoEditarUsuario(index);
+                  },
                 ),
                 IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
@@ -898,7 +1109,6 @@ void _mostrarDialogoEditarBarbero(Map<String, dynamic> barbero) {
     ),
   ],
 )),
-
           ]);
         }).toList(),
       ),
