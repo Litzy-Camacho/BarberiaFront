@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../Clients/user_profile.dart';
 import 'resume_reservation.dart';  // Asegúrate de importar la página de resumen
+import 'reservation_data.dart';
 
 class PaymentPage extends StatefulWidget {
   final String name;
@@ -146,6 +147,28 @@ class _PaymentPageState extends State<PaymentPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      onPressed: () {
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (context) => AppointmentFormPage(
+        
+        service: widget.service,
+      ),
+    ),
+  );
+},
+                    ),
+                    const Text(
+                      'Regresar',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                  ],
+                ),
                 const Text('Vista previa del pago',
                     style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 20),

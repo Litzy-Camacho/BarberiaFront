@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ContactoSection extends StatefulWidget {
   final GlobalKey keyContacto;
@@ -47,34 +48,25 @@ class _ContactoSectionState extends State<ContactoSection> {
                       horizontal: screenWidth * 0.05,
                     ),
                     child: Column(
-                      children: [
-                        const ContactInfoRow(
+                      children: const [
+                        ContactInfoRow(
                           icon: Icons.email,
                           text: 'essence_barber@gmail.com',
+                          isClickable: false, // No hace nada
                         ),
-                        const ContactInfoRow(
+                        ContactInfoRow(
                           icon: Icons.location_on,
                           text:
                               '20 de Noviembre #34\nCentro Histórico, Morelia',
+                          isClickable: true, // Abre Google Maps
                         ),
-                        const ContactInfoRow(
+                        ContactInfoRow(
                           icon: Icons.phone,
                           text: '443 4632 2732',
+                          isClickable: true,
                         ),
-                        Container(
-                          color: Colors.black,
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          child: Wrap(
-                            alignment: WrapAlignment.center,
-                            spacing: screenWidth * 0.06,
-                            children: const [
-                              Icon(FontAwesomeIcons.facebook,
-                                  color: Colors.white),
-                              Icon(FontAwesomeIcons.instagram,
-                                  color: Colors.white),
-                            ],
-                          ),
-                        ),
+                        SizedBox(height: 10),
+                        SocialIconsRow(),
                       ],
                     ),
                   ),
@@ -88,53 +80,44 @@ class _ContactoSectionState extends State<ContactoSection> {
   }
 }
 
-class ContactoItem extends StatelessWidget {
-  final IconData icon;
-  final String title;
-
-  const ContactoItem({super.key, required this.icon, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 40, color: Colors.black),
-            const SizedBox(height: 8),
-            Container(
-              width: 2,
-              height: 40,
-              color: Colors.black,
-            ),
-          ],
-        ),
-        const SizedBox(width: 12),
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 20,
-            color: Colors.black,
-            fontFamily: 'Georgia',
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 class ContactInfoRow extends StatelessWidget {
   final IconData icon;
   final String text;
+  final bool isClickable;
 
-  const ContactInfoRow({super.key, required this.icon, required this.text});
+  const ContactInfoRow({
+    super.key,
+    required this.icon,
+    required this.text,
+    this.isClickable = true,
+  });
+
+ Future<void> _handleTap(String text) async {
+  if (text.contains('@')) {
+    // No hacer nada si es correo
+    return;
+  } else if (text == '443 4632 2732') {
+    // Detecta explícitamente si es el número telefónico
+    final phone = text.replaceAll(RegExp(r'\s+'), '');
+    final uri = Uri(scheme: 'tel', path: phone);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
+  } else {
+    // Cualquier otro texto lo tratamos como dirección
+    final uri = Uri.parse('https://maps.app.goo.gl/Hp9RMw4Jc6jW8wCw6');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      debugPrint('No se pudo abrir el enlace de Google Maps.');
+    }
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final content = Container(
       color: Colors.black,
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
       child: Row(
@@ -146,11 +129,35 @@ class ContactInfoRow extends StatelessWidget {
             child: Text(
               text,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.white, fontSize: 16),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                decoration: TextDecoration.underline,
+              ),
             ),
           ),
         ],
       ),
+    );
+
+    return isClickable
+        ? InkWell(onTap: () => _handleTap(text), child: content)
+        : content;
+  }
+}
+
+class SocialIconsRow extends StatelessWidget {
+  const SocialIconsRow({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: MediaQuery.of(context).size.width * 0.06,
+      children: const [
+        Icon(FontAwesomeIcons.facebook, color: Colors.white),
+        Icon(FontAwesomeIcons.instagram, color: Colors.white),
+      ],
     );
   }
 }

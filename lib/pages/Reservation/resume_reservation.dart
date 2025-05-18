@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:confetti/confetti.dart';
 import '../Clients/user_profile.dart';
+import 'payment_data.dart';
 
 class ResumeReservationPage extends StatefulWidget {
   final String name;
@@ -67,6 +68,33 @@ class _ResumeReservationPageState extends State<ResumeReservationPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      onPressed: () {
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (context) => PaymentPage(
+        name: widget.name,
+        phone: widget.phone,
+        date: widget.date,
+        time: widget.time,
+        barber: widget.barber,
+        service: widget.service,
+      ),
+    ),
+  );
+},
+
+                    ),
+                    const Text(
+                      'Regresar',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                  ],
+                ),
                     const Text(
                       'Detalles de la reserva',
                       style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),

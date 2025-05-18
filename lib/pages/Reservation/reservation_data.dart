@@ -5,7 +5,10 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'payment_data.dart';
 import 'resume_reservation.dart';
+import '../Services/services_screen.dart';
+import '../Home/home_page.dart';
 
+// ... imports iguales
 class AppointmentFormPage extends StatefulWidget {
   final String service;
   const AppointmentFormPage({Key? key, required this.service}) : super(key: key);
@@ -24,8 +27,6 @@ class _AppointmentFormPageState extends State<AppointmentFormPage> {
   String? _paymentMethod;
 
   final List<String> _barbers = ['Ricardo', 'Andrea', 'Litzy'];
-
-  bool _showServiceDropdown = false;
   late String _selectedService;
   final List<String> _availableServices = ['Corte de cabello', 'Barba', 'Color', 'Afeitado'];
 
@@ -37,12 +38,12 @@ class _AppointmentFormPageState extends State<AppointmentFormPage> {
   bool get isPaymentValid => _paymentMethod != null;
 
   bool get isFormValid =>
-      isNameValid && isPhoneValid && isDateValid && isTimeValid && isBarberValid && isPaymentValid ;
+      isNameValid && isPhoneValid && isDateValid && isTimeValid && isBarberValid && isPaymentValid;
 
   @override
   void initState() {
     super.initState();
-    _selectedService = widget.service; // Servicio inicial
+    _selectedService = widget.service;
     _nameCtrl.addListener(() {
       setState(() {});
     });
@@ -102,6 +103,33 @@ class _AppointmentFormPageState extends State<AppointmentFormPage> {
     }
   }
 
+  void _showServiceDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: const Text('Selecciona un servicio'),
+          content: SingleChildScrollView(
+            child: Column(
+              children: _availableServices.map((service) {
+                return ListTile(
+                  title: Text(service),
+                  onTap: () {
+                    setState(() {
+                      _selectedService = service;
+                    });
+                    Navigator.pop(context);
+                  },
+                );
+              }).toList(),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final hours = List<TimeOfDay>.generate(9, (i) => TimeOfDay(hour: 10 + i, minute: 0));
@@ -116,15 +144,31 @@ class _AppointmentFormPageState extends State<AppointmentFormPage> {
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
               child: Form(
                 key: _formKey,
-                onChanged: () {
-                  setState(() {});
-                },
+                onChanged: () => setState(() {}),
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 child: DefaultTextStyle(
                   style: const TextStyle(color: Colors.white, fontSize: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const ServicesScreen()),
+                        );
+                      },
+                    ),
+                    const Text(
+                      'Regresar',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                  ],
+                ),
+                 const SizedBox(height: 20),
                       const Text('Nombre'),
                       const SizedBox(height: 8),
                       TextFormField(
@@ -142,28 +186,28 @@ class _AppointmentFormPageState extends State<AppointmentFormPage> {
                       ),
                       const SizedBox(height: 20),
 
-                     const Text('Telefono'),
-const SizedBox(height: 8),
-TextFormField(
-  controller: _phoneCtrl,
-  style: const TextStyle(color: Colors.black),
-  decoration: _customInputDecoration('Ingresa tu número de teléfono'),
-  keyboardType: TextInputType.number,
-  inputFormatters: [
-    FilteringTextInputFormatter.digitsOnly,
-    LengthLimitingTextInputFormatter(10),
-  ],
-  validator: (value) {
-    if (value == null || value.isEmpty) {
-      return 'Requerido';
-    } else if (!RegExp(r'^\d{10}$').hasMatch(value)) {
-      return 'Debe tener exactamente 10 dígitos numéricos';
-    }
-    return null;
-  },
-),
-
+                      const Text('Telefono'),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: _phoneCtrl,
+                        style: const TextStyle(color: Colors.black),
+                        decoration: _customInputDecoration('Ingresa tu número de teléfono'),
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(10),
+                        ],
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Requerido';
+                          } else if (!RegExp(r'^\d{10}$').hasMatch(value)) {
+                            return 'Debe tener exactamente 10 dígitos numéricos';
+                          }
+                          return null;
+                        },
+                      ),
                       const SizedBox(height: 20),
+
                       const Text('Fecha'),
                       const SizedBox(height: 8),
                       TextFormField(
@@ -207,49 +251,21 @@ TextFormField(
                       const Text('Servicio'),
                       const SizedBox(height: 8),
                       Row(
-  children: [
-    Expanded(
-      child: TextFormField(
-        controller: TextEditingController(text: _selectedService), // Dynamically update the service
-        enabled: false,
-        style: const TextStyle(color: Colors.black),
-        decoration: _customInputDecoration(''),
-      ),
-    ),
-  Container(
-  
-  child: IconButton(
-    icon: const Icon(Icons.edit, color: Colors.white), // ícono de editar
-    onPressed: () {
-      setState(() {
-        _showServiceDropdown = !_showServiceDropdown;
-      });
-    },
-  ),
-),
-
-  ],
-),
-
-                      const SizedBox(height: 8),
-                      if (_showServiceDropdown) ...[
-                        const SizedBox(height: 8),
-                        DropdownButtonFormField<String>(
-                          value: _availableServices.contains(_selectedService)
-                              ? _selectedService
-                              : null,
-                          decoration: _customInputDecoration('Selecciona un nuevo servicio'),
-                          items: _availableServices
-                              .map((s) => DropdownMenuItem(value: s, child: Text(s)))
-                              .toList(),
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedService = value!;  // Update selected service
-                              _showServiceDropdown = false;  // Hide the dropdown
-                            });
-                          },
-                        ),
-                      ],
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: TextEditingController(text: _selectedService),
+                              enabled: false,
+                              style: const TextStyle(color: Colors.black),
+                              decoration: _customInputDecoration(''),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.edit, color: Colors.white),
+                            onPressed: _showServiceDialog,
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: 20),
 
                       const Text('Barbero'),
@@ -286,23 +302,51 @@ TextFormField(
                       Center(
                         child: ElevatedButton(
                           onPressed: isFormValid
-                              ? () {
-                                  _saveAppointment();
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => PaymentPage(
-                                        name: _nameCtrl.text,
-                                        phone: _phoneCtrl.text,
-                                        date: _selectedDate ?? DateTime.now(),
-                                        time: _selectedTime ?? 'Hora no seleccionada',
-                                        barber: _selectedBarber ?? 'Barbero no seleccionado',
-                                        service: _selectedService,
-                                      ),
+                          ? () async {
+                              _saveAppointment();
+
+                              if (_paymentMethod == 'Efectivo') {
+                                // Mostrar SnackBar que abarca toda la pantalla
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: const Text(
+                                      'Reservación hecha con éxito',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontWeight: FontWeight.bold),
                                     ),
-                                  );
-                                }
-                              : null,
+                                    backgroundColor: Colors.green,
+                                    behavior: SnackBarBehavior.fixed,
+                                    duration: const Duration(seconds: 2),
+                                  ),
+                                );
+
+                                // Esperar que el SnackBar se muestre
+                                await Future.delayed(const Duration(seconds: 2));
+
+                                // Navegar a HomePage
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const HomePage()),
+                                  (route) => false,
+                                );
+                              } else {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PaymentPage(
+                                      name: _nameCtrl.text,
+                                      phone: _phoneCtrl.text,
+                                      date: _selectedDate ?? DateTime.now(),
+                                      time: _selectedTime ?? 'Hora no seleccionada',
+                                      barber: _selectedBarber ?? 'Barbero no seleccionado',
+                                      service: _selectedService,
+                                    ),
+                                  ),
+                                );
+                              }
+                            }
+                          : null,
+
                           style: ElevatedButton.styleFrom(
                             backgroundColor: isFormValid ? Colors.white : Colors.grey.shade700,
                             foregroundColor: isFormValid ? Colors.black : Colors.white,
