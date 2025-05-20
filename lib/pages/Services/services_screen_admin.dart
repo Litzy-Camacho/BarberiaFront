@@ -4,6 +4,7 @@ import '../Components/navbar_home.dart';
 import '../Home/home_page.dart';
 import '../Reservation/reservation_data.dart';
 import '../Components/contacto_section.dart';
+import 'package:flutter/services.dart'; 
 
 // Simulación de JSON local con campo de duración
 final List<Map<String, dynamic>> servicesJson = [
@@ -207,90 +208,295 @@ class _ServicesScreenAdminState extends State<ServicesScreenAdmin> {
     }
   }
 
-  void _showEditDialog(Map<String, dynamic> service) {
-    final nameController = TextEditingController(text: service['name']);
-    final descriptionController = TextEditingController(text: service['description']);
-    final priceController = TextEditingController(text: service['price']);
-    final durationController = TextEditingController(text: service['duration']);
 
-    showDialog(
-      context: context,
-      builder: (context) {
+
+void _showEditDialog(Map<String, dynamic> service) {
+  final nameController = TextEditingController(text: service['name']);
+  final descriptionController = TextEditingController(text: service['description']);
+  final priceController = TextEditingController(text: service['price']);
+  final durationController = TextEditingController(
+    text: service['duration'].toString().replaceAll(' min', ''),
+  );
+
+  bool isValid = true;
+
+  bool isNameValid(String text) {
+    return RegExp(r'^[a-zA-Z\s]+$').hasMatch(text) && text.isNotEmpty;
+  }
+
+  bool isDescriptionValid(String text) {
+    return text.isNotEmpty;
+  }
+
+  bool isPriceValid(String text) {
+    return RegExp(r'^\d+(\.\d{0,2})?$').hasMatch(text);
+  }
+
+  bool isDurationValid(String text) {
+    return RegExp(r'^\d{2}$').hasMatch(text);
+  }
+
+  void validateForm() {
+    final name = nameController.text.trim();
+    final description = descriptionController.text.trim();
+    final price = priceController.text.trim();
+    final duration = durationController.text.trim();
+
+    final valid = isNameValid(name) &&
+        isDescriptionValid(description) &&
+        isPriceValid(price) &&
+        isDurationValid(duration);
+
+    if (valid != isValid) {
+      setState(() {
+        isValid = valid;
+      });
+    }
+  }
+
+  showDialog(
+    context: context,
+    builder: (context) {
+      return StatefulBuilder(builder: (context, setState) {
+        final nameText = nameController.text.trim();
+        final descriptionText = descriptionController.text.trim();
+        final priceText = priceController.text.trim();
+        final durationText = durationController.text.trim();
+
+        Color nameColor() {
+          if (nameText.isEmpty) return Colors.black;
+          return isNameValid(nameText) ? Colors.green : Colors.red;
+        }
+
+        Color descriptionColor() {
+          if (descriptionText.isEmpty) return Colors.black;
+          return isDescriptionValid(descriptionText) ? Colors.green : Colors.red;
+        }
+
+        Color priceColor() {
+          if (priceText.isEmpty) return Colors.black;
+          return isPriceValid(priceText) ? Colors.green : Colors.red;
+        }
+
+        Color durationColor() {
+          if (durationText.isEmpty) return Colors.black;
+          return isDurationValid(durationText) ? Colors.green : Colors.red;
+        }
+
         return AlertDialog(
+          backgroundColor: Colors.white,
           title: const Text('Editar Servicio'),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Nombre
                 TextField(
                   controller: nameController,
-                  decoration: const InputDecoration(labelText: 'Nombre'),
+                  cursorColor: nameColor(),
+                  onChanged: (value) {
+                    validateForm();
+                    setState(() {});
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Nombre',
+                    labelStyle: TextStyle(color: nameColor()),
+                    errorText: nameText.isNotEmpty && !isNameValid(nameText)
+                        ? 'Solo letras permitidas'
+                        : null,
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: nameColor()),
+                    ),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: nameColor()),
+                    ),
+                  ),
                 ),
+                const SizedBox(height: 12),
+                // Descripción
                 TextField(
                   controller: descriptionController,
-                  decoration: const InputDecoration(labelText: 'Descripción'),
+                  cursorColor: descriptionColor(),
+                  onChanged: (value) {
+                    validateForm();
+                    setState(() {});
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Descripción',
+                    labelStyle: TextStyle(color: descriptionColor()),
+                    errorText: descriptionText.isNotEmpty && !isDescriptionValid(descriptionText)
+                        ? 'Descripción requerida'
+                        : null,
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: descriptionColor()),
+                    ),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: descriptionColor()),
+                    ),
+                  ),
                 ),
+                const SizedBox(height: 12),
+                // Precio
                 TextField(
                   controller: priceController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Precio'),
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                  ],
+                  cursorColor: priceColor(),
+                  onChanged: (value) {
+                    validateForm();
+                    setState(() {});
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Precio',
+                    labelStyle: TextStyle(color: priceColor()),
+                    errorText: priceText.isNotEmpty && !isPriceValid(priceText)
+                        ? 'Máximo 2 decimales permitidos'
+                        : null,
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: priceColor()),
+                    ),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: priceColor()),
+                    ),
+                  ),
                 ),
+                const SizedBox(height: 12),
+                // Duración
                 TextField(
                   controller: durationController,
-                  decoration: const InputDecoration(labelText: 'Duración'),
+                  keyboardType: TextInputType.number,
+                  maxLength: 2,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(2),
+                  ],
+                  cursorColor: durationColor(),
+                  onChanged: (value) {
+                    validateForm();
+                    setState(() {});
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Duración (en minutos)',
+                    counterText: "",
+                    labelStyle: TextStyle(color: durationColor()),
+                    errorText: durationText.isNotEmpty && !isDurationValid(durationText)
+                        ? 'Tiempo inválido (2 dígitos)'
+                        : null,
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: durationColor()),
+                    ),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: durationColor()),
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancelar'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  service['name'] = nameController.text;
-                  service['description'] = descriptionController.text;
-                  service['price'] = priceController.text;
-                  service['duration'] = durationController.text;
-                });
-                Navigator.pop(context);
-              },
-              child: const Text('Guardar'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Cancelar', style: TextStyle(color: Colors.white)),
+                ),
+                const SizedBox(width: 16),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
+                  onPressed: isValid
+                      ? () {
+                          final durationValue = durationController.text.trim();
+                          final durationFinal = durationValue.endsWith('min')
+                              ? durationValue
+                              : '$durationValue min';
+
+                          setState(() {
+                            service['name'] = nameController.text.trim();
+                            service['description'] = descriptionController.text.trim();
+                            service['price'] = priceController.text.trim();
+                            service['duration'] = durationFinal;
+                          });
+
+                          Navigator.of(context).pop();
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Servicio actualizado'),
+                              backgroundColor: Colors.green,
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                        }
+                      : null,
+                  child: const Text('Guardar', style: TextStyle(color: Colors.white)),
+                ),
+              ],
             ),
           ],
         );
-      },
-    );
-  }
+      });
+    },
+  );
+}
 
   void _showDeleteDialog(Map<String, dynamic> service) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Confirmar eliminación'),
-          content: Text('¿Estás seguro de que deseas eliminar el servicio "${service['name']}"?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancelar'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  servicesJson.remove(service);
-                });
-                Navigator.pop(context);
-              },
-              child: const Text('Eliminar'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        backgroundColor: Colors.white, // Fondo blanco del cuadro de diálogo
+        title: const Text('Confirmar eliminación'),
+        content: Text('¿Estás seguro de que deseas eliminar el servicio "${service['name']}"?'),
+        actions: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                ),
+                onPressed: () => Navigator.pop(context),
+                child: const Text(
+                  'Cancelar',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              const SizedBox(width: 16),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                ),
+                onPressed: () {
+                  setState(() {
+                    servicesJson.remove(service);
+                  });
+                  Navigator.pop(context);
+
+                  // Mostrar SnackBar
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Servicio eliminado'),
+                      backgroundColor: Colors.green,
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                },
+                child: const Text(
+                  'Aceptar',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
+    },
+  );
+}
 }
 
 class _ServiceCard extends StatelessWidget {

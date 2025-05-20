@@ -78,36 +78,47 @@ void _confirmarEliminacion(BuildContext context, {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
+        backgroundColor: Colors.white, // Fondo blanco del cuadro de diálogo
         title: const Text('Confirmar eliminación'),
         content: Text('¿Estás seguro que quieres eliminar a $nombre?'),
         actions: [
-          TextButton(
-            child: const Text(
-              'Cancelar',
-              style: TextStyle(color: Colors.black),
-            ),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          TextButton(
-            child: const Text(
-              'Aceptar',
-              style: TextStyle(color: Colors.black),
-            ),
-            style: TextButton.styleFrom(
-              
-            ),
-            onPressed: () {
-              Navigator.of(context).pop();
-              onConfirmar();
-            },
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text(
+                  'Cancelar',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              const SizedBox(width: 16),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  onConfirmar();
+                },
+                child: const Text(
+                  'Aceptar',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
           ),
         ],
       );
     },
   );
 }
+
 
 void _mostrarDialogoAnadirUsuario() {
   final nombreController = TextEditingController();
@@ -695,7 +706,6 @@ void _mostrarDialogoAnadirBarbero() {
   );
 }
 
-
 void _mostrarDialogoEditarBarbero(Map<String, dynamic> barbero) {
   final nombreController = TextEditingController(text: barbero['nombre']);
   final correoController = TextEditingController(text: barbero['correo']);
@@ -1216,7 +1226,6 @@ const SizedBox(height: 20),
   );
 }
 
-
   Widget _buildTablaGenerica({
     required List<DataColumn> columnas,
     required List<DataRow> filas,
@@ -1294,7 +1303,6 @@ const SizedBox(height: 20),
     ),
   );
 }
-
 
   Widget _buildOptionButton(String text, VoidCallback onPressed, {required bool seleccionado}) {
     return ElevatedButton(

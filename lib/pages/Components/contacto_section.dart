@@ -17,8 +17,13 @@ class _ContactoSectionState extends State<ContactoSection> {
 
   @override
   Widget build(BuildContext context) {
+    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+
+    final iconSize = isLandscape ? 18.0 : 24.0;
+    final textSize = isLandscape ? 13.0 : 16.0;
+    final socialIconSize = isLandscape ? 18.0 : 28.0;
 
     return Container(
       key: widget.keyContacto,
@@ -36,43 +41,99 @@ class _ContactoSectionState extends State<ContactoSection> {
           opacity: _isVisible ? 1.0 : 0.0,
           duration: const Duration(milliseconds: 800),
           curve: Curves.easeInOut,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    color: Colors.black,
-                    padding: EdgeInsets.symmetric(
-                      vertical: screenHeight * 0.04,
-                      horizontal: screenWidth * 0.05,
-                    ),
-                    child: Column(
-                      children: const [
-                        ContactInfoRow(
-                          icon: Icons.email,
-                          text: 'essence_barber@gmail.com',
-                          isClickable: false, // No hace nada
-                        ),
-                        ContactInfoRow(
-                          icon: Icons.location_on,
-                          text:
-                              '20 de Noviembre #34\nCentro Histórico, Morelia',
-                          isClickable: true, // Abre Google Maps
-                        ),
-                        ContactInfoRow(
-                          icon: Icons.phone,
-                          text: '443 4632 2732',
-                          isClickable: true,
-                        ),
-                        SizedBox(height: 10),
-                        SocialIconsRow(),
-                      ],
-                    ),
+          child: Container(
+            color: Colors.black,
+            padding: EdgeInsets.symmetric(
+              vertical: screenHeight * 0.04,
+              horizontal: screenWidth * 0.05,
+            ),
+            child: isLandscape
+                ? Column(
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          // Correo
+                          Flexible(
+                            flex: 3,
+                            child: ContactInfoRow(
+                              icon: Icons.email,
+                              text: 'barbercode@gmail.com',
+                              isClickable: false,
+                              iconSize: iconSize,
+                              textSize: textSize,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          // Dirección
+                          Flexible(
+                            flex: 4,
+                            child: ContactInfoRow(
+                              icon: Icons.location_on,
+                              text: '20 de Noviembre #34\nCentro Histórico, Morelia',
+                              isClickable: true,
+                              iconSize: iconSize,
+                              textSize: textSize,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          // Teléfono
+                          Flexible(
+                            flex: 3,
+                            child: Column(
+                              children: [
+                                ContactInfoRow(
+                                  icon: Icons.phone,
+                                  text: '443 4632 2732',
+                                  isClickable: true,
+                                  iconSize: iconSize,
+                                  textSize: textSize,
+                                  textAlign: TextAlign.center,
+                                ),
+                              
+                                SocialIconsRow(
+                                  iconSize: socialIconSize,
+                                  isCentered: true,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      ContactInfoRow(
+                        icon: Icons.email,
+                        text: 'barbercode@gmail.com',
+                        isClickable: false,
+                        iconSize: iconSize,
+                        textSize: textSize,
+                        textAlign: TextAlign.center,
+                      ),
+                      ContactInfoRow(
+                        icon: Icons.location_on,
+                        text: '20 de Noviembre #34\nCentro Histórico, Morelia',
+                        isClickable: true,
+                        iconSize: iconSize,
+                        textSize: textSize,
+                        textAlign: TextAlign.center,
+                      ),
+                      ContactInfoRow(
+                        icon: Icons.phone,
+                        text: '443 4632 2732',
+                        isClickable: true,
+                        iconSize: iconSize,
+                        textSize: textSize,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 12),
+                      SocialIconsRow(iconSize: socialIconSize, isCentered: true),
+                    ],
                   ),
-                ],
-              );
-            },
           ),
         ),
       ),
@@ -84,54 +145,54 @@ class ContactInfoRow extends StatelessWidget {
   final IconData icon;
   final String text;
   final bool isClickable;
+  final double iconSize;
+  final double textSize;
+  final TextAlign textAlign;
 
   const ContactInfoRow({
     super.key,
     required this.icon,
     required this.text,
     this.isClickable = true,
+    required this.iconSize,
+    required this.textSize,
+    this.textAlign = TextAlign.center,
   });
 
- Future<void> _handleTap(String text) async {
-  if (text.contains('@')) {
-    // No hacer nada si es correo
-    return;
-  } else if (text == '443 4632 2732') {
-    // Detecta explícitamente si es el número telefónico
-    final phone = text.replaceAll(RegExp(r'\s+'), '');
-    final uri = Uri(scheme: 'tel', path: phone);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    }
-  } else {
-    // Cualquier otro texto lo tratamos como dirección
-    final uri = Uri.parse('https://maps.app.goo.gl/Hp9RMw4Jc6jW8wCw6');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+  Future<void> _handleTap(String text) async {
+    if (text.contains('@')) return;
+
+    if (text == '443 4632 2732') {
+      final phone = text.replaceAll(RegExp(r'\s+'), '');
+      final uri = Uri(scheme: 'tel', path: phone);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri);
+      }
     } else {
-      debugPrint('No se pudo abrir el enlace de Google Maps.');
+      final uri = Uri.parse('https://maps.app.goo.gl/Hp9RMw4Jc6jW8wCw6');
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      }
     }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
     final content = Container(
-      color: Colors.black,
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: Colors.white),
+          Icon(icon, color: Colors.white, size: iconSize),
           const SizedBox(width: 8),
           Flexible(
             child: Text(
               text,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
+              textAlign: textAlign,
+              softWrap: true,
+              style: TextStyle(
                 color: Colors.white,
-                fontSize: 16,
+                fontSize: textSize,
                 decoration: TextDecoration.underline,
               ),
             ),
@@ -147,16 +208,23 @@ class ContactInfoRow extends StatelessWidget {
 }
 
 class SocialIconsRow extends StatelessWidget {
-  const SocialIconsRow({super.key});
+  final double iconSize;
+  final bool isCentered;
+
+  const SocialIconsRow({
+    super.key,
+    this.iconSize = 28.0,
+    this.isCentered = true,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Wrap(
-      alignment: WrapAlignment.center,
-      spacing: MediaQuery.of(context).size.width * 0.06,
-      children: const [
-        Icon(FontAwesomeIcons.facebook, color: Colors.white),
-        Icon(FontAwesomeIcons.instagram, color: Colors.white),
+      alignment: isCentered ? WrapAlignment.center : WrapAlignment.end,
+      spacing: 20,
+      children: [
+        Icon(FontAwesomeIcons.facebook, color: Colors.white, size: iconSize),
+        Icon(FontAwesomeIcons.instagram, color: Colors.white, size: iconSize),
       ],
     );
   }
