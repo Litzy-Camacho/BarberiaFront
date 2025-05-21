@@ -30,12 +30,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
       selectedOption = option;
     });
 
-    if (option == 'Inicio') {
-  widget.onNavigateToSection('inicio');
-} else {
-  widget.onNavigateToSection(option);
-}
-
+    widget.onNavigateToSection(option == 'Inicio' ? 'inicio' : option);
   }
 
   @override
@@ -47,9 +42,11 @@ class _CustomAppBarState extends State<CustomAppBar> {
         padding: const EdgeInsets.only(left: 12.0),
         child: GestureDetector(
           onTap: () {
-  widget.onNavigateToSection('inicio');
-},
-
+            setState(() {
+              selectedOption = 'Inicio';
+            });
+            widget.onNavigateToSection('inicio');
+          },
           child: Image.asset(
             'assets/imag/logo.png',
             height: 50,
@@ -86,7 +83,6 @@ class _CustomAppBarState extends State<CustomAppBar> {
           valueListenable: Session.email,
           builder: (context, userEmail, _) {
             if (userEmail == null) {
-              // Usuario no logueado
               return PopupMenuButton<String>(
                 icon: const Icon(Icons.person, color: Colors.white),
                 onSelected: (value) {
@@ -105,7 +101,6 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 ],
               );
             } else {
-              // Usuario logueado
               return PopupMenuButton<String>(
                 icon: const Icon(Icons.person, color: Colors.white),
                 onSelected: (value) {

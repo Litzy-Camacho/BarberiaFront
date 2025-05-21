@@ -59,6 +59,12 @@ class _ResetPasswordPage2State extends State<ResetPasswordPage2> {
       backgroundColor: const Color(0xFF1C1C1C),
       body: Stack(
         children: [
+          SizedBox.expand(
+          child: Image.asset(
+            'assets/imag/fondovertical.png',
+            fit: BoxFit.cover,
+          ),
+        ),
           LayoutBuilder(
             builder: (context, constraints) {
               if (constraints.maxWidth > 600) {

@@ -42,15 +42,23 @@ final List<Map<String, dynamic>> servicesJson = [
 ];
 
 class ServicesScreen extends StatefulWidget {
-  const ServicesScreen({super.key});
+  final int initialCategory;
+
+  const ServicesScreen({super.key, this.initialCategory = 1});
 
   @override
   _ServicesScreenState createState() => _ServicesScreenState();
 }
 
 class _ServicesScreenState extends State<ServicesScreen> {
-  final GlobalKey contactoKey = GlobalKey();
-  int selectedCategory = 1;
+ final GlobalKey contactoKey = GlobalKey();
+  late int selectedCategory;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedCategory = widget.initialCategory; // Asignamos la categoría inicial
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -27,7 +27,12 @@ class _ResetPasswordPage3State extends State<ResetPasswordPage3> {
       backgroundColor: const Color(0xFF1C1C1C),
       body: Stack(
         children: [
-          // Contenido principal
+          SizedBox.expand(
+          child: Image.asset(
+            'assets/imag/fondovertical.png',
+            fit: BoxFit.cover,
+          ),
+        ),
           Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24),

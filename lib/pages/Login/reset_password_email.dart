@@ -47,7 +47,12 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       body: SafeArea(
         child: Stack(
           children: [
-            // Botón de regresar arriba a la izquierda
+            SizedBox.expand(
+          child: Image.asset(
+            'assets/imag/fondovertical.png',
+            fit: BoxFit.cover,
+          ),
+        ),
             Positioned(
               top: 0,
               left: 0,

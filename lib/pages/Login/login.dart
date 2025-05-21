@@ -49,161 +49,169 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF1C1C1C),
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _LoginTextField(
-                  controller: emailController,
-                  label: 'Correo',
-                  hintText: 'Ingresa tu correo',
-                  errorText: emailError.isEmpty ? null : emailError,
-                ),
-                const SizedBox(height: 20),
-                _LoginTextField(
-                  controller: passwordController,
-                  label: 'Contraseña',
-                  hintText: 'Ingresa tu contraseña',
-                  obscureText: true,
-                ),
-                const SizedBox(height: 10),
-Row(
-  mainAxisAlignment: MainAxisAlignment.end,
-  children: [
-    TextButton(
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const ResetPasswordPage(),
+  @override
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: Stack(
+      children: [
+        // Imagen de fondo
+        SizedBox.expand(
+          child: Image.asset(
+            'assets/imag/fondovertical.png',
+            fit: BoxFit.cover,
           ),
-        );
-      },
-      style: TextButton.styleFrom(padding: EdgeInsets.zero),
-      child: const Text(
-        'Recuperar Contraseña',
-        style: TextStyle(
-          color: Colors.blue,
-          fontSize: 14,
-          decoration: TextDecoration.underline,
         ),
-      ),
-    ),
-    const Text(
-      ' / ',
-      style: TextStyle(color: Colors.white, fontSize: 14),
-    ),
-    TextButton(
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const RegisterPage(),
-          ),
-        );
-      },
-      style: TextButton.styleFrom(padding: EdgeInsets.zero),
-      child: const Text(
-        'Crear Cuenta',
-        style: TextStyle(
-          color: Colors.blue,
-          fontSize: 14,
-          decoration: TextDecoration.underline,
-        ),
-      ),
-    ),
-  ],
-),
-                const SizedBox(height: 20),
-
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isButtonEnabled ? Colors.white : Colors.grey.shade700,
-                    foregroundColor: isButtonEnabled ? Colors.black : Colors.white,
-                    disabledBackgroundColor: Colors.grey.shade700,
-                    disabledForegroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  _LoginTextField(
+                    controller: emailController,
+                    label: 'Correo',
+                    hintText: 'Ingresa tu correo',
+                    errorText: emailError.isEmpty ? null : emailError,
                   ),
-                  onPressed: isButtonEnabled
-                      ? () {
-                          String email = emailController.text.trim().toLowerCase();
-
-                          if (!isValidEmail(email)) {
-                            setState(() {
-                              emailError = 'Correo inválido';
-                            });
-                            return;
-                          }
-
-                          Widget destination;
-                          String userRole;
-
-                          if (email == 'admin@gmail.com') {
-                            destination = const HomePage();
-                            userRole = 'admin';
-                          } else if (email == 'barber@gmail.com') {
-                            destination = const HomePage();
-                            userRole = 'barber';
-                          } else if (email == 'user@gmail.com') {
-                            destination = const HomePage();
-                            userRole = 'user';
-                          } else {
-                            setState(() {
-                              emailError = 'Correo no reconocido';
-                            });
-                            return;
-                          }
-
-                          Session.email.value = email;
-                          Session.role.value = userRole;
-
-                          Navigator.pushReplacement(
+                  const SizedBox(height: 20),
+                  _LoginTextField(
+                    controller: passwordController,
+                    label: 'Contraseña',
+                    hintText: 'Ingresa tu contraseña',
+                    obscureText: true,
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => destination),
+                            MaterialPageRoute(
+                              builder: (context) => const ResetPasswordPage(),
+                            ),
                           );
-                        }
-                      : null,
-                  child: const Text('Confirmar'),
-                ),
-                const SizedBox(height: 20),
-
-                Row(
-                  children: const [
-                    Expanded(child: Divider(color: Colors.white)),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Text(
-                        'O inicia sesión con',
-                        style: TextStyle(color: Colors.white),
+                        },
+                        style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                        child: const Text(
+                          'Recuperar Contraseña',
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontSize: 14,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
                       ),
+                      const Text(
+                        ' / ',
+                        style: TextStyle(color: Colors.white, fontSize: 14),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const RegisterPage(),
+                            ),
+                          );
+                        },
+                        style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                        child: const Text(
+                          'Crear Cuenta',
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontSize: 14,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isButtonEnabled ? Colors.white : Colors.grey.shade700,
+                      foregroundColor: isButtonEnabled ? Colors.black : Colors.white,
+                      disabledBackgroundColor: Colors.grey.shade700,
+                      disabledForegroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                     ),
-                    Expanded(child: Divider(color: Colors.white)),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(FontAwesomeIcons.google, color: Colors.white, size: 30),
-                    SizedBox(width: 30),
-                    Icon(FontAwesomeIcons.github, color: Colors.white, size: 30),
-                
-                  ],
-                ),
-              ],
+                    onPressed: isButtonEnabled
+                        ? () {
+                            String email = emailController.text.trim().toLowerCase();
+
+                            if (!isValidEmail(email)) {
+                              setState(() {
+                                emailError = 'Correo inválido';
+                              });
+                              return;
+                            }
+
+                            Widget destination;
+                            String userRole;
+
+                            if (email == 'admin@gmail.com') {
+                              destination = const HomePage();
+                              userRole = 'admin';
+                            } else if (email == 'barber@gmail.com') {
+                              destination = const HomePage();
+                              userRole = 'barber';
+                            } else if (email == 'user@gmail.com') {
+                              destination = const HomePage();
+                              userRole = 'user';
+                            } else {
+                              setState(() {
+                                emailError = 'Correo no reconocido';
+                              });
+                              return;
+                            }
+
+                            Session.email.value = email;
+                            Session.role.value = userRole;
+
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => destination),
+                            );
+                          }
+                        : null,
+                    child: const Text('Confirmar'),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: const [
+                      Expanded(child: Divider(color: Colors.white)),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: Text(
+                          'O inicia sesión con',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      Expanded(child: Divider(color: Colors.white)),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(FontAwesomeIcons.google, color: Colors.white, size: 30),
+                      SizedBox(width: 30),
+                      Icon(FontAwesomeIcons.github, color: Colors.white, size: 30),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    );
-  }
+      ],
+    ),
+  );
+}
 }
 
 class _LoginTextField extends StatefulWidget {

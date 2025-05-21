@@ -132,243 +132,261 @@ class _AppointmentFormPageState extends State<AppointmentFormPage> {
 
   @override
   Widget build(BuildContext context) {
-    final hours = List<TimeOfDay>.generate(9, (i) => TimeOfDay(hour: 10 + i, minute: 0));
-    final times = hours.map((t) => t.format(context)).toList();
+  final hours = List<TimeOfDay>.generate(9, (i) => TimeOfDay(hour: 10 + i, minute: 0));
+  final times = hours.map((t) => t.format(context)).toList();
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF1C1C1C),
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-              child: Form(
-                key: _formKey,
-                onChanged: () => setState(() {}),
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                child: DefaultTextStyle(
-                  style: const TextStyle(color: Colors.white, fontSize: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => const ServicesScreen()),
-                        );
-                      },
-                    ),
-                    const Text(
-                      'Regresar',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                  ],
-                ),
-                 const SizedBox(height: 20),
-                      const Text('Nombre'),
-                      const SizedBox(height: 8),
-                      TextFormField(
-                        controller: _nameCtrl,
-                        style: const TextStyle(color: Colors.black),
-                        decoration: _customInputDecoration('Ingresa tu nombre completo'),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Requerido';
-                          } else if (RegExp(r'[0-9]').hasMatch(value)) {
-                            return 'El nombre no debe contener números';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 20),
+  return Scaffold(
+    backgroundColor: Colors.black,
+    body: Stack(
+      children: [
+        // Imagen de fondo
+        SizedBox.expand(
+          child: Image.asset(
+            'assets/imag/fondo.jpg',
+            fit: BoxFit.cover,
+          ),
+        ),
 
-                      const Text('Telefono'),
-                      const SizedBox(height: 8),
-                      TextFormField(
-                        controller: _phoneCtrl,
-                        style: const TextStyle(color: Colors.black),
-                        decoration: _customInputDecoration('Ingresa tu número de teléfono'),
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(10),
-                        ],
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Requerido';
-                          } else if (!RegExp(r'^\d{10}$').hasMatch(value)) {
-                            return 'Debe tener exactamente 10 dígitos numéricos';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 20),
+        // Capa negra translúcida
+        Container(
+          color: Colors.black.withOpacity(0.1),
+        ),
 
-                      const Text('Fecha'),
-                      const SizedBox(height: 8),
-                      TextFormField(
-                        readOnly: true,
-                        style: const TextStyle(color: Colors.black),
-                        decoration: _customInputDecoration(
-                          _selectedDate == null
-                              ? 'Selecciona fecha'
-                              : DateFormat.yMMMd().format(_selectedDate!),
-                        ),
-                        onTap: () async {
-                          final now = DateTime.now();
-                          final picked = await showDatePicker(
-                            context: context,
-                            initialDate: _selectedDate ?? now,
-                            firstDate: now,
-                            lastDate: now.add(const Duration(days: 60)),
-                          );
-                          if (picked != null) {
-                            setState(() => _selectedDate = picked);
-                          }
-                        },
-                        validator: (_) => _selectedDate == null ? 'Requerido' : null,
-                      ),
-                      const SizedBox(height: 20),
-
-                      const Text('Hora'),
-                      const SizedBox(height: 8),
-                      DropdownButtonFormField<String>(
-                        value: _selectedTime,
-                        hint: const Text('Selecciona hora'),
-                        decoration: _customInputDecoration(''),
-                        items: times.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
-                        onChanged: (v) {
-                          setState(() => _selectedTime = v);
-                        },
-                        validator: (v) => v == null ? 'Requerido' : null,
-                      ),
-                      const SizedBox(height: 20),
-
-                      const Text('Servicio'),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextFormField(
-                              controller: TextEditingController(text: _selectedService),
-                              enabled: false,
-                              style: const TextStyle(color: Colors.black),
-                              decoration: _customInputDecoration(''),
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.edit, color: Colors.white),
-                            onPressed: _showServiceDialog,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-
-                      const Text('Barbero'),
-                      const SizedBox(height: 8),
-                      DropdownButtonFormField<String>(
-                        value: _selectedBarber,
-                        hint: const Text('Elegir'),
-                        decoration: _customInputDecoration(''),
-                        items: _barbers.map((b) => DropdownMenuItem(value: b, child: Text(b))).toList(),
-                        onChanged: (v) {
-                          setState(() => _selectedBarber = v);
-                        },
-                        validator: (v) => v == null ? 'Requerido' : null,
-                      ),
-                      const SizedBox(height: 20),
-
-                      const Text('Forma de Pago'),
-                      const SizedBox(height: 8),
-                      DropdownButtonFormField<String>(
-                        value: _paymentMethod,
-                        hint: const Text('Selecciona una opción'),
-                        decoration: _customInputDecoration(''),
-                        items: const [
-                          DropdownMenuItem(value: 'Efectivo', child: Text('Efectivo')),
-                          DropdownMenuItem(value: 'Tarjeta', child: Text('Tarjeta')),
-                        ],
-                        onChanged: (v) {
-                          setState(() => _paymentMethod = v);
-                        },
-                        validator: (v) => v == null ? 'Requerido' : null,
-                      ),
-                      const SizedBox(height: 40),
-
-                      Center(
-                        child: ElevatedButton(
-                          onPressed: isFormValid
-                          ? () async {
-                              _saveAppointment();
-
-                              if (_paymentMethod == 'Efectivo') {
-                                // Mostrar SnackBar que abarca toda la pantalla
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: const Text(
-                                      'Reservación hecha con éxito',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(fontWeight: FontWeight.bold),
-                                    ),
-                                    backgroundColor: Colors.green,
-                                    behavior: SnackBarBehavior.fixed,
-                                    duration: const Duration(seconds: 2),
-                                  ),
-                                );
-
-                                // Esperar que el SnackBar se muestre
-                                await Future.delayed(const Duration(seconds: 2));
-
-                                // Navegar a HomePage
-                                Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const HomePage()),
-                                  (route) => false,
-                                );
-                              } else {
-                                Navigator.push(
+        // Contenido principal
+        SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                child: Form(
+                  key: _formKey,
+                  onChanged: () => setState(() {}),
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  child: DefaultTextStyle(
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.arrow_back, color: Colors.white),
+                              onPressed: () {
+                                Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => PaymentPage(
-                                      name: _nameCtrl.text,
-                                      phone: _phoneCtrl.text,
-                                      date: _selectedDate ?? DateTime.now(),
-                                      time: _selectedTime ?? 'Hora no seleccionada',
-                                      barber: _selectedBarber ?? 'Barbero no seleccionado',
-                                      service: _selectedService,
-                                    ),
-                                  ),
+                                      builder: (context) => const ServicesScreen()),
                                 );
-                              }
-                            }
-                          : null,
-
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: isFormValid ? Colors.white : Colors.grey.shade700,
-                            foregroundColor: isFormValid ? Colors.black : Colors.white,
-                            disabledBackgroundColor: Colors.grey.shade700,
-                            disabledForegroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
+                              },
                             ),
-                            elevation: isFormValid ? 5 : 0,
-                          ),
-                          child: const Text('Siguiente', style: TextStyle(fontSize: 16)),
+                            const Text(
+                              'Regresar',
+                              style: TextStyle(color: Colors.white, fontSize: 16),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 20),
+
+                        const Text('Nombre'),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: _nameCtrl,
+                          style: const TextStyle(color: Colors.black),
+                          decoration: _customInputDecoration('Ingresa tu nombre completo'),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Requerido';
+                            } else if (RegExp(r'[0-9]').hasMatch(value)) {
+                              return 'El nombre no debe contener números';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 20),
+
+                        const Text('Teléfono'),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: _phoneCtrl,
+                          style: const TextStyle(color: Colors.black),
+                          decoration: _customInputDecoration('Ingresa tu número de teléfono'),
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(10),
+                          ],
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Requerido';
+                            } else if (!RegExp(r'^\d{10}$').hasMatch(value)) {
+                              return 'Debe tener exactamente 10 dígitos numéricos';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 20),
+
+                        const Text('Fecha'),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          readOnly: true,
+                          style: const TextStyle(color: Colors.black),
+                          decoration: _customInputDecoration(
+                            _selectedDate == null
+                                ? 'Selecciona fecha'
+                                : DateFormat.yMMMd().format(_selectedDate!),
+                          ),
+                          onTap: () async {
+                            final now = DateTime.now();
+                            final picked = await showDatePicker(
+                              context: context,
+                              initialDate: _selectedDate ?? now,
+                              firstDate: now,
+                              lastDate: now.add(const Duration(days: 60)),
+                            );
+                            if (picked != null) {
+                              setState(() => _selectedDate = picked);
+                            }
+                          },
+                          validator: (_) => _selectedDate == null ? 'Requerido' : null,
+                        ),
+                        const SizedBox(height: 20),
+
+                        const Text('Hora'),
+                        const SizedBox(height: 8),
+                        DropdownButtonFormField<String>(
+                          value: _selectedTime,
+                          hint: const Text('Selecciona hora'),
+                          decoration: _customInputDecoration(''),
+                          items: times.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
+                          onChanged: (v) {
+                            setState(() => _selectedTime = v);
+                          },
+                          validator: (v) => v == null ? 'Requerido' : null,
+                        ),
+                        const SizedBox(height: 20),
+
+                        const Text('Servicio'),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextFormField(
+                                controller: TextEditingController(text: _selectedService),
+                                enabled: false,
+                                style: const TextStyle(color: Colors.black),
+                                decoration: _customInputDecoration(''),
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.edit, color: Colors.white),
+                              onPressed: _showServiceDialog,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+
+                        const Text('Barbero'),
+                        const SizedBox(height: 8),
+                        DropdownButtonFormField<String>(
+                          value: _selectedBarber,
+                          hint: const Text('Elegir'),
+                          decoration: _customInputDecoration(''),
+                          items: _barbers
+                              .map((b) => DropdownMenuItem(value: b, child: Text(b)))
+                              .toList(),
+                          onChanged: (v) {
+                            setState(() => _selectedBarber = v);
+                          },
+                          validator: (v) => v == null ? 'Requerido' : null,
+                        ),
+                        const SizedBox(height: 20),
+
+                        const Text('Forma de Pago'),
+                        const SizedBox(height: 8),
+                        DropdownButtonFormField<String>(
+                          value: _paymentMethod,
+                          hint: const Text('Selecciona una opción'),
+                          decoration: _customInputDecoration(''),
+                          items: const [
+                            DropdownMenuItem(value: 'Efectivo', child: Text('Efectivo')),
+                            DropdownMenuItem(value: 'Tarjeta', child: Text('Tarjeta')),
+                          ],
+                          onChanged: (v) {
+                            setState(() => _paymentMethod = v);
+                          },
+                          validator: (v) => v == null ? 'Requerido' : null,
+                        ),
+                        const SizedBox(height: 40),
+
+                        Center(
+                          child: ElevatedButton(
+                            onPressed: isFormValid
+                                ? () async {
+                                    _saveAppointment();
+
+                                    if (_paymentMethod == 'Efectivo') {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: const Text(
+                                            'Reservación hecha con éxito',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                          ),
+                                          backgroundColor: Colors.green,
+                                          behavior: SnackBarBehavior.fixed,
+                                          duration: const Duration(seconds: 2),
+                                        ),
+                                      );
+                                      await Future.delayed(const Duration(seconds: 2));
+                                      Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => const HomePage()),
+                                        (route) => false,
+                                      );
+                                    } else {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => PaymentPage(
+                                            name: _nameCtrl.text,
+                                            phone: _phoneCtrl.text,
+                                            date: _selectedDate ?? DateTime.now(),
+                                            time: _selectedTime ?? 'Hora no seleccionada',
+                                            barber: _selectedBarber ?? 'Barbero no seleccionado',
+                                            service: _selectedService,
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  }
+                                : null,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  isFormValid ? Colors.white : Colors.grey.shade700,
+                              foregroundColor:
+                                  isFormValid ? Colors.black : Colors.white,
+                              disabledBackgroundColor: Colors.grey.shade700,
+                              disabledForegroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              elevation: isFormValid ? 5 : 0,
+                            ),
+                            child: const Text('Siguiente', style: TextStyle(fontSize: 16)),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
-      ),
-    );
-  }
+      ],
+    ),
+  );
+}
 }

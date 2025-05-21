@@ -64,6 +64,8 @@ flutter:
      - assets/imag/corteestilo.jpg
      - assets/imag/estilos.jpg
      - assets/imag/extra.jpg
+     - assets/imag/fondo.jpg
+     - assets/imag/fondovertical.png
      - assets/imag/google.png
      - assets/imag/home.jpg
      - assets/imag/login.jpg

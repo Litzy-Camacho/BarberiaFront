@@ -129,40 +129,54 @@ void dispose() {
               child: Column(
                 children: [
                   // SECCIÓN HOME
-                  Container(
-                    height: 600,
-                    width: double.infinity,
-                    decoration: const BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage('assets/imag/home.jpg'),
-                        fit: BoxFit.cover,
-                        alignment: Alignment.center,
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 60),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: DefaultTextStyle(
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: screenWidth < 600 ? 24 : 40,
-                            height: 1.3,
-                            fontFamily: 'Georgia',
-                          ),
-                          child: AnimatedTextKit(
-                            isRepeatingAnimation: false,
-                            animatedTexts: [
-                              TypewriterAnimatedText(
-                                'Ven, siéntete único\ny reserva tu cita\npara vivir una\nexperiencia\nauténtica.',
-                                speed: const Duration(milliseconds: 80),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                  Stack(
+  children: [
+    Container(
+      height: 600,
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/imag/home.jpg'),
+          fit: BoxFit.cover,
+          alignment: Alignment.center,
+        ),
+      ),
+    ),
+    Container(
+      height: 600,
+      width: double.infinity,
+      color: Colors.black.withOpacity(0.6), // Opacidad aplicada aquí
+    ),
+    Container(
+      height: 600,
+      width: double.infinity,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 60),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: DefaultTextStyle(
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: screenWidth < 600 ? 24 : 40,
+              height: 1.3,
+              fontFamily: 'Georgia',
+            ),
+            child: AnimatedTextKit(
+              isRepeatingAnimation: false,
+              animatedTexts: [
+                TypewriterAnimatedText(
+                  'Ven, siéntete único\ny reserva tu cita\npara vivir una\nexperiencia\nauténtica.',
+                  speed: const Duration(milliseconds: 80),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ),
+  ],
+),
+
 
                   // SECCIÓN NOSOTROS
                   Container(

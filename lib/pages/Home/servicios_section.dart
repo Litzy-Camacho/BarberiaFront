@@ -1,143 +1,149 @@
 import 'package:flutter/material.dart';
-import 'package:front/pages/Services/service_cortestilo.dart';
-import 'package:front/pages/Services/service_barba.dart';
-import 'package:front/pages/Services/service_tratamiento_.dart';
 import '../Services/services_screen.dart';
 
-class ServiciosSection extends StatelessWidget {
+class ServiciosSection extends StatefulWidget {
   final GlobalKey keyServicios;
 
   const ServiciosSection({super.key, required this.keyServicios});
 
   @override
+  State<ServiciosSection> createState() => _ServiciosSectionState();
+}
+
+class _ServiciosSectionState extends State<ServiciosSection> {
+  final PageController _pageController = PageController(viewportFraction: 1.0);
+  int _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController.addListener(() {
+      int page = _pageController.page!.round();
+      if (page != _currentPage) {
+        setState(() {
+          _currentPage = page;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      key: keyServicios,
+      key: widget.keyServicios,
       width: double.infinity,
-      color: Colors.black,
-      padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 20),
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: ClipRect(
-              child: CustomPaint(
-                painter: LineasDiagonalesCruzadasPainter(),
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/imag/fondovertical.png'),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 20),
+        child: Column(
+          children: [
+            const Text(
+              'Nuestros servicios',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                fontFamily: 'Georgia',
               ),
             ),
-          ),
-          Column(
-  children: [
-    Container(
-      color: Colors.black, // Fondo negro
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-      child: const Text(
-        'Nuestros servicios',
-        style: TextStyle(
-          fontSize: 30,
-          fontWeight: FontWeight.bold,
-          color: Colors.white, // Texto blanco
-          fontFamily: 'Georgia',
-        ),
-      ),
-    ),
-    
-    Container(
-      color: Colors.black, // Fondo negro
-      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-      child: const Text(
-        'Todos nuestros servicios se realizan en cabinas privadas y son exclusivos para hombre.',
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          fontSize: 16,
-          color: Colors.white70, // Texto blanco
-          height: 1,
-          fontFamily: 'Georgia',
-        ),
-      ),
-    ),
-
-              const SizedBox(height: 50),
-              Center(
-                child: Wrap(
-                  spacing: 40,
-                  runSpacing: 40,
-                  alignment: WrapAlignment.center,
-                  children: [
-                    _ServicioCard(
-                      imagePath: 'assets/imag/estilos.jpg',
-                      title: 'Corte & Estilo',
-                      description:
-                          'Cortes clásicos, modernos y ejecutivos adaptados a tu personalidad. Precisión, técnica y estilo en cada visita.',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const ServicesScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                    _ServicioCard(
-                      imagePath: 'assets/imag/barba.jpg',
-                      title: 'Barba & Afeitado',
-                      description:
-                          'Perfilado, diseño y afeitado tradicional con toalla caliente. Cuida tu barba con detalle y estilo.',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const ServiceBarbaPage(),
-                          ),
-                        );
-                      },
-                    ),
-                    _ServicioCard(
-                      imagePath: 'assets/imag/tratamiento.jpg',
-                      title: 'Tratamientos & Cuidado Especial',
-                      description:
-                          'Faciales y tratamientos capilares que revitalizan tu piel y cabello. Bienestar y frescura en cada sesión.',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const ServiceEstilosTratamientoPage(),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+            const SizedBox(height: 10),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 30),
+              child: Text(
+                'Todos nuestros servicios se realizan en cabinas privadas y son exclusivos para hombre.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.white70,
+                  height: 1.5,
+                  fontFamily: 'Georgia',
                 ),
               ),
-            ],
-          ),
-        ],
+            ),
+            const SizedBox(height: 50),
+            SizedBox(
+              height: 450,
+              child: PageView(
+                controller: _pageController,
+                children: [
+                  _ServicioCard(
+                    imagePath: 'assets/imag/estilos.jpg',
+                    title: 'Corte & Estilo',
+                    description:
+                        'Cortes clásicos, modernos y ejecutivos adaptados a tu personalidad. Precisión, técnica y estilo en cada visita.',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ServicesScreen(initialCategory: 1),
+                        ),
+                      );
+                    },
+                  ),
+                  _ServicioCard(
+                    imagePath: 'assets/imag/barba.jpg',
+                    title: 'Barba & Afeitado',
+                    description:
+                        'Perfilado, diseño y afeitado tradicional con toalla caliente. Cuida tu barba con detalle y estilo.',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ServicesScreen(initialCategory: 2),
+                        ),
+                      );
+                    },
+                  ),
+                  _ServicioCard(
+                    imagePath: 'assets/imag/tratamiento.jpg',
+                    title: 'Tratamientos & Cuidado Especial',
+                    description:
+                        'Faciales y tratamientos capilares que revitalizan tu piel y cabello. Bienestar y frescura en cada sesión.',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ServicesScreen(initialCategory: 3),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(3, (index) {
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  margin: const EdgeInsets.symmetric(horizontal: 5),
+                  width: _currentPage == index ? 12 : 8,
+                  height: _currentPage == index ? 12 : 8,
+                  decoration: BoxDecoration(
+                    color: _currentPage == index ? Colors.white : Colors.white38,
+                    shape: BoxShape.circle,
+                  ),
+                );
+              }),
+            ),
+          ],
+        ),
       ),
     );
   }
-}
-
-class LineasDiagonalesCruzadasPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white.withOpacity(0.4)
-      ..strokeWidth = 1.5;
-
-    canvas.drawLine(Offset(0, size.height * 0.9), Offset(size.width * 0.3, 0), paint);
-    canvas.drawLine(Offset(0, size.height * 0.6), Offset(size.width * 0.5, 0), paint);
-    canvas.drawLine(Offset(size.width * 0.2, size.height), Offset(size.width * 0.65, 0), paint);
-    canvas.drawLine(Offset(size.width * 0.5, size.height), Offset(size.width * 0.9, 0), paint);
-    canvas.drawLine(Offset(size.width, size.height * 0.5), Offset(size.width * 0.7, 0), paint);
-    canvas.drawLine(Offset(size.width, size.height * 0.9), Offset(size.width * 0.9, 0), paint);
-
-    canvas.drawLine(Offset(0, size.height * 0.8), Offset(size.width * 0.5, size.height), paint);
-    canvas.drawLine(Offset(0, size.height), Offset(size.width * 0.6, size.height * 0.95), paint);
-    canvas.drawLine(Offset(size.width, size.height * 0.8), Offset(size.width * 0.5, size.height), paint);
-    canvas.drawLine(Offset(size.width, size.height), Offset(size.width * 0.4, size.height * 0.95), paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _ServicioCard extends StatelessWidget {
@@ -155,78 +161,84 @@ class _ServicioCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 400,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 6,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: ClipRRect(
+    return Center(
+      child: Container(
+        height: 420,
+        width: 320,
+        margin: const EdgeInsets.symmetric(horizontal: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 6,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 15, left: 15, right: 15),
               child: Image.asset(
                 imagePath,
                 width: double.infinity,
-                height: 260,
+                height: 180,
                 fit: BoxFit.cover,
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(15),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  title,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Georgia',
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  description,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    height: 1.5,
-                    fontFamily: 'Georgia',
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Divider(
-                  color: Colors.black.withOpacity(0.2),
-                  thickness: 1,
-                ),
-                const SizedBox(height: 20),
-                GestureDetector(
-                  onTap: onTap,
-                  child: const Text(
-                    'Ver más >',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Georgia',
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(15),
+                child: Column(
+                  children: [
+                    Text(
+                      title,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Georgia',
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 10),
+                    Expanded(
+                      child: Text(
+                        description,
+                        textAlign: TextAlign.center,
+                        maxLines: 5,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          height: 1.5,
+                          fontFamily: 'Georgia',
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Divider(
+                      color: Colors.black.withOpacity(0.2),
+                      thickness: 1,
+                    ),
+                    const SizedBox(height: 5),
+                    GestureDetector(
+                      onTap: onTap,
+                      child: const Text(
+                        'Ver más >',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Georgia',
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

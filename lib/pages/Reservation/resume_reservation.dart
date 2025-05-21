@@ -50,124 +50,141 @@ class _ResumeReservationPageState extends State<ResumeReservationPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: SafeArea(
-        child: Stack(
-          children: [
-            ConfettiWidget(
-              confettiController: _confettiController,
-              blastDirectionality: BlastDirectionality.explosive,
-              colors: const [Colors.green, Colors.blue, Colors.red, Colors.yellow],
+  @override
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: Colors.black,
+    body: SafeArea(
+      child: Stack(
+        children: [
+          // Fondo con imagen expandida
+          SizedBox.expand(
+            child: Image.asset(
+              'assets/imag/fondo.jpg',
+              fit: BoxFit.cover,
             ),
-            Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
-                      onPressed: () {
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(
-      builder: (context) => PaymentPage(
-        name: widget.name,
-        phone: widget.phone,
-        date: widget.date,
-        time: widget.time,
-        barber: widget.barber,
-        service: widget.service,
+          ),
+
+          // Capa negra translúcida
+          Container(
+            color: Colors.black.withOpacity(0.1),
+          ),
+
+          // Confetti
+          ConfettiWidget(
+            confettiController: _confettiController,
+            blastDirectionality: BlastDirectionality.explosive,
+            colors: const [Colors.green, Colors.blue, Colors.red, Colors.yellow],
+          ),
+
+          // Contenido principal
+          Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back, color: Colors.white),
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PaymentPage(
+                                name: widget.name,
+                                phone: widget.phone,
+                                date: widget.date,
+                                time: widget.time,
+                                barber: widget.barber,
+                                service: widget.service,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      const Text(
+                        'Regresar',
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                    ],
+                  ),
+                  const Text(
+                    'Detalles de la reserva',
+                    style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildInfo('Nombre: ', widget.name),
+                  _buildInfo('Telefono: ', widget.phone),
+                  _buildInfo('Fecha: ', DateFormat.yMMMd().format(widget.date)),
+                  _buildInfo('Hora: ', widget.time),
+                  _buildInfo('Barbero: ', widget.barber),
+                  _buildInfo('Servicio: ', widget.service),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Detalles del pago',
+                    style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  _buildInfo('Titular: ', widget.cardholderName),
+                  _buildInfo('Número: ', _formatCardNumber(widget.cardNumber)),
+                  _buildInfo('Expira: ', '${widget.expiryMonth}/${widget.expiryYear}'),
+                  const Divider(color: Colors.white24, height: 30),
+                  ElevatedButton(
+                    onPressed: () {
+                      _confettiController.play();
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            backgroundColor: Colors.green,
+                            title: const Text(
+                              'Cita Reservada',
+                              style: TextStyle(color: Colors.white, fontSize: 18),
+                            ),
+                            content: const Text(
+                              '¡Tu cita ha sido reservada exitosamente! 🎉',
+                              style: TextStyle(color: Colors.white, fontSize: 16),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const PantallaUsuario()),
+                                  );
+                                },
+                                child: const Text('Aceptar', style: TextStyle(color: Colors.white)),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      elevation: 5,
+                    ),
+                    child: const Text('Confirmar Reserva', style: TextStyle(fontSize: 16)),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     ),
   );
-},
+}
 
-                    ),
-                    const Text(
-                      'Regresar',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                  ],
-                ),
-                    const Text(
-                      'Detalles de la reserva',
-                      style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 12),
-                    _buildInfo('Nombre: ', widget.name),
-                    _buildInfo('Telefono: ', widget.phone),
-                    _buildInfo('Fecha: ', DateFormat.yMMMd().format(widget.date)),
-                    _buildInfo('Hora: ', widget.time),
-                    _buildInfo('Barbero: ', widget.barber),
-                    _buildInfo('Servicio: ', widget.service),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'Detalles del pago',
-                      style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 10),
-                    _buildInfo('Titular: ', widget.cardholderName),
-                    _buildInfo('Número: ', _formatCardNumber(widget.cardNumber)),
-                    _buildInfo('Expira: ', '${widget.expiryMonth}/${widget.expiryYear}'),
-                    const Divider(color: Colors.white24, height: 30),
-                    ElevatedButton(
-                      onPressed: () {
-                        _confettiController.play();
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              backgroundColor: Colors.green,
-                              title: const Text(
-                                'Cita Reservada',
-                                style: TextStyle(color: Colors.white, fontSize: 18),
-                              ),
-                              content: const Text(
-                                '¡Tu cita ha sido reservada exitosamente! 🎉',
-                                style: TextStyle(color: Colors.white, fontSize: 16),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => const PantallaUsuario()),
-                                    );
-                                  },
-                                  child: const Text('Aceptar', style: TextStyle(color: Colors.white)),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.black,
-                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        elevation: 5,
-                      ),
-                      child: const Text('Confirmar Reserva', style: TextStyle(fontSize: 16)),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildInfo(String label, String value) {
     return Padding(
