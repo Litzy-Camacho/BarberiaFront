@@ -53,6 +53,225 @@ class _ServicesScreenAdminState extends State<ServicesScreenAdmin> {
   final GlobalKey contactoKey = GlobalKey();
   int selectedCategory = 1;
 
+void _showAddDialog() {
+  final nameController = TextEditingController();
+  final descriptionController = TextEditingController();
+  final priceController = TextEditingController();
+  final durationController = TextEditingController();
+
+  bool isValid = false;
+
+  bool isNameValid(String text) => RegExp(r'^[a-zA-Z\s]+$').hasMatch(text) && text.isNotEmpty;
+  bool isDescriptionValid(String text) => text.isNotEmpty;
+  bool isPriceValid(String text) => RegExp(r'^\d+(\.\d{0,2})?$').hasMatch(text);
+  bool isDurationValid(String text) => RegExp(r'^\d{2}$').hasMatch(text);
+
+  void validateForm(StateSetter localSetState) {
+    final name = nameController.text.trim();
+    final description = descriptionController.text.trim();
+    final price = priceController.text.trim();
+    final duration = durationController.text.trim();
+
+    final valid = isNameValid(name) &&
+        isDescriptionValid(description) &&
+        isPriceValid(price) &&
+        isDurationValid(duration);
+
+    if (valid != isValid) {
+      localSetState(() => isValid = valid);
+    }
+  }
+
+  showDialog(
+    context: context,
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (context, localSetState) {
+          final nameText = nameController.text.trim();
+          final descriptionText = descriptionController.text.trim();
+          final priceText = priceController.text.trim();
+          final durationText = durationController.text.trim();
+
+          Color nameColor() {
+            if (nameText.isEmpty) return Colors.black;
+            return isNameValid(nameText) ? Colors.green : Colors.red;
+          }
+
+          Color descriptionColor() {
+            if (descriptionText.isEmpty) return Colors.black;
+            return isDescriptionValid(descriptionText) ? Colors.green : Colors.red;
+          }
+
+          Color priceColor() {
+            if (priceText.isEmpty) return Colors.black;
+            return isPriceValid(priceText) ? Colors.green : Colors.red;
+          }
+
+          Color durationColor() {
+            if (durationText.isEmpty) return Colors.black;
+            return isDurationValid(durationText) ? Colors.green : Colors.red;
+          }
+
+          return AlertDialog(
+            backgroundColor: Colors.white,
+            title: const Text('Añadir Servicio'),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: nameController,
+                    cursorColor: nameColor(),
+                    onChanged: (_) {
+                      validateForm(localSetState);
+                      localSetState(() {});
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Nombre',
+                      labelStyle: TextStyle(color: nameColor()),
+                      errorText: nameText.isNotEmpty && !isNameValid(nameText)
+                          ? 'Solo letras permitidas'
+                          : null,
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: nameColor()),
+                      ),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: nameColor()),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: descriptionController,
+                    cursorColor: descriptionColor(),
+                    onChanged: (_) {
+                      validateForm(localSetState);
+                      localSetState(() {});
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Descripción',
+                      labelStyle: TextStyle(color: descriptionColor()),
+                      errorText: descriptionText.isNotEmpty &&
+                              !isDescriptionValid(descriptionText)
+                          ? 'Descripción requerida'
+                          : null,
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: descriptionColor()),
+                      ),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: descriptionColor()),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: priceController,
+                    keyboardType: TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                    ],
+                    cursorColor: priceColor(),
+                    onChanged: (_) {
+                      validateForm(localSetState);
+                      localSetState(() {});
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Precio',
+                      labelStyle: TextStyle(color: priceColor()),
+                      errorText: priceText.isNotEmpty && !isPriceValid(priceText)
+                          ? 'Máximo 2 decimales permitidos'
+                          : null,
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: priceColor()),
+                      ),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: priceColor()),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: durationController,
+                    keyboardType: TextInputType.number,
+                    maxLength: 2,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(2),
+                    ],
+                    cursorColor: durationColor(),
+                    onChanged: (_) {
+                      validateForm(localSetState);
+                      localSetState(() {});
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Duración (minutos)',
+                      counterText: "",
+                      labelStyle: TextStyle(color: durationColor()),
+                      errorText: durationText.isNotEmpty && !isDurationValid(durationText)
+                          ? 'Tiempo inválido (2 dígitos)'
+                          : null,
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: durationColor()),
+                      ),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: durationColor()),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Cancelar', style: TextStyle(color: Colors.white)),
+                  ),
+                  const SizedBox(width: 16),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
+                    onPressed: isValid
+                        ? () {
+                            final newService = {
+                              'name': nameController.text.trim(),
+                              'description': descriptionController.text.trim(),
+                              'price': priceController.text.trim(),
+                              'duration': '${durationController.text.trim()} min',
+                              'categoryId': selectedCategory, // Usa tu lógica actual de categoría
+                            };
+
+                            setState(() {
+                              servicesJson.add(newService);
+                            });
+
+                            Navigator.of(context).pop();
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Servicio añadido correctamente'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                          }
+                        : null,
+                    child: const Text('Guardar', style: TextStyle(color: Colors.white)),
+                  ),
+                ],
+              ),
+            ],
+          );
+        },
+      );
+    },
+  );
+}
+
+
+
+
   @override
   Widget build(BuildContext context) {
     final filteredServices = servicesJson
@@ -73,17 +292,22 @@ class _ServicesScreenAdminState extends State<ServicesScreenAdmin> {
         scrollToTop: () {},
       ),
       body: OrientationBuilder(
+        
         builder: (context, orientation) {
           final isPortrait = orientation == Orientation.portrait;
-          final crossAxisCount = isPortrait ? 2 : 3;
+          final crossAxisCount = isPortrait ? 2 : 2;
+
           final spacing = 12.0;
 
           return LayoutBuilder(
             builder: (context, constraints) {
-              double idealItemWidth =
-                  (constraints.maxWidth - spacing * (crossAxisCount + 1)) / crossAxisCount;
-              double itemHeight = isPortrait ? idealItemWidth * 1.2 : idealItemWidth * 0.9;
+             double idealItemWidth = isPortrait
+    ? (constraints.maxWidth - spacing * (crossAxisCount + 1)) / crossAxisCount
+    : constraints.maxWidth / 2;
 
+double itemHeight = isPortrait
+    ? idealItemWidth * 1.2
+    : idealItemWidth * 0.35;
               return Column(
                 children: [
                   Expanded(
@@ -91,6 +315,23 @@ class _ServicesScreenAdminState extends State<ServicesScreenAdmin> {
                       child: Column(
                         children: [
                           _buildCategoryBar(),
+const SizedBox(height: 16),
+
+// Botón "Añadir servicio"
+Center(
+  child: ElevatedButton.icon(
+    onPressed: () => _showAddDialog(),
+    icon: const Icon(Icons.add, color: Colors.white),
+    label: const Text('Añadir Servicio', style: TextStyle(color: Colors.white)),
+    style: ElevatedButton.styleFrom(
+      backgroundColor: Colors.black,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+    ),
+  ),
+),
+
+const SizedBox(height: 16),
+
                           const SizedBox(height: 16),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -207,8 +448,6 @@ class _ServicesScreenAdminState extends State<ServicesScreenAdmin> {
         return 'assets/imag/default.jpg';
     }
   }
-
-
 
 void _showEditDialog(Map<String, dynamic> service) {
   final nameController = TextEditingController(text: service['name']);
@@ -517,6 +756,8 @@ class _ServiceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14),
@@ -548,73 +789,145 @@ class _ServiceCard extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.all(14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+              child: isPortrait
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Flexible(
+                          child: Text(
+                            description,
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 13,
+                              height: 1.3,
+                            ),
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Duración: $duration',
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '\$$price',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Divider(
+                          color: Colors.white,
+                          thickness: 1,
+                          height: 1,
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              onPressed: onEdit,
+                              icon: const Icon(Icons.edit, color: Colors.white),
+                              tooltip: 'Editar',
+                            ),
+                            const SizedBox(width: 8),
+                            IconButton(
+                              onPressed: onDelete,
+                              icon: const Icon(Icons.delete, color: Colors.white),
+                              tooltip: 'Eliminar',
+                            ),
+                          ],
+                        ),
+                      ],
+                    )
+                  : Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Contenido principal
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                title,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                description,
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 13,
+                                  height: 1.3,
+                                ),
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Duración: $duration',
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '\$$price',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Línea vertical separadora
+                        Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 12),
+                          width: 1,
+                          height: 80,
+                          color: Colors.white54,
+                        ),
+                        // Íconos en columna
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              onPressed: onEdit,
+                              icon: const Icon(Icons.edit, color: Colors.white),
+                              tooltip: 'Editar',
+                            ),
+                            IconButton(
+                              onPressed: onDelete,
+                              icon: const Icon(Icons.delete, color: Colors.white),
+                              tooltip: 'Eliminar',
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    description,
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 13,
-                      height: 1.3,
-                    ),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Duración: $duration',
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 12,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '\$$price',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 8),
-                    child: const Divider(
-                      color: Colors.white,
-                      thickness: 1,
-                      height: 1,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        onPressed: onEdit,
-                        icon: const Icon(Icons.edit, color: Colors.white),
-                        tooltip: 'Editar',
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        onPressed: onDelete,
-                        icon: const Icon(Icons.delete, color: Colors.white),
-                        tooltip: 'Eliminar',
-                      ),
-                    ],
-                  ),
-                ],
-              ),
             ),
           ],
         ),

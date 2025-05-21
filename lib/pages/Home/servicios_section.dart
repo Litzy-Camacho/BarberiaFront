@@ -35,16 +35,21 @@ class _ServiciosSectionState extends State<ServiciosSection> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      key: widget.keyServicios,
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('assets/imag/fondovertical.png'),
-          fit: BoxFit.cover,
-        ),
-      ),
-      child: SingleChildScrollView(
+     final screenHeight = MediaQuery.of(context).size.height;
+  final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+
+return Container(
+  key: widget.keyServicios,
+  width: double.infinity,
+  height: isPortrait ? screenHeight : null,
+  decoration: const BoxDecoration(
+    image: DecorationImage(
+      image: AssetImage('assets/imag/fondovertical.png'),
+      fit: BoxFit.cover,
+    ),
+  ),
+  child: SingleChildScrollView(
+
         padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 20),
         child: Column(
           children: [
@@ -72,9 +77,9 @@ class _ServiciosSectionState extends State<ServiciosSection> {
                 ),
               ),
             ),
-            const SizedBox(height: 50),
+            const SizedBox(height: 30),
             SizedBox(
-              height: 450,
+              height: screenHeight * 0.55,
               child: PageView(
                 controller: _pageController,
                 children: [
@@ -91,6 +96,7 @@ class _ServiciosSectionState extends State<ServiciosSection> {
                         ),
                       );
                     },
+                    height: screenHeight * 0.55,
                   ),
                   _ServicioCard(
                     imagePath: 'assets/imag/barba.jpg',
@@ -105,6 +111,7 @@ class _ServiciosSectionState extends State<ServiciosSection> {
                         ),
                       );
                     },
+                    height: screenHeight * 0.55,
                   ),
                   _ServicioCard(
                     imagePath: 'assets/imag/tratamiento.jpg',
@@ -119,6 +126,7 @@ class _ServiciosSectionState extends State<ServiciosSection> {
                         ),
                       );
                     },
+                    height: screenHeight * 0.6,
                   ),
                 ],
               ),
@@ -151,20 +159,25 @@ class _ServicioCard extends StatelessWidget {
   final String title;
   final String description;
   final VoidCallback? onTap;
+  final double height;
 
   const _ServicioCard({
     required this.imagePath,
     required this.title,
     required this.description,
     this.onTap,
+    required this.height,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Center(
       child: Container(
-        height: 420,
-        width: 320,
+        height: height,
+        width: isLandscape ? screenWidth * 0.75 : 360, // Más ancho en horizontal
         margin: const EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -176,70 +189,115 @@ class _ServicioCard extends StatelessWidget {
             ),
           ],
         ),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 15, left: 15, right: 15),
-              child: Image.asset(
-                imagePath,
-                width: double.infinity,
-                height: 180,
-                fit: BoxFit.cover,
+        child: isLandscape
+            ? Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10, bottom: 10, left: 10),
+                    child: Image.asset(
+                      imagePath,
+                      width: 130,
+                      height: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(15),
+                      child: _CardContent(
+                        title: title,
+                        description: description,
+                        onTap: onTap,
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            : Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 15, left: 15, right: 15),
+                    child: Image.asset(
+                      imagePath,
+                      width: double.infinity,
+                      height: 180,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(15),
+                      child: _CardContent(
+                        title: title,
+                        description: description,
+                        onTap: onTap,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(15),
-                child: Column(
-                  children: [
-                    Text(
-                      title,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Georgia',
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Expanded(
-                      child: Text(
-                        description,
-                        textAlign: TextAlign.center,
-                        maxLines: 5,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          height: 1.5,
-                          fontFamily: 'Georgia',
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Divider(
-                      color: Colors.black.withOpacity(0.2),
-                      thickness: 1,
-                    ),
-                    const SizedBox(height: 5),
-                    GestureDetector(
-                      onTap: onTap,
-                      child: const Text(
-                        'Ver más >',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Georgia',
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
+    );
+  }
+}
+
+class _CardContent extends StatelessWidget {
+  final String title;
+  final String description;
+  final VoidCallback? onTap;
+
+  const _CardContent({
+    required this.title,
+    required this.description,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          title,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Georgia',
+          ),
+        ),
+        const SizedBox(height: 10),
+        Expanded(
+          child: Text(
+            description,
+            textAlign: TextAlign.center,
+            maxLines: 5,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 14,
+              height: 1.5,
+              fontFamily: 'Georgia',
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Divider(
+          color: Colors.black.withOpacity(0.2),
+          thickness: 1,
+        ),
+        const SizedBox(height: 5),
+        GestureDetector(
+          onTap: onTap,
+          child: const Text(
+            'Ver más >',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Georgia',
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

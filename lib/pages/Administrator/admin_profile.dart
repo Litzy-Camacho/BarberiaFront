@@ -1188,7 +1188,7 @@ const SizedBox(height: 20),
             DataCell(Row(
               children: [
                 IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.yellow),
+                  icon: const Icon(Icons.edit, color: Colors.blue),
                   onPressed: () {
                     _mostrarDialogoEditarBarbero(barbero);
                   },

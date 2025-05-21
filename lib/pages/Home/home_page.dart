@@ -233,175 +233,415 @@ final textFontSize = orientation == Orientation.landscape
                       ],
                     ),
   // SECCIÓN NOSOTROS
+// SECCIÓN NOSOTROS
 Container(
   key: _nosotrosKey,
   color: Colors.white,
+  height: MediaQuery.of(context).size.height * 0.9, // 90% de la altura de la pantalla
+
   padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-  child: ClipRRect(
-    borderRadius: BorderRadius.circular(8),
+
+  child: LayoutBuilder(
+    builder: (context, constraints) {
+      final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+      final screenHeight = MediaQuery.of(context).size.height;
+
+      if (isLandscape) {
+  return SizedBox(
+    height: screenHeight * 0.4,
     child: Stack(
       children: [
-        // Imagen de fondo
-        Image.asset(
-          'assets/imag/nosotros.jpg',
-          fit: BoxFit.cover,
-          width: double.infinity,
-        ),
-
-        // Degradado más oscuro
-        Positioned.fill(
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.black.withOpacity(0.95), // más oscuro
-                  Colors.transparent,
-                ],
+        Row(
+          children: [
+            // Imagen (lado izquierdo, menos de la mitad)
+            Expanded(
+              flex: 3,
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  bottomLeft: Radius.circular(16),
+                ),
+                child: Image.asset(
+                  'assets/imag/nosotros.jpg',
+                  fit: BoxFit.cover,
+                  height: double.infinity,
+                  width: double.infinity,
+                ),
               ),
             ),
-          ),
-        ),
-
-        // Texto arriba
-        Positioned.fill(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
-                  'Essense',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    fontFamily: 'Georgia',
+            // Cuadro de texto (lado derecho, más de la mitad)
+            Expanded(
+              flex: 4,
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: const BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(16),
+                    bottomRight: Radius.circular(16),
                   ),
                 ),
-                SizedBox(height: 12),
-                Text(
-                  
-                  'Entendemos que el hombre actual busca verse bien, '
-                  'sentirse bien y proyectar seguridad en cada aspecto de su vida. ',
-                  
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white,
-                    height: 1.6,
-                    fontFamily: 'Georgia',
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Text(
+                      'Essense',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontFamily: 'Georgia',
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                    Text(
+                      'Entendemos que el hombre actual busca verse bien, '
+                      'sentirse bien y proyectar seguridad en cada aspecto de su vida.',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                        height: 1.6,
+                        fontFamily: 'Georgia',
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
+          ],
+        ),
+        // Degradado más notorio entre imagen y cuadro
+        Positioned.fill(
+          child: Row(
+            children: [
+              Expanded(
+                flex: 3,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.centerRight,
+                      end: Alignment.centerLeft,
+                      colors: [
+                        Colors.black,
+                        Colors.transparent,
+                      ],
+                      stops: [0.0, 0.8],
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 4,
+                child: SizedBox(),
+              ),
+            ],
           ),
         ),
       ],
     ),
+  );
+}
+       else {
+  // Diseño vertical (ajustar altura al alto total de la pantalla y centrar imagen)
+  return SizedBox(
+    height: screenHeight,
+    child: Center( // ← Centramos la imagen verticalmente
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Stack(
+          children: [
+            Image.asset(
+  'assets/imag/nosotros.jpg',
+  fit: BoxFit.cover,
+  width: double.infinity,
+  height: screenHeight * 0.8, // ← Puedes ajustar este valor
+),
+
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withOpacity(0.95),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Positioned.fill(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start, // También centramos el texto
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text(
+                      'Essense',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontFamily: 'Georgia',
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                    Text(
+                      'Entendemos que el hombre actual busca verse bien, '
+                      'sentirse bien y proyectar seguridad en cada aspecto de su vida.',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                        height: 1.6,
+                        fontFamily: 'Georgia',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+    },
   ),
 ),
+
                   // SECCIÓN SERVICIOS
                   ServiciosSection(keyServicios: _serviciosKey),
 // SECCIÓN ¿Por qué elegirnos?
-                  Container(
+            Container(
   color: Colors.white,
   padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
-  child: Column(
-    children: [
-      const Text(
-        '¿Por qué elegirnos?',
-        style: TextStyle(
-          fontSize: 24, // Tamaño reducido
-          fontWeight: FontWeight.bold,
-          fontFamily: 'Georgia',
-          color: Colors.black,
-        ),
-        textAlign: TextAlign.center,
-      ),
-      const SizedBox(height: 40),
-      LayoutBuilder(
-        builder: (context, constraints) {
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(icons.length, (index) {
-              final isActive = index == currentIndex;
-              return Row(
-                children: [
-                  AnimatedScale(
-                    scale: isActive ? 1.5 : 1.0,
-                    duration: const Duration(milliseconds: 300),
-                    child: Icon(
-                      icons[index],
-                      size: 50,
-                      color: Colors.black,
+  child: LayoutBuilder(
+    builder: (context, constraints) {
+      final screenSize = MediaQuery.of(context).size;
+      final isHorizontal = screenSize.width > screenSize.height;
+      final containerHeight = screenSize.height * 0.6;
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            '¿Por qué elegirnos?',
+            style: TextStyle(
+              fontSize: isHorizontal ? 20 : 24,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Georgia',
+              color: Colors.black,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+
+          if (!isHorizontal)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(icons.length, (index) {
+                final isActive = index == currentIndex;
+                return Row(
+                  children: [
+                    AnimatedScale(
+                      scale: isActive ? 1.5 : 1.0,
+                      duration: const Duration(milliseconds: 300),
+                      child: Icon(
+                        icons[index],
+                        size: 50,
+                        color: Colors.black,
+                      ),
                     ),
-                  ),
-                  if (index < icons.length - 1) ...[
-                    const SizedBox(width: 20),
-                    Container(width: 30, height: 2, color: Colors.black),
-                    const SizedBox(width: 20),
+                    if (index < icons.length - 1) ...[
+                      const SizedBox(width: 20),
+                      Container(width: 30, height: 2, color: Colors.black),
+                      const SizedBox(width: 20),
+                    ],
                   ],
-                ],
-              );
-            }),
-          );
-        },
-      ),
-      const SizedBox(height: 30),
-      LayoutBuilder(
-        builder: (context, constraints) {
-          double size = constraints.maxWidth;
-          return ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: SizedBox(
-              width: size,
-              height: size, // Para que sea cuadrada
+                );
+              }),
+            ),
+
+          if (!isHorizontal) const SizedBox(height: 30),
+
+          if (isHorizontal)
+            SizedBox(
+              height: containerHeight,
               child: Stack(
                 children: [
-                  Image.asset(
-                    images[currentIndex],
-                    fit: BoxFit.cover,
-                    width: size,
-                    height: size,
-                  ),
-                  Container(
-                    width: size,
-                    height: size,
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                        colors: [
-                          Colors.black87, // más oscuro
-                          Colors.transparent,
-                        ],
+                  Row(
+                    children: [
+                      // Íconos alineados verticalmente
+                      Padding(
+                        padding: const EdgeInsets.only(right: 20),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(icons.length, (index) {
+                            final isActive = index == currentIndex;
+                            return Column(
+                              children: [
+                                AnimatedScale(
+                                  scale: isActive ? 1.5 : 1.0,
+                                  duration: const Duration(milliseconds: 300),
+                                  child: Icon(
+                                    icons[index],
+                                    size: 30,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                if (index < icons.length - 1) ...[
+                                  const SizedBox(height: 10),
+                                  Container(width: 2, height: 20, color: Colors.black),
+                                  const SizedBox(height: 10),
+                                ],
+                              ],
+                            );
+                          }),
+                        ),
                       ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 16,
-                    left: 16,
-                    right: 16,
-                    child: Text(
-                      texts[currentIndex],
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontFamily: 'Georgia',
-                        fontWeight: FontWeight.w500,
+
+                      // Cuadro negro y imagen
+                      Expanded(
+                        child: Stack(
+                          children: [
+                            Row(
+                              children: [
+                                // Cuadro de texto
+                                Expanded(
+                                  flex: 4,
+                                  child: Container(
+                                    height: containerHeight,
+                                    padding: const EdgeInsets.all(24),
+                                    decoration: const BoxDecoration(
+                                      color: Colors.black,
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(12),
+                                        bottomLeft: Radius.circular(12),
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        texts[currentIndex],
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontFamily: 'Georgia',
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                                // Imagen
+                                Expanded(
+                                  flex: 6,
+                                  child: ClipRRect(
+                                    borderRadius: const BorderRadius.only(
+                                      topRight: Radius.circular(12),
+                                      bottomRight: Radius.circular(12),
+                                    ),
+                                    child: Image.asset(
+                                      images[currentIndex],
+                                      fit: BoxFit.cover,
+                                      height: containerHeight,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            // Degradado entre cuadro negro e imagen
+                            // Degradado entre cuadro negro e imagen
+// Degradado encima de la imagen (borde izquierdo de la imagen)
+Positioned.fill(
+  child: Row(
+    children: [
+      const Expanded(flex: 4, child: SizedBox()), // Cuadro negro
+      Expanded(
+        flex: 6,
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [
+                Colors.black,
+                Colors.transparent,
+              ],
+              stops: [0.0, 0.4], // Puedes ajustar este valor para hacerlo más o menos difuso
+            ),
+          ),
+        ),
+      ),
+    ],
+  ),
+),
+
+                          ],
+                        ),
                       ),
-                      textAlign: TextAlign.center,
-                    ),
+                    ],
                   ),
                 ],
               ),
+            )
+          else
+            // Vista vertical original
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: SizedBox(
+                width: constraints.maxWidth,
+                height: constraints.maxWidth,
+                child: Stack(
+                  children: [
+                    Image.asset(
+                      images[currentIndex],
+                      fit: BoxFit.cover,
+                      width: constraints.maxWidth,
+                      height: constraints.maxWidth,
+                    ),
+                    Container(
+                      width: constraints.maxWidth,
+                      height: constraints.maxWidth,
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [
+                            Colors.black,
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 16,
+                      left: 16,
+                      right: 16,
+                      child: Text(
+                        texts[currentIndex],
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontFamily: 'Georgia',
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          );
-        },
-      ),
-    ],
+        ],
+      );
+    },
   ),
 ),
 

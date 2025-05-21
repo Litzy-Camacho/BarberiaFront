@@ -62,6 +62,8 @@ class _ServicesScreenState extends State<ServicesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    
+
     final filteredServices = servicesJson
         .where((service) => service['categoryId'] == selectedCategory)
         .toList();
@@ -80,18 +82,22 @@ class _ServicesScreenState extends State<ServicesScreen> {
         scrollToTop: () {},
       ),
       body: OrientationBuilder(
+        
         builder: (context, orientation) {
           final isPortrait = orientation == Orientation.portrait;
-          final crossAxisCount = isPortrait ? 2 : 3;
+          final crossAxisCount = isPortrait ? 2 : 2;
+
           final spacing = 12.0;
 
           return LayoutBuilder(
             builder: (context, constraints) {
-              double idealItemWidth =
-                  (constraints.maxWidth - spacing * (crossAxisCount + 1)) /
-                      crossAxisCount;
-              double itemHeight =
-                  isPortrait ? idealItemWidth * 1.2 : idealItemWidth * 0.9;
+             double idealItemWidth = isPortrait
+    ? (constraints.maxWidth - spacing * (crossAxisCount + 1)) / crossAxisCount
+    : constraints.maxWidth / 2;
+
+double itemHeight = isPortrait
+    ? idealItemWidth * 1.2
+    : idealItemWidth * 0.4;
 
               return Column(
                 children: [
