@@ -8,6 +8,8 @@ import '../Administrator/admin_profile.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import '../Components/navbar_home.dart'; // Barra de navegación personalizada
 import 'dart:math';
+import 'dart:async';
+
 
 class HomePage extends StatefulWidget {
   final String? scrollTo;
@@ -23,6 +25,28 @@ class _HomePageState extends State<HomePage> {
   final GlobalKey _nosotrosKey = GlobalKey();
   final GlobalKey _serviciosKey = GlobalKey();
   final GlobalKey _contactoKey = GlobalKey();
+  int currentIndex = 0;
+late Timer _timer;
+  
+  final List<IconData> icons = [
+  Icons.lightbulb_outline,
+  Icons.verified,
+  Icons.spa,
+];
+
+final List<String> images = [
+  'assets/imag/a.jpg',
+  'assets/imag/b.jpg',
+  'assets/imag/c.jpg',
+];
+
+final List<String> texts = [
+  'Atención personalizada en cada visita.',
+  'Comprometidos con la calidad y el profesionalismo.',
+  'Ambiente relajante diseñado para ti.',
+];
+
+
   String currentSection = 'Inicio';
 
   void _scrollTo(GlobalKey key) {
@@ -50,12 +74,18 @@ void initState() {
       _scrollTo(_contactoKey);
     }
   });
+  _timer = Timer.periodic(const Duration(seconds: 4), (timer) {
+    setState(() {
+      currentIndex = (currentIndex + 1) % icons.length;
+    });
+  });
 }
 
 @override
 void dispose() {
   _scrollController.removeListener(_updateCurrentSection);
   _scrollController.dispose();
+  _timer.cancel();
   super.dispose();
 }
 
@@ -112,7 +142,30 @@ void dispose() {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+ 
+final screenSize = MediaQuery.of(context).size;
+final screenWidth = screenSize.width;
+final screenHeight = screenSize.height;
+final orientation = MediaQuery.of(context).orientation;
+
+// Altura dinámica
+final imageHeight = orientation == Orientation.landscape
+    ? screenHeight * 0.8 // 🔽 Disminuye más la altura en horizontal
+    : screenWidth < 600
+        ? screenHeight * 0.5
+        : 600.0;
+
+// Imagen según orientación
+final backgroundImage = orientation == Orientation.landscape
+    ? 'assets/imag/homehorizontal.jpg'
+    : 'assets/imag/homevertical.jpg';
+
+// Tamaño del texto según orientación y ancho
+final textFontSize = orientation == Orientation.landscape
+    ? 20.0
+    : screenWidth < 600
+        ? 24.0
+        : 40.0;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -129,328 +182,229 @@ void dispose() {
               child: Column(
                 children: [
                   // SECCIÓN HOME
-                  Stack(
-  children: [
-    Container(
-      height: 600,
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('assets/imag/home.jpg'),
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        SizedBox(
+                          height: imageHeight,
+                          width: double.infinity,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: AssetImage(backgroundImage),
+                                fit: BoxFit.cover,
+                                alignment: Alignment.center,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          height: imageHeight,
+                          width: double.infinity,
+                          color: Colors.black.withOpacity(0.5),
+                        ),
+                        Container(
+                          height: imageHeight,
+                          width: double.infinity,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 40),
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: DefaultTextStyle(
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: textFontSize,
+                                  height: 1.3,
+                                  fontFamily: 'Georgia',
+                                ),
+                                child: AnimatedTextKit(
+                                  isRepeatingAnimation: false,
+                                  animatedTexts: [
+                                    TypewriterAnimatedText(
+                                      'Ven, siéntete único\ny reserva tu cita\npara vivir una\nexperiencia\nauténtica.',
+                                      speed: const Duration(milliseconds: 80),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+  // SECCIÓN NOSOTROS
+Container(
+  key: _nosotrosKey,
+  color: Colors.white,
+  padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+  child: ClipRRect(
+    borderRadius: BorderRadius.circular(8),
+    child: Stack(
+      children: [
+        // Imagen de fondo
+        Image.asset(
+          'assets/imag/nosotros.jpg',
           fit: BoxFit.cover,
-          alignment: Alignment.center,
+          width: double.infinity,
         ),
-      ),
-    ),
-    Container(
-      height: 600,
-      width: double.infinity,
-      color: Colors.black.withOpacity(0.6), // Opacidad aplicada aquí
-    ),
-    Container(
-      height: 600,
-      width: double.infinity,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 60),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: DefaultTextStyle(
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: screenWidth < 600 ? 24 : 40,
-              height: 1.3,
-              fontFamily: 'Georgia',
+
+        // Degradado más oscuro
+        Positioned.fill(
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black.withOpacity(0.95), // más oscuro
+                  Colors.transparent,
+                ],
+              ),
             ),
-            child: AnimatedTextKit(
-              isRepeatingAnimation: false,
-              animatedTexts: [
-                TypewriterAnimatedText(
-                  'Ven, siéntete único\ny reserva tu cita\npara vivir una\nexperiencia\nauténtica.',
-                  speed: const Duration(milliseconds: 80),
+          ),
+        ),
+
+        // Texto arriba
+        Positioned.fill(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Text(
+                  'Essense',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    fontFamily: 'Georgia',
+                  ),
+                ),
+                SizedBox(height: 12),
+                Text(
+                  
+                  'Entendemos que el hombre actual busca verse bien, '
+                  'sentirse bien y proyectar seguridad en cada aspecto de su vida. ',
+                  
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                    height: 1.6,
+                    fontFamily: 'Georgia',
+                  ),
                 ),
               ],
             ),
           ),
         ),
-      ),
+      ],
     ),
-  ],
+  ),
 ),
-
-
-                  // SECCIÓN NOSOTROS
-                  Container(
-                    key: _nosotrosKey,
-                    color: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-                    child: Column(
-                      children: [
-                        Text(
-                          'En una era donde el bienestar y la autenticidad toman protagonismo, '
-                          'nace Essense, un espacio pensado para quienes buscan reconectar con '
-                          'su esencia a través del cuidado personal. Más que un lugar, Essense es '
-                          'una experiencia diseñada para elevar el ritual del autocuidado masculino.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: screenWidth < 600 ? 16 : 20,
-                            color: Colors.black,
-                            height: 1.5,
-                            fontFamily: 'Georgia',
-                          ),
-                        ),
-                        const SizedBox(height: 40),
-                        LayoutBuilder(
-                          builder: (context, constraints) {
-                            final isMobile = constraints.maxWidth < 900;
-                            if (isMobile) {
-                              return Column(
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: Image.asset(
-                                      'assets/imag/nosotros.jpg',
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 20),
-                                  Container(
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                      color: Colors.black,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    padding: const EdgeInsets.all(20),
-                                    child: const Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Essense',
-                                          style: TextStyle(
-                                            fontSize: 28,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                            fontFamily: 'Georgia',
-                                          ),
-                                        ),
-                                        SizedBox(height: 12),
-                                        Text(
-                                          'El primer centro integral de cuidado masculino en México. '
-                                          'En Essense, entendemos que el hombre actual busca verse bien, '
-                                          'sentirse bien y proyectar seguridad en cada aspecto de su vida. '
-                                          'Ofrecemos una experiencia completa de cuidado personal, '
-                                          'en un espacio cómodo, privado y diseñado especialmente para ti.',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.white,
-                                            height: 1.6,
-                                            fontFamily: 'Georgia',
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              );
-                            } else {
-                              return Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Expanded(
-                                    flex: 1,
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: Image.asset(
-                                        'assets/imag/nosotros.jpg',
-                                        height: 400,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 40),
-                                  Expanded(
-                                    flex: 1,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.black,
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      padding: const EdgeInsets.all(30),
-                                      child: const Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'Essense',
-                                            style: TextStyle(
-                                              fontSize: 36,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                              fontFamily: 'Georgia',
-                                            ),
-                                          ),
-                                          SizedBox(height: 20),
-                                          Text(
-                                            'El primer centro integral de cuidado masculino en México. '
-                                            'En Essense, entendemos que el hombre actual busca verse bien, '
-                                            'sentirse bien y proyectar seguridad en cada aspecto de su vida. '
-                                            'Ofrecemos una experiencia completa de cuidado personal, '
-                                            'en un espacio cómodo, privado y diseñado especialmente para ti.',
-                                            style: TextStyle(
-                                              fontSize: 18,
-                                              color: Colors.white,
-                                              height: 1.6,
-                                              fontFamily: 'Georgia',
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-
                   // SECCIÓN SERVICIOS
                   ServiciosSection(keyServicios: _serviciosKey),
 // SECCIÓN ¿Por qué elegirnos?
                   Container(
-                    color: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
-                    child: Column(
-                      children: [
-                        const Text(
-                          '¿Por qué elegirnos?',
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Georgia',
-                            color: Colors.black,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 40),
-                        LayoutBuilder(
-                          builder: (context, constraints) {
-                            final isMobile = constraints.maxWidth < 800;
-
-                            return isMobile
-                                ? Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      const ContactoItem(
-                                        icon: Icons.lightbulb_outline,
-                                        title: 'Experiencia\nPersonalizada',
-                                      ),
-                                      const SizedBox(height: 20),
-                                      const ContactoItem(
-                                        icon: Icons.verified,
-                                        title: 'Calidad &\nProfesionalismo',
-                                      ),
-                                      const SizedBox(height: 20),
-                                      const ContactoItem(
-                                        icon: Icons.spa,
-                                        title: 'Un Espacio\nCómodo Para Ti',
-                                      ),
-                                      const SizedBox(height: 30),
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(12),
-                                        child: Image.asset(
-                                          'assets/imag/extra.jpg',
-                                          fit: BoxFit.cover,
-                                          width: double.infinity,
-                                          height: 200,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Container(
-                                        padding: const EdgeInsets.all(16),
-                                        decoration: BoxDecoration(
-                                          color: Colors.black,
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                        child: const Text(
-                                          'En Essense, cada cliente recibe atención personalizada en un ambiente privado y cómodo.',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 16,
-                                            fontFamily: 'Georgia',
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                                : Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Expanded(
-                                        flex: 1,
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: const [
-                                            ContactoItem(
-                                              icon: Icons.lightbulb_outline,
-                                              title: 'Experiencia\nPersonalizada',
-                                            ),
-                                            SizedBox(height: 20),
-                                            ContactoItem(
-                                              icon: Icons.verified,
-                                              title: 'Calidad &\nProfesionalismo',
-                                            ),
-                                            SizedBox(height: 20),
-                                            ContactoItem(
-                                              icon: Icons.spa,
-                                              title: 'Un Espacio\nCómodo Para Ti',
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(width: 40),
-                                      Expanded(
-                                        flex: 1,
-                                        child: Column(
-                                          children: [
-                                            ClipRRect(
-                                              borderRadius: BorderRadius.circular(12),
-                                              child: Image.asset(
-                                                'assets/imag/extra.jpg',
-                                                fit: BoxFit.cover,
-                                                height: 280,
-                                                width: double.infinity,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 10),
-                                            Container(
-                                              padding: const EdgeInsets.all(16),
-                                              decoration: BoxDecoration(
-                                                color: Colors.black,
-                                                borderRadius: BorderRadius.circular(8),
-                                              ),
-                                              child: const Text(
-                                                'En Essense, cada cliente recibe atención personalizada en un ambiente privado y cómodo.',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 16,
-                                                  fontFamily: 'Georgia',
-                                                ),
-                                                textAlign: TextAlign.center,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                          },
-                        ),
-                      ],
+  color: Colors.white,
+  padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
+  child: Column(
+    children: [
+      const Text(
+        '¿Por qué elegirnos?',
+        style: TextStyle(
+          fontSize: 24, // Tamaño reducido
+          fontWeight: FontWeight.bold,
+          fontFamily: 'Georgia',
+          color: Colors.black,
+        ),
+        textAlign: TextAlign.center,
+      ),
+      const SizedBox(height: 40),
+      LayoutBuilder(
+        builder: (context, constraints) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(icons.length, (index) {
+              final isActive = index == currentIndex;
+              return Row(
+                children: [
+                  AnimatedScale(
+                    scale: isActive ? 1.5 : 1.0,
+                    duration: const Duration(milliseconds: 300),
+                    child: Icon(
+                      icons[index],
+                      size: 50,
+                      color: Colors.black,
                     ),
                   ),
-                  
+                  if (index < icons.length - 1) ...[
+                    const SizedBox(width: 20),
+                    Container(width: 30, height: 2, color: Colors.black),
+                    const SizedBox(width: 20),
+                  ],
+                ],
+              );
+            }),
+          );
+        },
+      ),
+      const SizedBox(height: 30),
+      LayoutBuilder(
+        builder: (context, constraints) {
+          double size = constraints.maxWidth;
+          return ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: SizedBox(
+              width: size,
+              height: size, // Para que sea cuadrada
+              child: Stack(
+                children: [
+                  Image.asset(
+                    images[currentIndex],
+                    fit: BoxFit.cover,
+                    width: size,
+                    height: size,
+                  ),
+                  Container(
+                    width: size,
+                    height: size,
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                        colors: [
+                          Colors.black87, // más oscuro
+                          Colors.transparent,
+                        ],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 16,
+                    left: 16,
+                    right: 16,
+                    child: Text(
+                      texts[currentIndex],
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontFamily: 'Georgia',
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    ],
+  ),
+),
+
                   // SECCIÓN CONTACTO
                   ContactoSection(keyContacto: _contactoKey),
                 ],
@@ -462,6 +416,20 @@ void dispose() {
     );
   }
 }
+
+class DividerLine extends StatelessWidget {
+  const DividerLine({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 30, // Longitud de la línea
+      height: 2, // Grosor de la línea
+      color: Colors.black,
+    );
+  }
+}
+
 
 class ContactoItem extends StatelessWidget {
   final IconData icon;

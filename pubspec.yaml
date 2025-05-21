@@ -59,8 +59,11 @@ flutter:
   uses-material-design: true
   assets:
      
+     - assets/imag/a.jpg
+     - assets/imag/b.jpg
      - assets/imag/barba.jpg
      - assets/imag/barbaafeitado.jpg
+     - assets/imag/c.jpg
      - assets/imag/corteestilo.jpg
      - assets/imag/estilos.jpg
      - assets/imag/extra.jpg
@@ -68,6 +71,8 @@ flutter:
      - assets/imag/fondovertical.png
      - assets/imag/google.png
      - assets/imag/home.jpg
+     - assets/imag/homehorizontal.jpg
+     - assets/imag/homevertical.jpg
      - assets/imag/login.jpg
      - assets/imag/logo.png
      - assets/imag/nosotros.jpg
