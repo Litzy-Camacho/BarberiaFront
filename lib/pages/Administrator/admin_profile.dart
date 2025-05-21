@@ -56,8 +56,6 @@ List<Map<String, dynamic>> barberosJson = [
   },
 ];
 
-
-
   bool showUsuarios = true;
   bool showBarberos = false;
 
@@ -118,7 +116,6 @@ void _confirmarEliminacion(BuildContext context, {
     },
   );
 }
-
 
 void _mostrarDialogoAnadirUsuario() {
   final nombreController = TextEditingController();
@@ -1120,7 +1117,7 @@ const SizedBox(height: 20),
             DataCell(Row(
               children: [
                 IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.yellow),
+                  icon: const Icon(Icons.edit, color: Colors.blue),
                   onPressed: () {
                     final index = usuariosJson.indexOf(usuario);
                     _mostrarDialogoEditarUsuario(index);
@@ -1139,7 +1136,7 @@ const SizedBox(height: 20),
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Usuario eliminado'),
-                            backgroundColor: Colors.green,
+                            backgroundColor: Colors.red,
                             duration: Duration(seconds: 2),
                           ),
                         );
@@ -1209,7 +1206,7 @@ const SizedBox(height: 20),
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Barbero eliminado'),
-                            backgroundColor: Colors.green,
+                            backgroundColor: Colors.red,
                             duration: Duration(seconds: 2),
                           ),
                         );
@@ -1264,7 +1261,7 @@ const SizedBox(height: 20),
     );
   }
 
-  Widget _buildTabOption(String title, bool isSelected, VoidCallback onTap) {
+ Widget _buildTabOption(String title, bool isSelected, VoidCallback onTap) {
   return GestureDetector(
     onTap: onTap,
     child: Container(

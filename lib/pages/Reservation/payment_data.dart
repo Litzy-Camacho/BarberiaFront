@@ -135,32 +135,23 @@ class _PaymentPageState extends State<PaymentPage> {
   }
 
   @override
-  
-      Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
   return Scaffold(
     backgroundColor: Colors.black,
     body: Stack(
       children: [
-        // Imagen de fondo
         SizedBox.expand(
           child: Image.asset(
-            'assets/imag/fondo.jpg',
+            'assets/imag/fondovertical.png',
             fit: BoxFit.cover,
           ),
         ),
-
-        // Capa de opacidad negra
-        Container(
-          color: Colors.black.withOpacity(0.1),
-        ),
-
-        // Contenido principal
         SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
             child: Form(
               key: _formKey,
-              onChanged: () => setState(() {}),
+              autovalidateMode: AutovalidateMode.disabled,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -185,44 +176,93 @@ class _PaymentPageState extends State<PaymentPage> {
                       ),
                     ],
                   ),
-                  const Text(
-                    'Vista previa del pago',
-                    style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
                   const SizedBox(height: 20),
-
-                  // Tarjeta visual
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.blueAccent,
-                      borderRadius: BorderRadius.circular(16),
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFFE0E0E0),
+                          Color(0xFFBDBDBD),
+                          Color(0xFF9E9E9E),
+                          Color(0xFFFFFFFF),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
                       boxShadow: const [
-                        BoxShadow(color: Colors.black38, blurRadius: 10, spreadRadius: 2)
+                        BoxShadow(
+                          color: Colors.black54,
+                          offset: Offset(0, 6),
+                          blurRadius: 12,
+                          spreadRadius: 1,
+                        ),
                       ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('TARJETA DE CRÉDITO',
-                            style: TextStyle(color: Colors.white, fontSize: 14)),
-                        const SizedBox(height: 10),
+                        Row(
+                          children: const [
+                            Icon(Icons.credit_card, color: Colors.black38, size: 20),
+                            SizedBox(width: 8),
+                            Text(
+                              'TARJETA DE CRÉDITO',
+                              style: TextStyle(
+                                color: Colors.black38,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
                         Text(
                           _formatCardNumber(
-                              _cardNumberCtrl.text.isEmpty ? '**** **** **** ****' : _cardNumberCtrl.text),
-                          style: const TextStyle(color: Colors.white, fontSize: 24, letterSpacing: 2),
+                            _cardNumberCtrl.text.isEmpty
+                                ? '**** **** **** ****'
+                                : _cardNumberCtrl.text,
+                          ),
+                          style: const TextStyle(
+                            color: Colors.black38,
+                            fontSize: 20,
+                            letterSpacing: 3,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 16),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              'Exp: ${_expiryMonthCtrl.text}/${_expiryYearCtrl.text}',
-                              style: const TextStyle(color: Colors.white, fontSize: 16),
+                            Row(
+                              children: [
+                                const Icon(Icons.date_range, color: Colors.black38, size: 18),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Exp: ${_expiryMonthCtrl.text}/${_expiryYearCtrl.text}',
+                                  style: const TextStyle(
+                                    color: Colors.black38,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
                             ),
-                            const Text(
-                              'CVV: ***',
-                              style: TextStyle(color: Colors.white, fontSize: 16),
+                            Row(
+                              children: const [
+                                Icon(Icons.lock_outline, color: Colors.black38, size: 18),
+                                SizedBox(width: 4),
+                                Text(
+                                  'CVV: ***',
+                                  style: TextStyle(
+                                    color: Colors.black38,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -268,73 +308,124 @@ class _PaymentPageState extends State<PaymentPage> {
                   ),
 
                   const SizedBox(height: 16),
-                  const Text('CVV',
-                      style: TextStyle(color: Colors.white, fontSize: 16)),
-                  const SizedBox(height: 6),
-                  TextFormField(
-                    controller: _cvvCtrl,
-                    keyboardType: TextInputType.number,
-                    maxLength: 3,
-                    validator: _cvvValidator,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    style: const TextStyle(color: Colors.black),
-                    decoration: InputDecoration(
-                      hintText: 'CVV',
-                      filled: true,
-                      fillColor: Colors.white,
-                      counterText: '',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
+                  // Etiquetas
 
-                  const SizedBox(height: 20),
-                  const Text('Fecha de expiración',
-                      style: TextStyle(color: Colors.white, fontSize: 16)),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _styledTextField(
-                          controller: _expiryMonthCtrl,
-                          hint: 'MM',
-                          validator: _expiryMonthValidator,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                        ),
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Text('/', style: TextStyle(color: Colors.white, fontSize: 20)),
-                      ),
-                      Expanded(
-                        child: _styledTextField(
-                          controller: _expiryYearCtrl,
-                          hint: 'AA',
-                          validator: _expiryYearValidator,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                        ),
-                      ),
-                    ],
-                  ),
+
+
+const SizedBox(height: 6),
+
+// Campos de entrada
+// Etiquetas
+Row(
+  children: [
+    Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          Text('CVV', style: TextStyle(color: Colors.white, fontSize: 16)),
+          SizedBox(height: 6),
+        ],
+      ),
+    ),
+    Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          Text('Fecha de expiración', style: TextStyle(color: Colors.white, fontSize: 16)),
+          SizedBox(height: 6),
+        ],
+      ),
+    ),
+  ],
+),
+
+const SizedBox(height: 6),
+
+// Campos de entrada
+Row(
+  children: [
+    // Campo CVV (media pantalla)
+    Expanded(
+      child: TextFormField(
+        controller: _cvvCtrl,
+        keyboardType: TextInputType.number,
+        maxLength: 3,
+        validator: _cvvValidator,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        style: const TextStyle(color: Colors.black),
+        decoration: InputDecoration(
+          hintText: 'CVV',
+          filled: true,
+          fillColor: Colors.white,
+          counterText: '',
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+        ),
+      ),
+    ),
+
+    const SizedBox(width: 12),
+
+    // Campo MM/AA (media pantalla)
+    Expanded(
+      child: Row(
+        children: [
+          Expanded(
+            child: _styledTextField(
+              controller: _expiryMonthCtrl,
+              hint: 'MM',
+              validator: _expiryMonthValidator,
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 4.0),
+            child: Text('/', style: TextStyle(color: Colors.white, fontSize: 18)),
+          ),
+          Expanded(
+            child: _styledTextField(
+              controller: _expiryYearCtrl,
+              hint: 'AA',
+              validator: _expiryYearValidator,
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            ),
+          ),
+        ],
+      ),
+    ),
+  ],
+),
+
 
                   const SizedBox(height: 30),
                   Center(
                     child: ElevatedButton(
-                      onPressed: isFormValid ? _submit : null,
+                      onPressed: () {
+                        final isValid = _formKey.currentState?.validate() ?? false;
+                        if (isValid) {
+                          _submit();
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Por favor completa todos los campos correctamente.'),
+                              backgroundColor: Colors.redAccent,
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                        }
+                      },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: isFormValid ? Colors.white : Colors.grey.shade700,
-                        foregroundColor: isFormValid ? Colors.black : Colors.white,
-                        disabledBackgroundColor: Colors.grey.shade700,
-                        disabledForegroundColor: Colors.white,
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
                         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        elevation: isFormValid ? 5 : 0,
+                        elevation: 5,
                       ),
                       child: const Text('Pagar', style: TextStyle(fontSize: 16)),
                     ),

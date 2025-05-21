@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Import necesario para filtrar entrada
-import 'login.dart';  // Asegúrate de importar la página de login
+import 'package:flutter/services.dart';
+import 'login.dart';
+import 'reset_password_code.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -11,19 +12,20 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController(); // Nuevo controlador para teléfono
+  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  bool _showErrors = false;
 
   bool get isNameValid => RegExp(r'^[a-zA-Z\s]+$').hasMatch(_nameController.text);
   bool get isPhoneValid => RegExp(r'^\d{10}$').hasMatch(_phoneController.text);
   bool get isEmailValid => RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(_emailController.text);
+  bool get doPasswordsMatch => _passwordController.text == _confirmPasswordController.text;
   bool get isPasswordValid =>
-      _passwordController.text == _confirmPasswordController.text &&
       _passwordController.text.isNotEmpty &&
       _passwordController.text.length >= 8 &&
       RegExp(r'[A-Z]').hasMatch(_passwordController.text) &&
@@ -33,196 +35,211 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-  return Scaffold(
-    body: Stack(
-      children: [
-        SizedBox.expand(
-          child: Image.asset(
-            'assets/imag/fondovertical.png',
-            fit: BoxFit.cover,
+    return Scaffold(
+      body: Stack(
+        children: [
+          SizedBox.expand(
+            child: Image.asset(
+              'assets/imag/fondovertical.png',
+              fit: BoxFit.cover,
+            ),
           ),
-        ),
-        Container(
-          width: double.infinity,
-          height: MediaQuery.of(context).size.height,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-          child: Center(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Botón de regreso
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back, color: Colors.white),
+          Container(
+            width: double.infinity,
+            height: MediaQuery.of(context).size.height,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+            child: Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Botón de regreso
+                    Row(
+  children: [
+    IconButton(
+      icon: const Icon(Icons.arrow_back, color: Colors.white),
+      onPressed: () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+        );
+      },
+    ),
+    const Text(
+      'Regresar',
+      style: TextStyle(color: Colors.white, fontSize: 16),
+    ),
+  ],
+),
+
+                    const SizedBox(height: 20),
+
+                    _RegisterTextField(
+                      label: 'Nombre',
+                      hintText: 'Ingresa tu nombre completo',
+                      controller: _nameController,
+                      onChanged: (_) => setState(() {}),
+                    ),
+                    if (_showErrors && !isNameValid)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 4),
+                        child: Text(
+                          'El nombre solo debe contener letras.',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+
+                    const SizedBox(height: 20),
+
+                    _RegisterTextField(
+                      label: 'Teléfono',
+                      hintText: 'Ingresa tu número de teléfono',
+                      controller: _phoneController,
+                      onChanged: (_) => setState(() {}),
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(10),
+                      ],
+                    ),
+                    if (_showErrors && !isPhoneValid)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 4),
+                        child: Text(
+                          'El teléfono debe tener 10 dígitos.',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+
+                    const SizedBox(height: 20),
+
+                    _RegisterTextField(
+                      label: 'Correo',
+                      hintText: 'Ingresa un correo',
+                      controller: _emailController,
+                      onChanged: (_) => setState(() {}),
+                    ),
+                    if (_showErrors && !isEmailValid)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 4),
+                        child: Text(
+                          'El correo no es válido.',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+
+                    const SizedBox(height: 20),
+
+                    _RegisterTextField(
+                      label: 'Contraseña',
+                      hintText: 'Ingresa una contraseña',
+                      controller: _passwordController,
+                      obscureText: _obscurePassword,
+                      onChanged: (_) => setState(() {}),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                          color: Colors.grey,
+                        ),
                         onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (context) => const LoginPage()),
-                          );
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
                         },
                       ),
-                      const Text(
-                        'Regresar',
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-
-                  _RegisterTextField(
-                    label: 'Nombre',
-                    hintText: 'Ingresa tu nombre completo',
-                    controller: _nameController,
-                    onChanged: (_) => setState(() {}),
-                  ),
-                  if (!isNameValid && _nameController.text.isNotEmpty)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 4),
-                      child: Text(
-                        'El nombre solo debe contener letras.',
-                        style: TextStyle(color: Colors.red),
-                      ),
-                    ),
-                  const SizedBox(height: 20),
-
-                  // NUEVO CAMPO TELÉFONO
-                  _RegisterTextField(
-                    label: 'Teléfono',
-                    hintText: 'Ingresa tu número de teléfono',
-                    controller: _phoneController,
-                    onChanged: (_) => setState(() {}),
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(10),
-                    ],
-                  ),
-                  if (!isPhoneValid && _phoneController.text.isNotEmpty)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 4),
-                      child: Text(
-                        'El teléfono debe contener exactamente 10 dígitos.',
-                        style: TextStyle(color: Colors.red),
-                      ),
                     ),
 
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 4.0),
+                      child: PasswordCriteriaWidget(password: _passwordController.text),
+                    ),
+                    if (_showErrors && !isPasswordValid)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 4),
+                        child: Text(
+                          'La contraseña no cumple con los requisitos.',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
 
-                  _RegisterTextField(
-                    label: 'Correo',
-                    hintText: 'Ingresa un correo',
-                    controller: _emailController,
-                    onChanged: (_) => setState(() {}),
-                  ),
-                  if (!isEmailValid && _emailController.text.isNotEmpty)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 4),
-                      child: Text(
-                        'Formato de correo inválido.',
-                        style: TextStyle(color: Colors.red),
+                    const SizedBox(height: 20),
+
+                    _RegisterTextField(
+                      label: 'Confirmar Contraseña',
+                      hintText: 'Confirma tu contraseña',
+                      controller: _confirmPasswordController,
+                      obscureText: _obscureConfirmPassword,
+                      onChanged: (_) => setState(() {}),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureConfirmPassword ? Icons.visibility : Icons.visibility_off,
+                          color: Colors.grey,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscureConfirmPassword = !_obscureConfirmPassword;
+                          });
+                        },
                       ),
                     ),
-                  const SizedBox(height: 20),
-
-                  _RegisterTextField(
-                    label: 'Contraseña',
-                    hintText: 'Ingresa una contraseña',
-                    controller: _passwordController,
-                    obscureText: _obscurePassword,
-                    onChanged: (_) => setState(() {}),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword ? Icons.visibility : Icons.visibility_off,
-                        color: Colors.grey,
+                    if (_showErrors && !doPasswordsMatch)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 4),
+                        child: Text(
+                          'Las contraseñas no coinciden.',
+                          style: TextStyle(color: Colors.red),
+                        ),
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
-                    ),
-                  ),
 
-                  const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 4.0),
-                    child: PasswordCriteriaWidget(password: _passwordController.text),
-                  ),
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 30),
 
-                  _RegisterTextField(
-                    label: 'Confirmar Contraseña',
-                    hintText: 'Confirma tu contraseña',
-                    controller: _confirmPasswordController,
-                    obscureText: _obscureConfirmPassword,
-                    onChanged: (_) => setState(() {}),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscureConfirmPassword ? Icons.visibility : Icons.visibility_off,
-                        color: Colors.grey,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _obscureConfirmPassword = !_obscureConfirmPassword;
-                        });
-                      },
-                    ),
-                  ),
-                  if (_passwordController.text != _confirmPasswordController.text &&
-                      _confirmPasswordController.text.isNotEmpty)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 4),
-                      child: Text(
-                        'Las contraseñas no coinciden.',
-                        style: TextStyle(color: Colors.red),
+                    Center(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _showErrors = true;
+                          });
+
+                          if (isNameValid && isPhoneValid && isEmailValid && isPasswordValid && doPasswordsMatch) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('¡Registro exitoso!'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => const LoginPage()),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Por favor corrige los campos marcados.'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        },
+                        child: const Text('Crear Cuenta'),
                       ),
                     ),
-                  const SizedBox(height: 30),
-
-                  Center(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: isNameValid && isEmailValid && isPasswordValid && isPhoneValid
-                            ? Colors.white
-                            : Colors.grey.shade700,
-                        foregroundColor: isNameValid && isEmailValid && isPasswordValid && isPhoneValid
-                            ? Colors.black
-                            : Colors.white,
-                        disabledBackgroundColor: Colors.grey.shade700,
-                        disabledForegroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                      ),
-                      onPressed: isNameValid && isEmailValid && isPasswordValid && isPhoneValid
-                          ? () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('¡Registro exitoso!'),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
-                              // Redirigir a la página de Login
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(builder: (context) => const LoginPage()),
-                              );
-                            }
-                          : null,
-                      child: const Text('Crear Cuenta'),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 }
 
 // Widget campo de texto
@@ -233,8 +250,8 @@ class _RegisterTextField extends StatelessWidget {
   final bool obscureText;
   final ValueChanged<String>? onChanged;
   final Widget? suffixIcon;
-  final TextInputType? keyboardType;  // Agregado para permitir tipos de teclado
-  final List<TextInputFormatter>? inputFormatters; // Para filtrar entrada
+  final TextInputType? keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
 
   const _RegisterTextField({
     required this.label,

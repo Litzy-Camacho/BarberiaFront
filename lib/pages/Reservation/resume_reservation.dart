@@ -50,24 +50,18 @@ class _ResumeReservationPageState extends State<ResumeReservationPage> {
   }
 
   @override
-  @override
 Widget build(BuildContext context) {
   return Scaffold(
     backgroundColor: Colors.black,
     body: SafeArea(
       child: Stack(
         children: [
-          // Fondo con imagen expandida
+          // Fondo
           SizedBox.expand(
             child: Image.asset(
-              'assets/imag/fondo.jpg',
+              'assets/imag/fondovertical.png',
               fit: BoxFit.cover,
             ),
-          ),
-
-          // Capa negra translúcida
-          Container(
-            color: Colors.black.withOpacity(0.1),
           ),
 
           // Confetti
@@ -77,7 +71,39 @@ Widget build(BuildContext context) {
             colors: const [Colors.green, Colors.blue, Colors.red, Colors.yellow],
           ),
 
-          // Contenido principal
+          // Botón de regresar arriba a la izquierda
+          Positioned(
+            top: 10,
+            left: 10,
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PaymentPage(
+                          name: widget.name,
+                          phone: widget.phone,
+                          date: widget.date,
+                          time: widget.time,
+                          barber: widget.barber,
+                          service: widget.service,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                const Text(
+                  'Regresar',
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              ],
+            ),
+          ),
+
+          // Contenido principal centrado
           Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
@@ -85,32 +111,7 @@ Widget build(BuildContext context) {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back, color: Colors.white),
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PaymentPage(
-                                name: widget.name,
-                                phone: widget.phone,
-                                date: widget.date,
-                                time: widget.time,
-                                barber: widget.barber,
-                                service: widget.service,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                      const Text(
-                        'Regresar',
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
-                    ],
-                  ),
+                  const SizedBox(height: 60), // Espacio superior para evitar que se solape con "Regresar"
                   const Text(
                     'Detalles de la reserva',
                     style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),

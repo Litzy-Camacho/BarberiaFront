@@ -25,6 +25,8 @@ class _AppointmentFormPageState extends State<AppointmentFormPage> {
   String? _selectedTime;
   String? _selectedBarber;
   String? _paymentMethod;
+  bool _submitted = false;
+
 
   final List<String> _barbers = ['Ricardo', 'Andrea', 'Litzy'];
   late String _selectedService;
@@ -139,20 +141,12 @@ class _AppointmentFormPageState extends State<AppointmentFormPage> {
     backgroundColor: Colors.black,
     body: Stack(
       children: [
-        // Imagen de fondo
         SizedBox.expand(
           child: Image.asset(
-            'assets/imag/fondo.jpg',
+            'assets/imag/fondovertical.png',
             fit: BoxFit.cover,
           ),
         ),
-
-        // Capa negra translúcida
-        Container(
-          color: Colors.black.withOpacity(0.1),
-        ),
-
-        // Contenido principal
         SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {
@@ -161,7 +155,6 @@ class _AppointmentFormPageState extends State<AppointmentFormPage> {
                 child: Form(
                   key: _formKey,
                   onChanged: () => setState(() {}),
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
                   child: DefaultTextStyle(
                     style: const TextStyle(color: Colors.white, fontSize: 16),
                     child: Column(
@@ -194,6 +187,7 @@ class _AppointmentFormPageState extends State<AppointmentFormPage> {
                           style: const TextStyle(color: Colors.black),
                           decoration: _customInputDecoration('Ingresa tu nombre completo'),
                           validator: (value) {
+                            if (!_submitted) return null;
                             if (value == null || value.isEmpty) {
                               return 'Requerido';
                             } else if (RegExp(r'[0-9]').hasMatch(value)) {
@@ -216,6 +210,7 @@ class _AppointmentFormPageState extends State<AppointmentFormPage> {
                             LengthLimitingTextInputFormatter(10),
                           ],
                           validator: (value) {
+                            if (!_submitted) return null;
                             if (value == null || value.isEmpty) {
                               return 'Requerido';
                             } else if (!RegExp(r'^\d{10}$').hasMatch(value)) {
@@ -229,40 +224,86 @@ class _AppointmentFormPageState extends State<AppointmentFormPage> {
                         const Text('Fecha'),
                         const SizedBox(height: 8),
                         TextFormField(
-                          readOnly: true,
-                          style: const TextStyle(color: Colors.black),
-                          decoration: _customInputDecoration(
-                            _selectedDate == null
-                                ? 'Selecciona fecha'
-                                : DateFormat.yMMMd().format(_selectedDate!),
-                          ),
-                          onTap: () async {
-                            final now = DateTime.now();
-                            final picked = await showDatePicker(
-                              context: context,
-                              initialDate: _selectedDate ?? now,
-                              firstDate: now,
-                              lastDate: now.add(const Duration(days: 60)),
-                            );
-                            if (picked != null) {
-                              setState(() => _selectedDate = picked);
-                            }
-                          },
-                          validator: (_) => _selectedDate == null ? 'Requerido' : null,
-                        ),
+  readOnly: true,
+  style: const TextStyle(color: Colors.black), // Texto en negro cuando hay contenido
+  decoration: InputDecoration(
+    hintText: _selectedDate == null
+        ? 'Selecciona fecha'
+        : DateFormat.yMMMd().format(_selectedDate!),
+    hintStyle: TextStyle(
+      color: _selectedDate == null ? Colors.grey : Colors.black,
+      fontWeight: FontWeight.normal,
+    ),
+    filled: true,
+    fillColor: Colors.white,
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide.none,
+    ),
+    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+  ),
+  onTap: () async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? now,
+      firstDate: now,
+      lastDate: now.add(const Duration(days: 60)),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Colors.black, // Color negro en lugar de morado
+              onPrimary: Colors.white,
+              surface: Colors.white,
+              onSurface: Colors.black,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      setState(() => _selectedDate = picked);
+    }
+  },
+  validator: (_) {
+    if (!_submitted) return null;
+    return _selectedDate == null ? 'Requerido' : null;
+  },
+),
+
                         const SizedBox(height: 20),
 
                         const Text('Hora'),
                         const SizedBox(height: 8),
-                        DropdownButtonFormField<String>(
-                          value: _selectedTime,
-                          hint: const Text('Selecciona hora'),
-                          decoration: _customInputDecoration(''),
-                          items: times.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
-                          onChanged: (v) {
-                            setState(() => _selectedTime = v);
-                          },
-                          validator: (v) => v == null ? 'Requerido' : null,
+                        Theme(
+                          data: Theme.of(context).copyWith(
+                            canvasColor: Colors.white,
+                          ),
+                          child: DropdownButtonFormField<String>(
+                            value: _selectedTime,
+                            hint: const Text(
+    'Selecciona hora',
+    style: TextStyle(
+      color: Colors.grey,
+      fontWeight: FontWeight.normal,
+    ),
+                            ),
+                            decoration: _customInputDecoration(''),
+                            items: times.map((t) => DropdownMenuItem(
+                              value: t,
+                              child: Text(t, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.normal))
+
+                            )).toList(),
+                            onChanged: (v) {
+                              setState(() => _selectedTime = v);
+                            },
+                            validator: (v) {
+                              if (!_submitted) return null;
+                              return v == null ? 'Requerido' : null;
+                            },
+                          ),
                         ),
                         const SizedBox(height: 20),
 
@@ -288,91 +329,127 @@ class _AppointmentFormPageState extends State<AppointmentFormPage> {
 
                         const Text('Barbero'),
                         const SizedBox(height: 8),
-                        DropdownButtonFormField<String>(
-                          value: _selectedBarber,
-                          hint: const Text('Elegir'),
-                          decoration: _customInputDecoration(''),
-                          items: _barbers
-                              .map((b) => DropdownMenuItem(value: b, child: Text(b)))
-                              .toList(),
-                          onChanged: (v) {
-                            setState(() => _selectedBarber = v);
-                          },
-                          validator: (v) => v == null ? 'Requerido' : null,
+                        Theme(
+                          data: Theme.of(context).copyWith(
+                            canvasColor: Colors.white,
+                          ),
+                          child: DropdownButtonFormField<String>(
+                            value: _selectedBarber,
+                            hint: const Text(
+    'Selecciona el barbero',
+    style: TextStyle(
+      color: Colors.grey,
+      fontWeight: FontWeight.normal,
+    ),
+  ),
+
+                            decoration: _customInputDecoration(''),
+                            items: _barbers
+                                .map((b) => DropdownMenuItem(
+                                      value: b,
+                                      child: Text(b, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.normal))
+
+                                    ))
+                                .toList(),
+                            onChanged: (v) {
+                              setState(() => _selectedBarber = v);
+                            },
+                            validator: (v) {
+                              if (!_submitted) return null;
+                              return v == null ? 'Requerido' : null;
+                            },
+                          ),
                         ),
                         const SizedBox(height: 20),
 
                         const Text('Forma de Pago'),
                         const SizedBox(height: 8),
-                        DropdownButtonFormField<String>(
-                          value: _paymentMethod,
-                          hint: const Text('Selecciona una opción'),
-                          decoration: _customInputDecoration(''),
-                          items: const [
-                            DropdownMenuItem(value: 'Efectivo', child: Text('Efectivo')),
-                            DropdownMenuItem(value: 'Tarjeta', child: Text('Tarjeta')),
-                          ],
-                          onChanged: (v) {
-                            setState(() => _paymentMethod = v);
-                          },
-                          validator: (v) => v == null ? 'Requerido' : null,
+                        Theme(
+                          data: Theme.of(context).copyWith(
+                            canvasColor: Colors.white,
+                          ),
+                          child: DropdownButtonFormField<String>(
+                            value: _paymentMethod,
+                            hint: const Text(
+    'Selecciona la forma de pago',
+    style: TextStyle(
+      color: Colors.grey,
+      fontWeight: FontWeight.normal,
+    ),
+  ),
+
+                            decoration: _customInputDecoration(''),
+                            items: const [
+                              DropdownMenuItem(
+                                  value: 'Efectivo',
+                                  child: Text('Efectivo', style: TextStyle(color: Colors.black, fontWeight: FontWeight.normal))),
+                              DropdownMenuItem(
+                                  value: 'Tarjeta',
+                                  child: Text('Tarjeta', style: TextStyle(color: Colors.black, fontWeight: FontWeight.normal))),
+                            ],
+                            onChanged: (v) {
+                              setState(() => _paymentMethod = v);
+                            },
+                            validator: (v) {
+                              if (!_submitted) return null;
+                              return v == null ? 'Requerido' : null;
+                            },
+                          ),
                         ),
                         const SizedBox(height: 40),
 
                         Center(
                           child: ElevatedButton(
-                            onPressed: isFormValid
-                                ? () async {
-                                    _saveAppointment();
+                            onPressed: () async {
+                              setState(() => _submitted = true);
 
-                                    if (_paymentMethod == 'Efectivo') {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                          content: const Text(
-                                            'Reservación hecha con éxito',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(fontWeight: FontWeight.bold),
-                                          ),
-                                          backgroundColor: Colors.green,
-                                          behavior: SnackBarBehavior.fixed,
-                                          duration: const Duration(seconds: 2),
-                                        ),
-                                      );
-                                      await Future.delayed(const Duration(seconds: 2));
-                                      Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => const HomePage()),
-                                        (route) => false,
-                                      );
-                                    } else {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => PaymentPage(
-                                            name: _nameCtrl.text,
-                                            phone: _phoneCtrl.text,
-                                            date: _selectedDate ?? DateTime.now(),
-                                            time: _selectedTime ?? 'Hora no seleccionada',
-                                            barber: _selectedBarber ?? 'Barbero no seleccionado',
-                                            service: _selectedService,
-                                          ),
-                                        ),
-                                      );
-                                    }
-                                  }
-                                : null,
+                              if (_formKey.currentState!.validate()) {
+                                _saveAppointment();
+
+                                if (_paymentMethod == 'Efectivo') {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Reservación hecha con éxito',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(fontWeight: FontWeight.bold),
+                                      ),
+                                      backgroundColor: Colors.green,
+                                      behavior: SnackBarBehavior.fixed,
+                                      duration: Duration(seconds: 2),
+                                    ),
+                                  );
+                                  await Future.delayed(const Duration(seconds: 2));
+                                  Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const HomePage()),
+                                    (route) => false,
+                                  );
+                                } else {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => PaymentPage(
+                                        name: _nameCtrl.text,
+                                        phone: _phoneCtrl.text,
+                                        date: _selectedDate ?? DateTime.now(),
+                                        time: _selectedTime ?? 'Hora no seleccionada',
+                                        barber: _selectedBarber ?? 'Barbero no seleccionado',
+                                        service: _selectedService,
+                                      ),
+                                    ),
+                                  );
+                                }
+                              }
+                            },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  isFormValid ? Colors.white : Colors.grey.shade700,
-                              foregroundColor:
-                                  isFormValid ? Colors.black : Colors.white,
-                              disabledBackgroundColor: Colors.grey.shade700,
-                              disabledForegroundColor: Colors.white,
+                              backgroundColor: Colors.white,
+                              foregroundColor: Colors.black,
                               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              elevation: isFormValid ? 5 : 0,
+                              elevation: 5,
                             ),
                             child: const Text('Siguiente', style: TextStyle(fontSize: 16)),
                           ),
@@ -389,4 +466,6 @@ class _AppointmentFormPageState extends State<AppointmentFormPage> {
     ),
   );
 }
+
+
 }

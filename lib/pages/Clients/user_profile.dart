@@ -14,6 +14,9 @@ class _PantallaUsuarioState extends State<PantallaUsuario> {
   TextEditingController controllerNombre = TextEditingController(text: 'Andrés');
   TextEditingController controllerTelefono = TextEditingController(text: '5551234567');
   TextEditingController controllerCorreo = TextEditingController(text: 'usuario@gmail.com');
+  final ScrollController _scrollController = ScrollController();
+  final List<GlobalKey> _filtroKeys = [];
+
 
   bool nombreValido = true;
 
@@ -67,6 +70,8 @@ class _PantallaUsuarioState extends State<PantallaUsuario> {
     serviciosSolicitados = List<Map<String, String>>.from(datosServiciosJson['serviciosSolicitados']);
     _aplicarFiltro();
     controllerNombre.addListener(_validarNombre);
+    _filtroKeys.addAll(List.generate(opcionesFiltro.length, (_) => GlobalKey()));
+
   }
 
   void _validarNombre() {
@@ -109,35 +114,34 @@ class _PantallaUsuarioState extends State<PantallaUsuario> {
   }
 
   Widget filtroEstilo(String texto, bool seleccionado, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              texto,
-              style: TextStyle(
-                color: seleccionado ? Colors.black : Colors.grey,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Container(
-              height: 3,
-              width: 70,
-              decoration: BoxDecoration(
-                color: seleccionado ? Colors.black : Colors.transparent,
-                borderRadius: BorderRadius.circular(3),
-              ),
-            ),
-          ],
+  return GestureDetector(
+    onTap: onTap,
+    child: Container(
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            color: seleccionado ? Colors.black : Colors.transparent,
+            width: 2,
+          ),
+          bottom: BorderSide(
+            color: seleccionado ? Colors.black : Colors.transparent,
+            width: 2,
+          ),
         ),
       ),
-    );
-  }
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+      child: Text(
+        texto,
+        style: TextStyle(
+          color: seleccionado ? Colors.black : Colors.grey,
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+        ),
+      ),
+    ),
+  );
+}
+
 
   Widget _buildEditableTextField({
   required TextEditingController controller,
@@ -237,7 +241,9 @@ class _PantallaUsuarioState extends State<PantallaUsuario> {
 
 
   @override
+  
   Widget build(BuildContext context) {
+    
     return Scaffold(
       appBar: CustomAppBar(
         onNavigateToSection: (seccion) {
@@ -305,21 +311,51 @@ class _PantallaUsuarioState extends State<PantallaUsuario> {
                   ),
                   const SizedBox(height: 10),
                   Center(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: opcionesFiltro.map((opcion) {
-                          return filtroEstilo(opcion, filtroSeleccionado == opcion, () {
-                            setState(() {
-                              filtroSeleccionado = opcion;
-                              _aplicarFiltro();
-                            });
-                          });
-                        }).toList(),
-                      ),
-                    ),
+  child: SingleChildScrollView(
+    scrollDirection: Axis.horizontal,
+    controller: _scrollController,
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: opcionesFiltro.map((opcion) {
+        final index = opcionesFiltro.indexOf(opcion);
+        final key = _filtroKeys[index];
+
+        return Container(
+          key: key,
+          child: filtroEstilo(opcion, filtroSeleccionado == opcion, () {
+            setState(() {
+              filtroSeleccionado = opcion;
+              _aplicarFiltro();
+            });
+
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              final RenderBox? box = key.currentContext?.findRenderObject() as RenderBox?;
+              if (box != null) {
+                final position = box.localToGlobal(Offset.zero, ancestor: context.findRenderObject());
+                final size = box.size;
+                final screenWidth = MediaQuery.of(context).size.width;
+                final offset = _scrollController.offset +
+                    position.dx +
+                    size.width / 2 -
+                    screenWidth / 2;
+
+                _scrollController.animateTo(
+                  offset.clamp(
+                    _scrollController.position.minScrollExtent,
+                    _scrollController.position.maxScrollExtent,
                   ),
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
+              }
+            });
+          }),
+        );
+      }).toList(),
+    ),
+  ),
+),
+
                   const SizedBox(height: 20),
                   _buildTablaServicios(serviciosFiltrados),
                 ],

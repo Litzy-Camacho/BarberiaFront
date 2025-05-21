@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'reset_password_data.dart';
-import 'reset_password_email.dart'; // ResetPasswordPage
- // Asegúrate de tener esta importación
+import 'reset_password_email.dart'; // Asegúrate de tener esta importación
 
 class ResetPasswordPage2 extends StatefulWidget {
   const ResetPasswordPage2({super.key});
@@ -60,11 +59,11 @@ class _ResetPasswordPage2State extends State<ResetPasswordPage2> {
       body: Stack(
         children: [
           SizedBox.expand(
-          child: Image.asset(
-            'assets/imag/fondovertical.png',
-            fit: BoxFit.cover,
+            child: Image.asset(
+              'assets/imag/fondovertical.png',
+              fit: BoxFit.cover,
+            ),
           ),
-        ),
           LayoutBuilder(
             builder: (context, constraints) {
               if (constraints.maxWidth > 600) {
@@ -80,8 +79,6 @@ class _ResetPasswordPage2State extends State<ResetPasswordPage2> {
               }
             },
           ),
-
-          // Botón de regreso con texto
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.only(left: 8.0, top: 16.0),
@@ -89,7 +86,8 @@ class _ResetPasswordPage2State extends State<ResetPasswordPage2> {
                 onTap: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const ResetPasswordPage()),
+                    MaterialPageRoute(
+                        builder: (context) => const ResetPasswordPage()),
                   );
                 },
                 child: Row(
@@ -123,18 +121,18 @@ class _ResetPasswordPage2State extends State<ResetPasswordPage2> {
                 style: TextStyle(color: Colors.white, fontSize: 16),
               ),
               const SizedBox(height: 10),
-
               _SecurityCodeInput(
                 controllers: _controllers,
                 focusNodes: _focusNodes,
               ),
-
               const SizedBox(height: 40),
-
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
+                  backgroundColor: _isCodeComplete
+                      ? Colors.white
+                      : Colors.grey.shade700,
+                  foregroundColor:
+                      _isCodeComplete ? Colors.black : Colors.white,
                   disabledBackgroundColor: Colors.grey.shade700,
                   disabledForegroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(
@@ -147,12 +145,13 @@ class _ResetPasswordPage2State extends State<ResetPasswordPage2> {
                 ),
                 onPressed: _isCodeComplete
                     ? () {
-                        _showSuccessSnackbar(); // Mostrar SnackBar
+                        _showSuccessSnackbar();
                         Future.delayed(const Duration(seconds: 2), () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const ResetPasswordPage3(),
+                              builder: (context) =>
+                                  const ResetPasswordPage3(),
                             ),
                           );
                         });

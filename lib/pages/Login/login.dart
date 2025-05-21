@@ -18,6 +18,9 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController passwordController = TextEditingController();
   String emailError = '';
   bool isButtonEnabled = false;
+  bool _emailTouched = false;
+bool _passwordTouched = false;
+
 
   @override
   void initState() {
@@ -27,14 +30,16 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _validateInputs() {
-    final email = emailController.text.trim();
-    final password = passwordController.text;
+  final email = emailController.text.trim();
+  final password = passwordController.text;
 
-    setState(() {
-      isButtonEnabled = isValidEmail(email) && password.isNotEmpty;
-      emailError = email.isEmpty || isValidEmail(email) ? '' : 'Correo inválido';
-    });
-  }
+  setState(() {
+    emailError = (!_emailTouched || email.isEmpty || isValidEmail(email))
+        ? ''
+        : 'Correo inválido';
+  });
+}
+
 
   bool isValidEmail(String email) {
     final regex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$');
@@ -69,18 +74,34 @@ Widget build(BuildContext context) {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   _LoginTextField(
-                    controller: emailController,
-                    label: 'Correo',
-                    hintText: 'Ingresa tu correo',
-                    errorText: emailError.isEmpty ? null : emailError,
-                  ),
+  controller: emailController,
+  label: 'Correo',
+  hintText: 'Ingresa tu correo',
+  errorText: emailError.isEmpty ? null : emailError,
+  onTap: () {
+    if (!_emailTouched) {
+      setState(() {
+        _emailTouched = true;
+      });
+    }
+  },
+),
+
                   const SizedBox(height: 20),
                   _LoginTextField(
-                    controller: passwordController,
-                    label: 'Contraseña',
-                    hintText: 'Ingresa tu contraseña',
-                    obscureText: true,
-                  ),
+  controller: passwordController,
+  label: 'Contraseña',
+  hintText: 'Ingresa tu contraseña',
+  obscureText: true,
+  onTap: () {
+    if (!_passwordTouched) {
+      setState(() {
+        _passwordTouched = true;
+      });
+    }
+  },
+),
+
                   const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -131,55 +152,54 @@ Widget build(BuildContext context) {
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isButtonEnabled ? Colors.white : Colors.grey.shade700,
-                      foregroundColor: isButtonEnabled ? Colors.black : Colors.white,
-                      disabledBackgroundColor: Colors.grey.shade700,
-                      disabledForegroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    ),
-                    onPressed: isButtonEnabled
-                        ? () {
-                            String email = emailController.text.trim().toLowerCase();
+  style: ElevatedButton.styleFrom(
+    backgroundColor: Colors.white,
+    foregroundColor: Colors.black,
+    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+  ),
+  onPressed: () {
+    setState(() {
+      _emailTouched = true;
+      _passwordTouched = true;
+      _validateInputs(); // Para mostrar errores si los hay
+    });
 
-                            if (!isValidEmail(email)) {
-                              setState(() {
-                                emailError = 'Correo inválido';
-                              });
-                              return;
-                            }
+    String email = emailController.text.trim().toLowerCase();
+    String password = passwordController.text;
 
-                            Widget destination;
-                            String userRole;
+    if (!isValidEmail(email) || password.isEmpty) return;
 
-                            if (email == 'admin@gmail.com') {
-                              destination = const HomePage();
-                              userRole = 'admin';
-                            } else if (email == 'barber@gmail.com') {
-                              destination = const HomePage();
-                              userRole = 'barber';
-                            } else if (email == 'user@gmail.com') {
-                              destination = const HomePage();
-                              userRole = 'user';
-                            } else {
-                              setState(() {
-                                emailError = 'Correo no reconocido';
-                              });
-                              return;
-                            }
+    Widget destination;
+    String userRole;
 
-                            Session.email.value = email;
-                            Session.role.value = userRole;
+    if (email == 'admin@gmail.com') {
+      destination = const HomePage();
+      userRole = 'admin';
+    } else if (email == 'barber@gmail.com') {
+      destination = const HomePage();
+      userRole = 'barber';
+    } else if (email == 'user@gmail.com') {
+      destination = const HomePage();
+      userRole = 'user';
+    } else {
+      setState(() {
+        emailError = 'Correo no reconocido';
+      });
+      return;
+    }
 
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(builder: (context) => destination),
-                            );
-                          }
-                        : null,
-                    child: const Text('Confirmar'),
-                  ),
+    Session.email.value = email;
+    Session.role.value = userRole;
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => destination),
+    );
+  },
+  child: const Text('Confirmar'),
+),
+
                   const SizedBox(height: 20),
                   Row(
                     children: const [
@@ -220,6 +240,7 @@ class _LoginTextField extends StatefulWidget {
   final bool obscureText;
   final TextEditingController controller;
   final String? errorText;
+  final VoidCallback? onTap;
 
   const _LoginTextField({
     required this.label,
@@ -227,6 +248,8 @@ class _LoginTextField extends StatefulWidget {
     this.obscureText = false,
     required this.controller,
     this.errorText,
+    this.onTap, 
+
   });
 
   @override

@@ -12,22 +12,7 @@ class ResetPasswordPage extends StatefulWidget {
 class _ResetPasswordPageState extends State<ResetPasswordPage> {
   final TextEditingController emailController = TextEditingController();
   String emailError = '';
-  bool isButtonEnabled = false;
-
-  @override
-  void initState() {
-    super.initState();
-    emailController.addListener(_validateInputs);
-  }
-
-  void _validateInputs() {
-    final email = emailController.text.trim();
-
-    setState(() {
-      isButtonEnabled = isValidEmail(email);
-      emailError = email.isEmpty || isValidEmail(email) ? '' : 'Correo inválido';
-    });
-  }
+  bool _showError = false;
 
   bool isValidEmail(String email) {
     final regex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$');
@@ -48,11 +33,11 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         child: Stack(
           children: [
             SizedBox.expand(
-          child: Image.asset(
-            'assets/imag/fondovertical.png',
-            fit: BoxFit.cover,
-          ),
-        ),
+              child: Image.asset(
+                'assets/imag/fondovertical.png',
+                fit: BoxFit.cover,
+              ),
+            ),
             Positioned(
               top: 0,
               left: 0,
@@ -89,44 +74,45 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                       controller: emailController,
                       label: 'Te Enviaremos un Código a tu Correo',
                       hintText: 'Ingresa tu correo',
-                      errorText: emailError.isEmpty ? null : emailError,
+                      errorText: _showError && emailError.isNotEmpty ? emailError : null,
                     ),
                     const SizedBox(height: 20),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: isButtonEnabled ? Colors.white : Colors.grey.shade700,
-                        foregroundColor: isButtonEnabled ? Colors.black : Colors.white,
-                        disabledBackgroundColor: Colors.grey.shade700,
-                        disabledForegroundColor: Colors.white,
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
                         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                       ),
-                      onPressed: isButtonEnabled
-                          ? () {
-                              String email = emailController.text.trim().toLowerCase();
-                              if (!isValidEmail(email)) {
-                                setState(() {
-                                  emailError = 'Correo inválido';
-                                });
-                                return;
-                              }
+                      onPressed: () {
+                        setState(() {
+                          _showError = true;
+                          String email = emailController.text.trim().toLowerCase();
 
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Correo enviado a: $email'),
-                                  backgroundColor: Colors.green,
-                                  duration: const Duration(seconds: 2),
-                                ),
+                          if (!isValidEmail(email)) {
+                            emailError = 'Correo inválido';
+                          } else {
+                            emailError = '';
+                          }
+
+                          if (emailError.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Correo enviado a: $email'),
+                                backgroundColor: Colors.green,
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+
+                            Future.delayed(const Duration(milliseconds: 300), () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const ResetPasswordPage2()),
                               );
-
-                              Future.delayed(const Duration(milliseconds: 300), () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const ResetPasswordPage2()),
-                                );
-                              });
-                            }
-                          : null,
+                            });
+                          }
+                        });
+                      },
                       child: const Text('Enviar'),
                     ),
                   ],
